@@ -1,0 +1,5 @@
+.ssh/id_*
+.ssh/known_hosts
+**/*secret*
+**/*.local
+**/local.***/*token*
