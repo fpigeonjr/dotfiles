@@ -3,3 +3,4 @@
 **/*secret*
 **/*.local
 **/local.***/*token*
+shell/.profile
