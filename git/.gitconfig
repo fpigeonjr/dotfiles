@@ -4,8 +4,8 @@
 	process = git-lfs filter-process
 	required = true
 [user]
-	name = $GIT_USER_NAME
-	email = $GIT_USER_EMAIL
+	name = Frank Pigeon Jr.
+	email = fpigeon@flexion.us
 	signingkey = ~/.ssh/id_ed25519.pub
 	username = fpigeonjr
 [init]
