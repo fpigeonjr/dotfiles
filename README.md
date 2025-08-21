@@ -31,6 +31,8 @@ dotfiles/
 ├── config/          # Modern config files (~/.config/)
 │   └── .config/
 │       └── nvim/    # Neovim configuration (LazyVim)
+├── ghostty/         # Ghostty terminal configuration
+│   └── config       # Terminal settings, colors, fonts
 ├── git/             # Git configuration
 │   ├── .gitconfig
 │   └── .gitignore_global
@@ -78,6 +80,7 @@ sudo pacman -S stow
    stow shell      # Zsh, profile, functions
    stow vim        # Vim configuration
    stow config     # Neovim configuration
+   stow ghostty    # Ghostty terminal configuration
    stow ssh        # SSH client config
    ```
 
@@ -182,6 +185,7 @@ ls -la ~ | grep dotfiles
 | `shell` | .zshrc, .env.local, functions | Shell configuration |
 | `vim` | .vimrc | Traditional Vim settings |
 | `config` | .config/nvim/ | Modern Neovim configuration |
+| `ghostty` | config | Terminal emulator settings and themes |
 | `ssh` | .ssh/config | SSH client settings (no keys) |
 
 ## Dependencies
