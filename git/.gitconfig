@@ -3,17 +3,31 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+
 [user]
 	name = Frank Pigeon Jr.
-	email = fpigeon@flexion.us
+	email = frank.pigeonjr@gmail.com
 	signingkey = ~/.ssh/id_ed25519.pub
 	username = fpigeonjr
+
 [init]
 	defaultBranch = main
+
 [core]
 	editor = nvim
 	excludesfile = ~/.gitignore_global
+
 [gpg]
 	format = ssh
+
 [commit]
 	gpgsign = true
+
+[pull]
+	rebase = true
+
+[alias]
+	co = checkout
+	br = branch
+	ci = commit
+	st = status

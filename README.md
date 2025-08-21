@@ -2,6 +2,28 @@
 
 Personal configuration files managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
+## ⚠️ Important Notes
+
+### Git Configuration
+- **Default email**: Set to personal email 
+- **Work projects**: Manually configure work email per repository:
+  ```bash
+  cd ~/Code/work-project
+  git config user.email "work@example.com"
+  ```
+
+### Breaking Changes from Previous Configs
+- **Default branch**: Uses `main` (not `master`)
+- **Pull strategy**: Uses `rebase` by default for cleaner history
+- **Email**: Defaults to personal email (override per project as needed)
+- **New aliases**: Added `co`, `br`, `ci`, `st` for common git commands
+
+### Cross-Platform Compatibility
+When using on Linux systems that have existing git configs:
+1. **Backup existing config**: `cp ~/.gitconfig ~/.gitconfig.backup`
+2. **Check for conflicts**: Compare settings before stowing
+3. **Merge manually if needed**: Combine useful settings from both configs
+
 ## Structure
 
 ```
@@ -16,7 +38,6 @@ dotfiles/
 │   ├── .zsh_functions/
 │   │   └── image-tools.zsh
 │   ├── .env.local
-│   ├── .profile
 │   └── .zshrc
 ├── ssh/             # SSH client configuration
 │   └── .ssh/
@@ -38,9 +59,9 @@ dotfiles/
 brew install stow
 ```
 
-**Ubuntu/Debian:**
+**Arch Linux:**
 ```bash
-sudo apt install stow
+sudo pacman -S stow
 ```
 
 ## Installation
@@ -158,7 +179,7 @@ ls -la ~ | grep dotfiles
 | Package | Contains | Purpose |
 |---------|----------|---------|
 | `git` | .gitconfig, .gitignore_global | Git settings and global ignores |
-| `shell` | .zshrc, .profile, .env.local, functions | Shell configuration |
+| `shell` | .zshrc, .env.local, functions | Shell configuration |
 | `vim` | .vimrc | Traditional Vim settings |
 | `config` | .config/nvim/ | Modern Neovim configuration |
 | `ssh` | .ssh/config | SSH client settings (no keys) |

@@ -109,12 +109,6 @@ export VISUAL="$EDITOR"
 alias zshell="code ~/.zshrc"
 alias ohmyzsh="code ~/.oh-my-zsh"
 alias new="source ~/.zshrc"
-# Git
-alias gs="git status"
-alias gb="git branch"
-alias gco="git checkout"
-alias gcm="git commit"
-alias ga="git add"
 # SSH
 alias pi="ssh pi@192.168.1.100"
 alias pi-up="pihole -up"
@@ -136,7 +130,6 @@ alias graph="cd ~/Library/Mobile\ Documents/iCloud~com~logseq~logseq/Documents/G
 alias journal='graph'
 alias matrix='cmatrix'
 # Source environment variables
-[ -f ~/.profile ] && source ~/.profile
 [ -f ~/.env.local ] && source ~/.env.local
 # Created by `pipx` on 2025-05-29 21:25:12
 export PATH="$PATH:/Users/fpigeon/.local/bin"
