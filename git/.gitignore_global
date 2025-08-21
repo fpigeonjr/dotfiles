@@ -23,7 +23,6 @@
 
 # Makepkg build directories
 pkg/
-src/
 
 # AUR build artifacts
 *.log
