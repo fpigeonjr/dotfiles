@@ -172,7 +172,7 @@ ls -la ~ | grep dotfiles
 
 - SSH keys and sensitive data are excluded via `.gitignore`
 - Only configuration files are tracked, not secrets
-- Review `.env.local` and `.profile` for sensitive environment variables
+- Review `.env.local` for sensitive environment variables
 
 ## Package Overview
 
