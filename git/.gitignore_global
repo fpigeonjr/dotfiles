@@ -1,5 +1,32 @@
-# Created by https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode
-# Edit at https://www.toptal.com/developers/gitignore?templates=macos,visualstudiocode
+# Created by https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode,linux
+# Edit at https://www.toptal.com/developers/gitignore?templates=macos,visualstudiocode,linux
+
+### Linux ###
+*~
+
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
+
+# KDE directory preferences
+.directory
+
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
+
+# .nfs files are created when an open file is removed but is still being accessed
+.nfs*
+
+### Arch Linux ###
+# Pacman package files
+*.pkg.tar.xz
+*.pkg.tar.zst
+
+# Makepkg build directories
+pkg/
+src/
+
+# AUR build artifacts
+*.log
 
 ### macOS ###
 # General
@@ -52,4 +79,4 @@ Temporary Items
 .history
 .ionide
 
-# End of https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode
+# End of https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode,linux
