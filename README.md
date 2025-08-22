@@ -82,13 +82,29 @@ sudo pacman -S stow
 
 ## Installation
 
-1. **Clone the repository:**
+### Fresh Machine Setup
+
+1. **Install prerequisites:**
+   ```bash
+   # Install Homebrew (if not already installed)
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   
+   # Install Stow
+   brew install stow
+   ```
+
+2. **Clone the repository:**
    ```bash
    git clone <your-repo-url> ~/dotfiles
    cd ~/dotfiles
    ```
 
-2. **Stow packages individually:**
+3. **Install packages from Brewfile:**
+   ```bash
+   brew bundle install --file=homebrew/Brewfile
+   ```
+
+4. **Stow packages individually:**
    ```bash
    stow git        # Git configuration
    stow shell      # Zsh, profile, functions
@@ -102,9 +118,26 @@ sudo pacman -S stow
    stow homebrew   # Homebrew Brewfile
    ```
 
-3. **Or stow all packages at once:**
+5. **Or stow all packages at once:**
    ```bash
    stow */
+   ```
+
+### Existing Machine (Update)
+
+If you already have some configs and want to adopt them:
+
+1. **Pull latest changes:**
+   ```bash
+   cd ~/dotfiles
+   git pull
+   ```
+
+2. **Stow with adopt flag to take over existing files:**
+   ```bash
+   stow --adopt packagename  # For specific package
+   # or
+   stow --adopt */           # For all packages
    ```
 
 ## Usage
@@ -168,26 +201,127 @@ stow -R */  # Restow all packages
 
 ## Troubleshooting
 
-### Stow Conflicts
-If stow reports conflicts:
+### Before First-Time Setup: Backup Existing Configs
+
+**Always backup existing configurations before stowing for the first time:**
 ```bash
-# Remove conflicting files manually
+# Create backup directory
+mkdir -p ~/config-backup/$(date +%Y%m%d)
+
+# Backup common config files
+cp ~/.gitconfig ~/config-backup/$(date +%Y%m%d)/ 2>/dev/null || true
+cp ~/.zshrc ~/config-backup/$(date +%Y%m%d)/ 2>/dev/null || true
+cp ~/.vimrc ~/config-backup/$(date +%Y%m%d)/ 2>/dev/null || true
+cp -r ~/.config/nvim ~/config-backup/$(date +%Y%m%d)/ 2>/dev/null || true
+cp -r ~/.config/zed ~/config-backup/$(date +%Y%m%d)/ 2>/dev/null || true
+cp ~/Library/Application\ Support/Code/User/settings.json ~/config-backup/$(date +%Y%m%d)/vscode-settings.json 2>/dev/null || true
+cp ~/Library/Application\ Support/Code/User/keybindings.json ~/config-backup/$(date +%Y%m%d)/vscode-keybindings.json 2>/dev/null || true
+
+echo "Backup created in ~/config-backup/$(date +%Y%m%d)/"
+```
+
+### Stow Conflicts
+
+When stow reports "cannot stow over existing target", you have three options:
+
+**Method 1: Manual backup and removal (Recommended - Safest)**
+```bash
+# Backup the conflicting file first
+cp ~/.conflicting-file ~/.conflicting-file.backup
+
+# Remove the conflicting file
 rm ~/.conflicting-file
 
-# Then stow again
+# Then stow normally
 stow packagename
+
+# If issues occur, restore from backup:
+# cp ~/.conflicting-file.backup ~/.conflicting-file
 ```
 
-### Broken Symlinks
-Check for broken symlinks:
+**Method 2: Using -R flag (Only for already-stowed packages)**
 ```bash
-find ~ -maxdepth 1 -type l ! -exec test -e {} \; -print
+# This only works if the package was previously stowed successfully
+# -R (restow) removes existing symlinks, then recreates them
+stow -R packagename
+
+# Note: -R will FAIL if there are actual file conflicts
+# It only removes symlinks it previously created
 ```
 
-### Verify Stow Status
+**Method 3: Using --adopt flag (Advanced - Modifies your dotfiles repo)**
+```bash
+# CAUTION: This modifies your dotfiles repo!
+stow --adopt packagename
+```
+
+⚠️ **Critical Notes about `--adopt`:**
+- Takes existing files from your system and **overwrites** files in your dotfiles repo
+- Your carefully crafted configurations will be replaced with current system files
+- Always run `git diff` after using `--adopt` to see what changed
+- Only commit if you actually want to keep the system versions over your dotfiles versions
+- This is useful when setting up dotfiles on a machine with existing configs you prefer
+
+**Safe workflow with --adopt:**
+```bash
+# 1. Create a backup branch first
+git checkout -b backup-before-adopt-$(date +%Y%m%d)
+git checkout main
+
+# 2. Try adopt
+stow --adopt packagename
+
+# 3. MANDATORY: Review what changed
+git diff
+
+# 4. Decision point:
+# Keep adopted changes: git add . && git commit -m "Adopt system configs"
+# Revert adopted changes: git checkout -- .
+```
+
+### Restoring from Backup
+
+If something goes wrong after stowing:
+```bash
+# Unstow the problematic package
+stow -D packagename
+
+# Restore from backup
+cp ~/config-backup/YYYYMMDD/.configfile ~/.configfile
+
+# Fix issues, then try stowing again
+```
+
+### Other Common Issues
+
+**Broken Symlinks:**
+```bash
+# Find broken symlinks
+find ~ -maxdepth 1 -type l ! -exec test -e {} \; -print
+
+# Remove broken symlinks
+find ~ -maxdepth 1 -type l ! -exec test -e {} \; -delete
+```
+
+**Verify Stow Status:**
 ```bash
 # Check what's currently stowed
 ls -la ~ | grep dotfiles
+
+# Check specific config directories
+ls -la ~/.config/ | grep dotfiles
+```
+
+**Complete Reset (Nuclear option):**
+```bash
+# Unstow everything
+cd ~/dotfiles
+stow -D */
+
+# Restore all from backup
+cp -r ~/config-backup/YYYYMMDD/* ~/
+
+# Start fresh with stowing
 ```
 
 ## Security Notes
