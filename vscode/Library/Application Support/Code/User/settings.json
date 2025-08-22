@@ -1,0 +1,79 @@
+{
+  "breadcrumbs.enabled": true,
+  "editor.fontFamily": "'jetbrains mono', 'rec mono casual', hasklig, 'Fira Code'",
+  // "editor.fontLigatures": "'ss01', 'ss02', 'ss03', 'ss06', 'zero',",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 12.5,
+  "editor.fontWeight": "500",
+  "editor.tabSize": 2,
+  "editor.wordWrap": "on",
+  "editor.formatOnSave": true,
+  "editor.minimap.enabled": false,
+  "editor.tabCompletion": "on",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.linkedEditing": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "editor.inlineSuggest.enabled": true,
+  "explorer.confirmDelete": false,
+  "extensions.ignoreRecommendations": true,
+  "extensions.autoUpdate": "onlyEnabledExtensions",
+  "files.autoSave": "onFocusChange",
+  "files.associations": {
+    ".prettierrc": "yaml"
+  },
+  "terminal.integrated.cursorBlinking": true,
+  "terminal.integrated.cursorStyle": "line",
+  "workbench.editor.showTabs": "single",
+  "workbench.editor.splitInGroupLayout": "vertical",
+  "workbench.editor.enablePreview": false,
+  "workbench.iconTheme": "catppuccin-mocha",
+  "workbench.preferredLightColorTheme": "Catppuccin Frappé",
+  "workbench.preferredDarkColorTheme": "Catppuccin Mocha",
+  "window.autoDetectColorScheme": true,
+  "git.enableSmartCommit": true,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "eslint.validate": ["javascript", "javascriptreact", "vue"],
+  "prettier.requireConfig": true,
+  "prettier.documentSelectors": ["**/*.astro"],
+  "[astro]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "emmet.includeLanguages": {
+    "vue-html": "html",
+    "javascript": "javascriptreact",
+    "razor": "html",
+    "markdown": "html"
+  },
+  "svelte.enable-ts-plugin": true,
+  "[svelte]": {
+    "editor.defaultFormatter": "svelte.svelte-vscode"
+  },
+
+  "tailwindCSS.emmetCompletions": true,
+  // Volar
+  "volar.autoCompleteRefs": false,
+  "volar.codeLens.pugTools": false,
+  "volar.completion.preferredTagNameCase": "pascal",
+  "volar.takeOverMode.enabled": "auto",
+  "volar.codeLens.references": false,
+  "githubPullRequests.pullBranch": "never",
+  "workbench.statusBar.visible": false,
+  "editor.accessibilitySupport": "off",
+  "editor.copyWithSyntaxHighlighting": false,
+  "workbench.colorTheme": "Catppuccin Frappé",
+  "CodeGPT.model": "gpt-4",
+  "totalTypeScript.hideAllTips": false,
+  "totalTypeScript.hideBasicTips": false,
+  "totalTypeScript.hiddenTips": [
+    "typing-function-parameters",
+    "union-type",
+    "null-keyword",
+    "literal-type",
+    "type-alias-declaration",
+    "basic-types",
+    "function-return-type",
+    "ts-object-type"
+  ]
+}

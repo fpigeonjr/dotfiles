@@ -1,0 +1,61 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.detectIndentation": true,
+  "editor.fontFamily": "MonoLisa",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 11,
+  "editor.formatOnSave": true,
+  // When lineHeight is set to zero, VS Code will figure out the
+  // the height automatically based on the font
+  "editor.lineHeight": 0,
+  "editor.minimap.enabled": false,
+  "editor.tabCompletion": "on",
+  "editor.tabSize": 3,
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": "comment",
+        "settings": {
+          "fontStyle": "italic"
+        }
+      }
+    ]
+  },
+  "editor.wordWrap": "on",
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact",
+    "razor": "html",
+    "vue-html": "html"
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "vue"
+  ],
+  "explorer.confirmDelete": false,
+  "files.autoSave": "afterDelay",
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "prettier.requireConfig": true,
+  "workbench.colorCustomizations": {},
+  "workbench.editor.enablePreview": false,
+  "workbench.editor.showTabs": "single",
+  "workbench.preferredDarkColorTheme": "Catppuccin Mocha",
+  "workbench.preferredLightColorTheme": "Catppuccin Frappé",
+  "workbench.sideBar.location": "right",
+  "workbench.statusBar.visible": false,
+  "window.nativeTabs": true,
+  "update.mode": "manual",
+  "editor.cursorStyle": "block",
+  "github.copilot.enable": {
+    "inlineSuggests": false,
+    "suggestions": false,
+    "*": false
+  },
+  "security.promptForLocalFileProtocolHandling": false,
+  "window.systemColorTheme": "dark",
+  "editor.linkedEditing": true,
+  "window.zoomLevel": -0.5,
+  "workbench.colorTheme": "Pines"
+}

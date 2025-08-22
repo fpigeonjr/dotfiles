@@ -1,0 +1,21 @@
+[
+  {
+    "context": "Editor",
+    "bindings": {
+      "cmd-shift-l": "assistant::InlineAssist",
+      "cmd-l": "assistant::ToggleFocus"
+    }
+  },
+  {
+    "context": "AssistantPanel",
+    "bindings": {
+      "cmd-l": "workspace::ToggleRightDock"
+    }
+  },
+  {
+    "context": "Terminal",
+    "bindings": {
+      "cmd-l": "assistant::ToggleFocus"
+    }
+  }
+]

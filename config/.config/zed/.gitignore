@@ -1,0 +1,3 @@
+# Exclude AI conversations and backups
+conversations/
+settings_backup.json

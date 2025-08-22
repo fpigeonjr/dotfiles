@@ -30,12 +30,18 @@ When using on Linux systems that have existing git configs:
 dotfiles/
 ├── config/          # Modern config files (~/.config/)
 │   └── .config/
-│       └── nvim/    # Neovim configuration (LazyVim)
+│       ├── nvim/    # Neovim configuration (LazyVim)
+│       └── zed/     # Zed editor settings and keymaps
 ├── ghostty/         # Ghostty terminal configuration
 │   └── config       # Terminal settings, colors, fonts
 ├── git/             # Git configuration
 │   ├── .gitconfig
 │   └── .gitignore_global
+├── homebrew/        # Homebrew package management
+│   └── Brewfile     # List of installed packages
+├── logseq/          # Logseq knowledge management
+│   └── Library/Application Support/Logseq/
+│       └── configs.edn
 ├── shell/           # Shell configuration
 │   ├── .zsh_functions/
 │   │   └── image-tools.zsh
@@ -44,8 +50,16 @@ dotfiles/
 ├── ssh/             # SSH client configuration
 │   └── .ssh/
 │       └── config
-└── vim/             # Vim configuration
-    └── .vimrc
+├── vim/             # Vim configuration
+│   └── .vimrc
+├── vscode/          # VS Code configuration
+│   └── Library/Application Support/Code/User/
+│       ├── settings.json
+│       └── keybindings.json
+└── vscode-insiders/ # VS Code Insiders configuration
+    └── Library/Application Support/Code - Insiders/User/
+        ├── settings.json
+        └── keybindings.json
 ```
 
 ## Prerequisites
@@ -79,9 +93,13 @@ sudo pacman -S stow
    stow git        # Git configuration
    stow shell      # Zsh, profile, functions
    stow vim        # Vim configuration
-   stow config     # Neovim configuration
+   stow config     # Neovim and Zed configuration
    stow ghostty    # Ghostty terminal configuration
    stow ssh        # SSH client config
+   stow vscode     # VS Code settings and keybindings
+   stow vscode-insiders # VS Code Insiders settings
+   stow logseq     # Logseq configuration
+   stow homebrew   # Homebrew Brewfile
    ```
 
 3. **Or stow all packages at once:**
@@ -134,6 +152,7 @@ git checkout main
 - Update Oh My Zsh: `omz update`
 - Update Neovim plugins: `:Lazy sync` in nvim
 - Update Homebrew packages: `brew upgrade`
+- Regenerate Brewfile: `brew bundle dump --force --file=homebrew/Brewfile`
 
 ### Sync Across Machines
 ```bash
@@ -184,9 +203,13 @@ ls -la ~ | grep dotfiles
 | `git` | .gitconfig, .gitignore_global | Git settings and global ignores |
 | `shell` | .zshrc, .env.local, functions | Shell configuration |
 | `vim` | .vimrc | Traditional Vim settings |
-| `config` | .config/nvim/ | Modern Neovim configuration |
+| `config` | .config/nvim/, .config/zed/ | Modern app configurations |
 | `ghostty` | config | Terminal emulator settings and themes |
 | `ssh` | .ssh/config | SSH client settings (no keys) |
+| `vscode` | settings.json, keybindings.json | VS Code configuration |
+| `vscode-insiders` | settings.json, keybindings.json | VS Code Insiders configuration |
+| `logseq` | configs.edn | Logseq knowledge management settings |
+| `homebrew` | Brewfile | Homebrew package list for easy setup |
 
 ## Dependencies
 

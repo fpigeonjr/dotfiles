@@ -1,0 +1,5 @@
+# Exclude profiles and sensitive data
+profiles/
+globalStorage/
+History/
+sync/

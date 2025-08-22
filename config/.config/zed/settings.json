@@ -1,0 +1,104 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "vim_mode": true,
+  "features": {
+    "edit_prediction_provider": "copilot"
+    // "edit_prediction_provider": "none"
+  },
+  "agent": {
+    "play_sound_when_agent_done": true,
+    "always_allow_tool_actions": true,
+    "default_profile": "write",
+    "inline_assistant_model": {
+      "provider": "copilot_chat",
+      "model": "claude-sonntet-4"
+    },
+    "default_model": {
+      "provider": "zed.dev",
+      "model": "claude-sonnet-4"
+    }
+  },
+  "buffer_font_size": 10.5,
+  "ui_font_size": 13,
+  "theme": {
+    "mode": "system",
+    "light": "Everforest Dark Soft",
+    "dark": "Everforest Dark Medium"
+  },
+  "buffer_font_family": "MonoLisa",
+  "buffer_font_features": {
+    "feat": true,
+    "ures": true,
+    "liga": true,
+    "ss02": true,
+    "ss07": true
+  },
+  "buffer_line_height": "comfortable",
+  "project_panel": {
+    "dock": "right"
+  },
+  "autosave": "on_focus_change",
+  "soft_wrap": "preferred_line_length",
+  "preferred_line_length": 120,
+  "show_wrap_guides": false,
+  "cursor_shape": "block",
+  "scroll_sensitivity": 1.5,
+  "horizontal_scroll_margin": 0,
+  "vertical_scroll_margin": 0,
+
+  "indent_guides": {
+    "enabled": false
+  },
+  "tab_bar": {
+    // Whether or not to show the tab bar in the editor
+    "show": true,
+    "show_tab_bar_buttons": false,
+    "show_nav_history_buttons": true
+  },
+  "scrollbar": {
+    "show": "never",
+    // Forcefully enable or disable the scrollbar for each axis
+    "axes": {
+      // When false, forcefully disables the horizontal scrollbar. Otherwise, obey other settings.
+      "horizontal": false,
+      // When false, forcefully disables the vertical scrollbar. Otherwise, obey other settings.
+      "vertical": true
+    }
+  },
+  // Add this section to completely disable horizontal scrolling
+  "scroll_beyond_last_line": "one_page",
+  "wrap_guides": [],
+  "hard_tabs": false,
+  "jsx_tag_auto_close": {
+    "enabled": true
+  },
+  "collaboration_panel": {
+    // Whether to show the collaboration panel button in the status bar.
+    "button": false
+  },
+  "chat_panel": {
+    // Whether to show the chat panel button in the status bar.
+    "button": "never"
+  },
+  "notification_panel": {
+    // Whether to show the notification panel button in the status bar.
+    "button": false
+  },
+  "toolbar": {
+    // Whether to show breadcrumbs.
+    "breadcrumbs": false,
+    // Whether to show quick action buttons.
+    "quick_actions": false,
+    // Whether to show the Selections menu in the editor toolbar.
+    "selections_menu": false,
+    // Whether to show agent review buttons in the editor toolbar.
+    "agent_review": false
+  }
+}
