@@ -38,6 +38,25 @@ let g:colors_name = 'everforest-%s'
     end,
   },
   {
+    "arcticicestudio/nord-vim",
+    lazy = false,
+    priority = 1000,
+  },
+  {
+    "shaunsingh/nord.nvim",
+    lazy = false,
+    priority = 1000,
+    config = function()
+      -- Nord theme configuration
+      vim.g.nord_contrast = true
+      vim.g.nord_borders = false
+      vim.g.nord_disable_background = false
+      vim.g.nord_italic = false
+      vim.g.nord_uniform_diff_background = true
+      vim.g.nord_bold = false
+    end,
+  },
+  {
     "LazyVim/LazyVim",
     opts = {
       colorscheme = "everforest",
