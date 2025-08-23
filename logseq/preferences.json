@@ -1,0 +1,33 @@
+{
+  "theme": {
+    "name": "Flow Nord Theme - Nord",
+    "url": "assets:///Users/fpigeon/.logseq/plugins/logseq-flow-nord-theme/nord.css",
+    "description": "Flow Nord Theme - Nord",
+    "pid": "logseq-flow-nord-theme"
+  },
+  "themes": {
+    "mode": "dark",
+    "light": {
+      "name": "Catppuccin Latte",
+      "url": "file:///Users/fpigeon/.logseq/plugins/logseq-catppuccin/ctp-latte.css",
+      "description": "Catppuccin Latte",
+      "mode": "light",
+      "pid": "logseq-catppuccin",
+      "selected": false
+    },
+    "dark": {
+      "name": "Everforest Dark Hard",
+      "url": "file:///Users/fpigeon/.logseq/plugins/logseq-everforest-theme/everforest-dark-hard.css",
+      "description": "Dark version of the Everforest theme (high contrast variation)",
+      "mode": "dark",
+      "pid": "logseq-everforest-theme"
+    }
+  },
+  "externals": [],
+  "pinnedToolbarItems": [
+    "logseq-journals-calendar:goto-today",
+    "logseq-journals-calendar:open-calendar",
+    "logseq-plugin-assistseq-ai-assistant:template-plugin-open",
+    "logseq-awesome-styler:AwesomeStyler"
+  ]
+}

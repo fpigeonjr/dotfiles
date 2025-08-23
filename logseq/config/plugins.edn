@@ -1,0 +1,11 @@
+{:logseq-catppuccin {:version "v0.6.4", :repo "catppuccin/logseq", :effect false, :theme true}
+ :logseq-journals-calendar {:version "v0.11.0", :repo "xyhp915/logseq-journals-calendar", :effect false, :theme false}
+ :logseq-todo-master {:version "v1.10.3", :repo "pengx17/logseq-plugin-todo-master", :effect false, :theme false}
+ :logseq-scroll-past-bottom {:version "v1.1.0", :repo "RubenSmn/logseq-scroll-past-bottom", :effect false, :theme false}
+ :logseq-link-preview {:version "v2.3.0", :repo "pengx17/logseq-plugin-link-preview", :effect true, :theme false}
+ :logseq-helium-plugin {:version "v.2.1.3", :repo "vyleung/logseq-helium-plugin", :effect true, :theme false}
+ :logseq-toc-plugin {:version "v2.0.3", :repo "benjypng/logseq-toc-plugin", :effect true, :theme false}
+ :logseq-awesome-props {:version "v1.10.0", :repo "yoyurec/logseq-awesome-props", :effect true, :theme false}
+ :logseq-tabs {:version "v1.19.4", :repo "pengx17/logseq-plugin-tabs", :effect true, :theme false}
+ :nord-theme {:version "0.0.19", :repo "Bad3r/Logseq-Nord-Theme", :effect false, :theme true}
+ :logseq-everforest-theme {:version "v0.1.4", :repo "khoulihan/logseq-everforest-theme", :effect false, :theme true}}

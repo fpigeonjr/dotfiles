@@ -40,8 +40,13 @@ dotfiles/
 ├── homebrew/        # Homebrew package management
 │   └── Brewfile     # List of installed packages
 ├── logseq/          # Logseq knowledge management
-│   └── Library/Application Support/Logseq/
-│       └── configs.edn
+│   ├── config/
+│   │   ├── config.edn    # Global shortcuts and settings
+│   │   └── plugins.edn   # Installed plugins list
+│   ├── settings/
+│   │   ├── logseq-everforest-theme.json
+│   │   └── logseq-journals-calendar.json
+│   └── preferences.json  # UI preferences and themes
 ├── shell/           # Shell configuration
 │   ├── .zsh_functions/
 │   │   └── image-tools.zsh
@@ -215,7 +220,8 @@ cp ~/.vimrc ~/config-backup/$(date +%Y%m%d)/ 2>/dev/null || true
 cp -r ~/.config/nvim ~/config-backup/$(date +%Y%m%d)/ 2>/dev/null || true
 cp -r ~/.config/zed ~/config-backup/$(date +%Y%m%d)/ 2>/dev/null || true
 cp ~/Library/Application\ Support/Code/User/settings.json ~/config-backup/$(date +%Y%m%d)/vscode-settings.json 2>/dev/null || true
-cp ~/Library/Application\ Support/Code/User/keybindings.json ~/config-backup/$(date +%Y%m%d)/vscode-keybindings.json 2>/dev/null || true
+cp -r ~/.logseq/config ~/config-backup/$(date +%Y%m%d)/ 2>/dev/null || true
+cp ~/.logseq/preferences.json ~/config-backup/$(date +%Y%m%d)/ 2>/dev/null || true
 
 echo "Backup created in ~/config-backup/$(date +%Y%m%d)/"
 ```
@@ -342,7 +348,7 @@ cp -r ~/config-backup/YYYYMMDD/* ~/
 | `ssh` | .ssh/config | SSH client settings (no keys) |
 | `vscode` | settings.json, keybindings.json | VS Code configuration |
 | `vscode-insiders` | settings.json, keybindings.json | VS Code Insiders configuration |
-| `logseq` | configs.edn | Logseq knowledge management settings |
+| `logseq` | config.edn, plugins.edn, preferences.json | Logseq knowledge management settings and plugins |
 | `homebrew` | Brewfile | Homebrew package list for easy setup |
 
 ## Dependencies
