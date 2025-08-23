@@ -24,12 +24,22 @@ When using on Linux systems that have existing git configs:
 2. **Check for conflicts**: Compare settings before stowing
 3. **Merge manually if needed**: Combine useful settings from both configs
 
+### OMArchy/Hyprland Integration
+The Hyprland configuration is designed for [OMArchy](https://omarchy.org) systems:
+- **Keybindings**: Custom app launchers (Super+A for ChatGPT, Super+B for Brave)
+- **Theme integration**: Sources OMArchy theme system
+- **Hardware**: Configured for modern displays with proper scaling
+- **Input**: Natural touchpad scrolling and fingerprint authentication
+
+Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland installed.
+
 ## Structure
 
 ```
 dotfiles/
 ├── config/          # Modern config files (~/.config/)
 │   └── .config/
+│       ├── hypr/    # Hyprland window manager (OMArchy)
 │       ├── nvim/    # Neovim configuration (LazyVim)
 │       └── zed/     # Zed editor settings and keymaps
 ├── ghostty/         # Ghostty terminal configuration
@@ -111,16 +121,16 @@ sudo pacman -S stow
 
 4. **Stow packages individually:**
    ```bash
-   stow git        # Git configuration
-   stow shell      # Zsh, profile, functions
-   stow vim        # Vim configuration
-   stow config     # Neovim and Zed configuration
-   stow ghostty    # Ghostty terminal configuration
-   stow ssh        # SSH client config
-   stow vscode     # VS Code settings and keybindings
-   stow vscode-insiders # VS Code Insiders settings
-   stow logseq     # Logseq configuration
-   stow homebrew   # Homebrew Brewfile
+    stow git        # Git configuration
+    stow shell      # Zsh, profile, functions
+    stow vim        # Vim configuration
+    stow config     # Neovim, Zed, and Hyprland configuration
+    stow ghostty    # Ghostty terminal configuration
+    stow ssh        # SSH client config
+    stow vscode     # VS Code settings and keybindings
+    stow vscode-insiders # VS Code Insiders settings
+    stow logseq     # Logseq configuration
+    stow homebrew   # Homebrew Brewfile
    ```
 
 5. **Or stow all packages at once:**
@@ -219,6 +229,7 @@ cp ~/.zshrc ~/config-backup/$(date +%Y%m%d)/ 2>/dev/null || true
 cp ~/.vimrc ~/config-backup/$(date +%Y%m%d)/ 2>/dev/null || true
 cp -r ~/.config/nvim ~/config-backup/$(date +%Y%m%d)/ 2>/dev/null || true
 cp -r ~/.config/zed ~/config-backup/$(date +%Y%m%d)/ 2>/dev/null || true
+cp -r ~/.config/hypr ~/config-backup/$(date +%Y%m%d)/ 2>/dev/null || true
 cp ~/Library/Application\ Support/Code/User/settings.json ~/config-backup/$(date +%Y%m%d)/vscode-settings.json 2>/dev/null || true
 cp -r ~/.logseq/config ~/config-backup/$(date +%Y%m%d)/ 2>/dev/null || true
 cp ~/.logseq/preferences.json ~/config-backup/$(date +%Y%m%d)/ 2>/dev/null || true
@@ -343,7 +354,7 @@ cp -r ~/config-backup/YYYYMMDD/* ~/
 | `git` | .gitconfig, .gitignore_global | Git settings and global ignores |
 | `shell` | .zshrc, .env.local, functions | Shell configuration |
 | `vim` | .vimrc | Traditional Vim settings |
-| `config` | .config/nvim/, .config/zed/ | Modern app configurations |
+| `config` | .config/nvim/, .config/zed/, .config/hypr/ | Modern app configurations |
 | `ghostty` | config | Terminal emulator settings and themes |
 | `ssh` | .ssh/config | SSH client settings (no keys) |
 | `vscode` | settings.json, keybindings.json | VS Code configuration |
