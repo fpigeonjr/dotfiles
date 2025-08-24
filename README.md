@@ -58,10 +58,14 @@ dotfiles/
 │   │   └── logseq-journals-calendar.json
 │   └── preferences.json  # UI preferences and themes
 ├── shell/           # Shell configuration
+│   ├── .bash_functions/
+│   │   └── image-tools.bash  # Bash image utilities
 │   ├── .zsh_functions/
 │   │   └── image-tools.zsh
+│   ├── .bashrc           # Enhanced bash config (Arch Linux/OMArchy)
+│   ├── .bash_profile     # Bash profile (sources .bashrc)
 │   ├── .env.local
-│   └── .zshrc
+│   └── .zshrc            # Zsh configuration (macOS)
 ├── ssh/             # SSH client configuration
 │   └── .ssh/
 │       └── config
@@ -352,7 +356,7 @@ cp -r ~/config-backup/YYYYMMDD/* ~/
 | Package | Contains | Purpose |
 |---------|----------|---------|
 | `git` | .gitconfig, .gitignore_global | Git settings and global ignores |
-| `shell` | .zshrc, .env.local, functions | Shell configuration |
+| `shell` | .bashrc, .bash_profile, .zshrc, .env.local, functions | Shell configuration (bash for Arch/OMArchy, zsh for macOS) |
 | `vim` | .vimrc | Traditional Vim settings |
 | `config` | .config/nvim/, .config/zed/, .config/hypr/ | Modern app configurations |
 | `ghostty` | config | Terminal emulator settings and themes |
