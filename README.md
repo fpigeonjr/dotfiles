@@ -40,7 +40,7 @@ dotfiles/
 ├── config/          # Modern config files (~/.config/)
 │   └── .config/
 │       ├── hypr/    # Hyprland window manager (OMArchy)
-│       ├── nvim/    # Neovim configuration (LazyVim)
+│       ├── nvim/    # Neovim configuration (LazyVim + GitHub Copilot)
 │       ├── waybar/  # Waybar status bar (OMArchy) with VPN module
 │       └── zed/     # Zed editor settings and keymaps
 ├── ghostty/         # Ghostty terminal configuration
@@ -359,7 +359,7 @@ cp -r ~/config-backup/YYYYMMDD/* ~/
 | `git` | .gitconfig, .gitignore_global | Git settings and global ignores |
 | `shell` | .bashrc, .bash_profile, .zshrc, .env.local, functions | Shell configuration (bash for Arch/OMArchy, zsh for macOS) |
 | `vim` | .vimrc | Traditional Vim settings |
-| `config` | .config/nvim/, .config/zed/, .config/hypr/, .config/waybar/ | Modern app configurations |
+| `config` | .config/nvim/, .config/zed/, .config/hypr/, .config/waybar/ | Modern app configurations (Neovim includes GitHub Copilot) |
 | `ghostty` | config | Terminal emulator settings and themes |
 | `ssh` | .ssh/config | SSH client settings (no keys) |
 | `vscode` | settings.json, keybindings.json | VS Code configuration |
