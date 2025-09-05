@@ -137,6 +137,14 @@ export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
 # Homebrew Ruby gem executables
 export PATH="/opt/homebrew/lib/ruby/gems/3.4.0/bin:$PATH"
 
+# KOShelf server management
+alias koshelf-start="start_koshelf"
+alias koshelf-stop="stop_koshelf"
+alias koshelf-restart="restart_koshelf"
+alias koshelf-status="koshelf_status"
+alias koshelf-logs="koshelf_logs"
+alias library="open http://koshelf.books"
+
 # Load custom functions
 for f in ~/.zsh_functions/*.zsh; do
   source "$f"
