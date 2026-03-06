@@ -7,29 +7,30 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
-  "vim_mode": true,
-  "features": {
-    "edit_prediction_provider": "copilot"
-    // "edit_prediction_provider": "none"
+  "edit_predictions": {
+    "provider": "copilot"
   },
+  "vim_mode": true,
   "agent": {
+    "tool_permissions": {
+      "default": "allow"
+    },
     "play_sound_when_agent_done": true,
-    "always_allow_tool_actions": true,
-    "default_profile": "write",
+    "default_profile": "ask",
     "inline_assistant_model": {
       "provider": "copilot_chat",
-      "model": "claude-sonntet-4"
+      "model": "gpt-5.2-codex"
     },
     "default_model": {
-      "provider": "zed.dev",
+      "provider": "copilot_chat",
       "model": "claude-sonnet-4"
     }
   },
   "buffer_font_size": 10.5,
   "ui_font_size": 13,
   "theme": {
-    "mode": "system",
-    "light": "Everforest Dark Soft",
+    "mode": "dark",
+    "light": "Everforest Dark Medium",
     "dark": "Everforest Dark Medium"
   },
   "buffer_font_family": "MonoLisa",
@@ -48,7 +49,7 @@
   "soft_wrap": "preferred_line_length",
   "preferred_line_length": 120,
   "show_wrap_guides": false,
-  "cursor_shape": "block",
+  "cursor_shape": null,
   "scroll_sensitivity": 1.5,
   "horizontal_scroll_margin": 0,
   "vertical_scroll_margin": 0,
@@ -83,7 +84,7 @@
     // Whether to show the collaboration panel button in the status bar.
     "button": false
   },
-  "chat_panel": {
+  "chat-panel": {
     // Whether to show the chat panel button in the status bar.
     "button": "never"
   },

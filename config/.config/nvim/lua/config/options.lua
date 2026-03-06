@@ -23,6 +23,14 @@ vim.opt.hidden = true -- Allow switching buffers without saving
 vim.opt.autoread = true -- Automatically read files that have been changed outside of vim
 vim.opt.updatetime = 300 -- Faster completion and swap file writing
 
+-- Disable inlay hints on all buffers
+vim.api.nvim_create_autocmd("BufEnter", {
+  group = vim.api.nvim_create_augroup("DisableInlayHintsAllBuffers", {}),
+  callback = function()
+    vim.lsp.inlay_hint.enable(false)
+  end,
+})
+
 -- Preserve certain settings across buffers
 vim.api.nvim_create_autocmd("BufEnter", {
   group = vim.api.nvim_create_augroup("PreserveBufferSettings", {}),

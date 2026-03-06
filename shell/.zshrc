@@ -114,7 +114,7 @@ alias pi="ssh pi@192.168.1.100"
 alias pi-up="pihole -up"
 alias speedtest="networkquality"
 alias neofetch="fastfetch"
-alias pod-up='podman compose up --build --watch'
+alias pod-up='podman compose up --build'
 alias dc-up-init='podman compose --profile data-initial up --build'
 alias dc-up-prod="podman compose -f docker-compose.static.yml up --build"
 alias pod-down='podman compose down -v'
@@ -151,3 +151,7 @@ for f in ~/.zsh_functions/*.zsh; do
 done
 # zoxide
 eval "$(zoxide init zsh)"
+
+
+# Load Angular CLI autocompletion.
+source <(ng completion script)

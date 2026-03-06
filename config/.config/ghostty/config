@@ -17,6 +17,8 @@ font-family-bold-italic = MonoLisaFreezed Nerd Font
 # =============================================================================
 # THEME AND COLORS (Dark Ocean Theme)
 # =============================================================================
+# Use no theme - define all colors manually
+
 background = #1b2b34
 foreground = #c1c5cd
 selection-foreground = #c1c5cd
@@ -50,17 +52,19 @@ background-blur = true
 macos-window-shadow = true
 
 # =============================================================================
-# QUICK TERMINAL CONFIGURATION (Global Terminal Access)
+# QUICK TERMINAL CONFIGURATION (Global Terminal Access)  
 # =============================================================================
-# Quick terminal positioning and behavior
-quick-terminal-position = top
-quick-terminal-size = 40%
-quick-terminal-autohide = false
-quick-terminal-space-behavior = move
+# Quick terminal positioning and behavior - FULLSCREEN ATTEMPT 2
+quick-terminal-size = 100%
+quick-terminal-autohide = false  
 quick-terminal-animation-duration = 0.1
 
-# Optional: Quick terminal layer (uncomment for Linux Wayland)
-# gtk-quick-terminal-layer = overlay
+# Global keybind for system-wide quick terminal access (~ key / grave accent)
+# ✅ WORKING: Cmd+~ from any application on any desktop
+keybind = global:super+grave_accent=toggle_quick_terminal
+
+# Local fallback keybind REMOVED - it was overriding the global keybind
+# keybind = super+grave_accent=toggle_quick_terminal
 
 # =============================================================================
 # WINDOW MANAGEMENT
@@ -77,20 +81,17 @@ window-inherit-font-size = true
 # =============================================================================
 # Titlebar settings
 macos-titlebar-style = native
-macos-titlebar-proxy-icon = true
+macos-titlebar-proxy-icon = visible
 
 # Use standard macOS fullscreen (not separate space)
 macos-non-native-fullscreen = true
 
 # =============================================================================
-# KEYBINDINGS
+# KEYBINDINGS  
 # =============================================================================
-# Manual quick terminal toggle (backup for Raycast)
-keybind = cmd+grave=toggle_quick_terminal
-
 # Window management shortcuts
-keybind = cmd+shift+f=toggle_window_float_on_top
-keybind = cmd+shift+enter=toggle_fullscreen
+keybind = super+shift+f=toggle_window_float_on_top
+keybind = super+shift+enter=toggle_fullscreen
 
 # =============================================================================
 # GENERAL SETTINGS
