@@ -34,6 +34,33 @@ flexion_use_lts_node() {
   }
 }
 
+flexion_export_aws_credentials() {
+  local aws_creds
+  local key
+  local value
+
+  echo "🔑 Exporting AWS credentials..."
+  if ! aws_creds="$(aws configure export-credentials --format env-no-export 2>/dev/null)"; then
+    echo "❌ Failed to export AWS credentials"
+    return 1
+  fi
+
+  if [[ -z "$aws_creds" ]]; then
+    echo "❌ Failed to export AWS credentials (no credentials returned)"
+    return 1
+  fi
+
+  while IFS='=' read -r key value; do
+    [[ -z "$key" ]] && continue
+
+    case "$key" in
+      AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|AWS_SESSION_TOKEN|AWS_CREDENTIAL_EXPIRATION)
+        export "$key=$value"
+        ;;
+    esac
+  done <<< "$aws_creds"
+}
+
 flexion_bedrock_login() {
   local export_credentials=${1:-1}
   local aws_var
@@ -60,11 +87,8 @@ flexion_bedrock_login() {
     return 0
   fi
 
-  echo "🔑 Exporting AWS credentials..."
-  eval "$(aws configure export-credentials --format env)" || {
-    echo "❌ Failed to export AWS credentials"
-    return 1
-  }
+  flexion_export_aws_credentials || return 1
+  unset AWS_PROFILE
 }
 
 flexion-claude() {
@@ -79,8 +103,8 @@ flexion-claude() {
   echo "🤖 You can now run the 'claude' command against AWS Bedrock"
   echo ""
   echo "Environment variables set:"
-  echo "  AWS_PROFILE=$AWS_PROFILE"
   echo "  AWS_REGION=$AWS_REGION"
+  echo "  AWS credentials exported from SSO"
   echo "  CLAUDE_CODE_USE_BEDROCK=1"
   echo "  ANTHROPIC_MODEL=$ANTHROPIC_MODEL"
   echo ""
