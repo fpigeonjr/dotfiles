@@ -110,7 +110,6 @@ alias zshell="code ~/.zshrc"
 alias ohmyzsh="code ~/.oh-my-zsh"
 alias new="source ~/.zshrc"
 # SSH
-alias pi="ssh pi@192.168.1.100"
 alias pi-up="pihole -up"
 alias speedtest="networkquality"
 alias neofetch="fastfetch"
