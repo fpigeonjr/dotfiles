@@ -42,6 +42,10 @@ require_file() {
   [[ -f "$file_path" ]] || die "Required file not found: $file_path"
 }
 
+remote_active_interface() {
+  ssh "$HOST" "ip -o -4 route show to default | awk '{print \$5; exit}'"
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --host)
@@ -99,6 +103,11 @@ scp -r "$BACKUP_DIR" "$HOST:$REMOTE_BACKUP_BASE/"
 log "Checking Pi-hole availability"
 ssh "$HOST" "command -v pihole >/dev/null 2>&1"
 
+ACTIVE_INTERFACE="$(remote_active_interface)"
+[[ -n "$ACTIVE_INTERFACE" ]] || die "Unable to determine remote active network interface"
+
+log "Using remote interface $ACTIVE_INTERFACE for restored Pi-hole config"
+
 log "Restoring Pi-hole configuration"
 ssh "$HOST" "set -euo pipefail; \
   backup_dir='$REMOTE_BACKUP_DIR'; \
@@ -109,20 +118,22 @@ ssh "$HOST" "set -euo pipefail; \
   sudo tar -czf \"\$remote_snapshot\" /etc/pihole >/dev/null 2>&1 || true; \
   sudo cp \"\$backup_dir/pihole.toml\" /etc/pihole/pihole.toml; \
   sudo cp \"\$backup_dir/gravity.db\" /etc/pihole/gravity.db; \
+  sudo perl -0pi -e 's/^\s*interface = \"[^\"]+\"/  interface = \"$ACTIVE_INTERFACE\"/m' /etc/pihole/pihole.toml; \
   if [[ -f \"\$restore_tmp/etc/pihole/custom.list\" ]]; then sudo cp \"\$restore_tmp/etc/pihole/custom.list\" /etc/pihole/custom.list; fi; \
+  sudo usermod -aG pihole pi 2>/dev/null || true; \
   sudo chown pihole:pihole /etc/pihole/gravity.db /etc/pihole/pihole.toml /etc/pihole/custom.list 2>/dev/null || true; \
   sudo systemctl restart pihole-FTL; \
-  rm -rf \"\$restore_tmp\"; \
+  sudo rm -rf \"\$restore_tmp\"; \
   printf 'Remote Pi-hole backup saved to %s\n' \"\$remote_snapshot\""
 
 if [[ "$RUN_GRAVITY" -eq 1 ]]; then
   log "Refreshing gravity"
-  ssh "$HOST" "pihole updateGravity"
+  ssh "$HOST" "sudo pihole updateGravity"
 fi
 
 log "Running health checks"
 ssh "$HOST" "set -e; \
-  pihole status; \
+  sudo pihole status; \
   printf '\n---\n'; \
   dig +short google.com @127.0.0.1; \
   printf '\n---\n'; \
