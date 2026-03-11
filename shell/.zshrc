@@ -154,3 +154,5 @@ eval "$(zoxide init zsh)"
 
 # Load Angular CLI autocompletion.
 source <(ng completion script)
+
+if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
