@@ -81,6 +81,7 @@
 - **Zsh**: `source ~/.zshrc` or restart terminal
 - **Bash**: `source ~/.bashrc` or restart terminal
 - **Syntax errors**: Use `zsh -n` or `bash -n` to check
+- **Repo shell helpers**: Validate scripts in `scripts/` with `bash -n path/to/script.sh`
 
 ### Stow Conflicts
 - Use backup and manual resolution (see README.md)

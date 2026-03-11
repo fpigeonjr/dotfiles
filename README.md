@@ -167,7 +167,7 @@ If you already have some configs and want to adopt them:
 After flashing a fresh Bookworm card, enabling SSH, and installing Pi-hole, you can restore the saved Pi-hole config with:
 
 ```bash
-./scripts/pi-bookworm-restore.sh
+./scripts/pi-pihole-restore.sh
 ```
 
 The script expects the backup set at `~/Downloads/pi-pre-upgrade-backups/20260310-150325` by default and can target a different host or backup directory with `--host` and `--backup-dir`.

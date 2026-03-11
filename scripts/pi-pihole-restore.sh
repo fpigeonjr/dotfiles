@@ -5,25 +5,27 @@ set -euo pipefail
 HOST="pi"
 BACKUP_DIR="${HOME}/Downloads/pi-pre-upgrade-backups/20260310-150325"
 REMOTE_BACKUP_BASE="/home/pi/pi-restore"
+EXPECTED_OS_CODENAMES="bookworm trixie"
 RUN_UPGRADE=1
 RUN_GRAVITY=1
 
 usage() {
   cat <<'EOF'
-Usage: scripts/pi-bookworm-restore.sh [options]
+Usage: scripts/pi-pihole-restore.sh [options]
 
-Restore a fresh Raspberry Pi OS Bookworm Pi-hole install from a saved backup set.
+Restore a fresh Raspberry Pi OS Pi-hole install from a saved backup set.
 
 Options:
   --host HOST              SSH host to target (default: pi)
   --backup-dir PATH        Local backup directory (default: ~/Downloads/pi-pre-upgrade-backups/20260310-150325)
   --remote-backup-base DIR Remote working directory (default: /home/pi/pi-restore)
+  --expected-os LIST       Space-separated allowed OS codenames (default: "bookworm trixie")
   --skip-upgrade           Skip apt update/full-upgrade on the Pi
   --skip-gravity           Skip pihole updateGravity after restore
   -h, --help               Show this help
 
 Notes:
-  - Run this from your Mac after imaging Bookworm, enabling SSH, and installing Pi-hole.
+  - Run this from your Mac after imaging Raspberry Pi OS, enabling SSH, and installing Pi-hole.
   - The remote host must allow passwordless sudo for the pi user.
 EOF
 }
@@ -42,6 +44,10 @@ require_file() {
   [[ -f "$file_path" ]] || die "Required file not found: $file_path"
 }
 
+remote_os_codename() {
+  ssh "$HOST" ". /etc/os-release && printf '%s\n' \"\$VERSION_CODENAME\""
+}
+
 remote_active_interface() {
   ssh "$HOST" "ip -o -4 route show to default | awk '{print \$5; exit}'"
 }
@@ -58,6 +64,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --remote-backup-base)
       REMOTE_BACKUP_BASE="$2"
+      shift 2
+      ;;
+    --expected-os)
+      EXPECTED_OS_CODENAMES="$2"
       shift 2
       ;;
     --skip-upgrade)
@@ -86,11 +96,20 @@ require_file "$BACKUP_DIR/pihole-etc.tgz"
 log "Checking SSH connectivity to $HOST"
 ssh "$HOST" "true"
 
-log "Verifying remote OS and sudo access"
-ssh "$HOST" "grep -q 'VERSION_CODENAME=bookworm' /etc/os-release && sudo -n true"
+REMOTE_OS_CODENAME="$(remote_os_codename)"
+[[ -n "$REMOTE_OS_CODENAME" ]] || die "Unable to determine remote OS codename"
+
+case " $EXPECTED_OS_CODENAMES " in
+  *" $REMOTE_OS_CODENAME "*) ;;
+  *) die "Remote OS '$REMOTE_OS_CODENAME' is not in allowed list: $EXPECTED_OS_CODENAMES" ;;
+esac
+
+log "Verified remote OS codename: $REMOTE_OS_CODENAME"
+log "Verifying sudo access"
+ssh "$HOST" "sudo -n true"
 
 if [[ "$RUN_UPGRADE" -eq 1 ]]; then
-  log "Updating Bookworm packages"
+  log "Updating remote packages"
   ssh "$HOST" "sudo apt update && sudo apt full-upgrade -y"
 fi
 
