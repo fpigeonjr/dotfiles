@@ -1,5 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "enabled_providers": ["openai", "amazon-bedrock"],
   "provider": {
     "amazon-bedrock": {
       "models": {
@@ -12,5 +13,5 @@
       }
     }
   },
-  "model": "amazon-bedrock/claude-sonnet-4-6"
+  "model": "openai/gpt-5"
 }
