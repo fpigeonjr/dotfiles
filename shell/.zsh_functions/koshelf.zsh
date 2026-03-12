@@ -4,7 +4,7 @@ start_koshelf() {
   echo "🚀 Starting KOShelf server..."
   
   # Check if we're in the right directory
-  local koshelf_dir="/Users/fpigeonjr/Code/koshelf"
+  local koshelf_dir="$HOME/Code/koshelf"
   
   # Start Podman machine
   echo "Starting Podman machine..."
@@ -41,7 +41,7 @@ start_koshelf() {
 stop_koshelf() {
   echo "⏹️  Stopping KOShelf server..."
   
-  local koshelf_dir="/Users/fpigeonjr/Code/koshelf"
+  local koshelf_dir="$HOME/Code/koshelf"
   
   # Stop services
   (cd "$koshelf_dir" && podman-compose down) || {
@@ -56,7 +56,7 @@ stop_koshelf() {
 restart_koshelf() {
   echo "🔄 Restarting KOShelf server..."
   
-  local koshelf_dir="/Users/fpigeonjr/Code/koshelf"
+  local koshelf_dir="$HOME/Code/koshelf"
   
   # Stop services
   (cd "$koshelf_dir" && podman-compose down)
@@ -105,7 +105,7 @@ koshelf_status() {
 
 # View KOShelf logs
 koshelf_logs() {
-  local koshelf_dir="/Users/fpigeonjr/Code/koshelf"
+  local koshelf_dir="$HOME/Code/koshelf"
   
   echo "📋 KOShelf Logs:"
   (cd "$koshelf_dir" && podman logs --tail=50 koshelf-app)

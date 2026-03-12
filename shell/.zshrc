@@ -100,12 +100,6 @@ export VISUAL="$EDITOR"
 # - $ZSH_CUSTOM/macos.zsh
 # For a full list of active aliases, run `alias`.
 #
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
 alias zshell="code ~/.zshrc"
 alias ohmyzsh="code ~/.oh-my-zsh"
 alias new="source ~/.zshrc"
@@ -120,7 +114,9 @@ alias pod-down='podman compose down -v'
 alias dc-up="pod-up"
 alias dc-down="pod-down"
 # fnm - Fast Node Manager
-eval "$(fnm env --use-on-cd --shell zsh)"
+if command -v fnm >/dev/null 2>&1; then
+  eval "$(fnm env --use-on-cd --shell zsh)"
+fi
 #code default
 alias code='code-insiders'
 #macos shortcuts
@@ -131,7 +127,7 @@ alias matrix='cmatrix'
 # Source environment variables
 [ -f ~/.env.local ] && source ~/.env.local
 # Created by `pipx` on 2025-05-29 21:25:12
-export PATH="$PATH:/Users/fpigeon/.local/bin"
+export PATH="$PATH:$HOME/.local/bin"
 export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
 # Homebrew Ruby gem executables
 export PATH="/opt/homebrew/lib/ruby/gems/3.4.0/bin:$PATH"
@@ -145,11 +141,14 @@ alias koshelf-logs="koshelf_logs"
 alias library="open http://koshelf.books"
 
 # Load custom functions
-for f in ~/.zsh_functions/*.zsh; do
+for f in ~/.zsh_functions/*.zsh(N); do
   source "$f"
 done
+
 # zoxide
-eval "$(zoxide init zsh)"
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh)"
+fi
 
 
 # Load Angular CLI autocompletion when available.
