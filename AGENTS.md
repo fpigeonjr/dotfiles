@@ -53,7 +53,7 @@
 
 ### OMArchy/Linux (Arch-based)
 - Use pacman for system packages (`sudo pacman -S`)
-- Bash as default shell
+- Prefer the shared Zsh setup for shell changes; keep Bash for OMArchy/bash-specific compatibility only
 - Hyprland window manager with Waybar
 - Manual SSH key management
 - Custom keybindings for Hyprland (Super+A for ChatGPT, Super+B for Brave)
@@ -61,6 +61,7 @@
 ## File Organization
 - Configuration files in `config/.config/`
 - Shell configs in `shell/`
+- Shared Zsh layers in `shell/.config/zsh/` with `common.zsh`, `macos.zsh`, and `linux.zsh`
 - Editor configs in respective directories
 - Custom functions in language-specific subdirectories
 
@@ -78,7 +79,7 @@
 - **LSP issues**: `:LspInfo`, `:checkhealth lsp`
 
 ### Shell Configuration Issues
-- **Zsh**: `source ~/.zshrc` or restart terminal
+- **Zsh**: `source ~/.zshrc` or restart terminal; keep shared logic in `~/.config/zsh/common.zsh` and OS-specific logic in `~/.config/zsh/macos.zsh` or `~/.config/zsh/linux.zsh`
 - **Bash**: `source ~/.bashrc` or restart terminal
 - **Syntax errors**: Use `zsh -n` or `bash -n` to check
 - **Repo shell helpers**: Validate scripts in `scripts/` with `bash -n path/to/script.sh`

@@ -1,0 +1,5 @@
+# Copy this file to ~/.config/zsh/local.zsh for machine-specific settings.
+# Keep secrets and host-only overrides out of git.
+
+# export MY_ENV_VAR="value"
+# alias work='cd ~/Code/work-project'
