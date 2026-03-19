@@ -1,0 +1,10 @@
+[Unit]
+Description=Disable ACPI lid wakeup on boot
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/sh -c "grep -q 'LID0.*enabled' /proc/acpi/wakeup && echo LID0 > /proc/acpi/wakeup || true"
+
+[Install]
+WantedBy=multi-user.target

@@ -19,6 +19,11 @@ Personal configuration files managed with [GNU Stow](https://www.gnu.org/softwar
 - **New aliases**: Added `co`, `br`, `ci`, `st` for common git commands
 
 ### Cross-Platform Compatibility
+This repo is organized around a shared Zsh setup plus OS-specific overlays:
+1. **Shared shell base**: `shell/.zshrc` loads `shell/.config/zsh/common.zsh`
+2. **OS overlays**: `shell/.config/zsh/macos.zsh` and `shell/.config/zsh/linux.zsh`
+3. **Local overrides**: Copy `shell/.config/zsh/local.zsh.example` to `~/.config/zsh/local.zsh` for machine-specific settings and secrets
+
 When using on Linux systems that have existing git configs:
 1. **Backup existing config**: `cp ~/.gitconfig ~/.gitconfig.backup`
 2. **Check for conflicts**: Compare settings before stowing
@@ -32,6 +37,10 @@ The Hyprland configuration is designed for [OMArchy](https://omarchy.org) system
 - **Input**: Natural touchpad scrolling and fingerprint authentication
 
 Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland installed.
+
+### Machine-Specific Linux Fixes
+- `scripts/install-lid-wakeup-fix.sh`: Installs a small systemd service that disables ACPI lid wakeup on boot for laptops that immediately wake from suspend with the lid open.
+- This is intentionally managed as an install script plus service template instead of a stowed `~/.config` file, because it writes to `/etc/systemd/system/` and is machine-specific.
 
 ## Structure
 
@@ -65,8 +74,9 @@ dotfiles/
 │   │   └── image-tools.zsh
 │   ├── .bashrc           # Enhanced bash config (Arch Linux/OMArchy)
 │   ├── .bash_profile     # Bash profile (sources .bashrc)
+│   ├── .config/zsh/      # Shared + OS-specific Zsh config layers
 │   ├── .env.local
-│   └── .zshrc            # Zsh configuration (macOS)
+│   └── .zshrc            # Cross-platform Zsh entrypoint
 ├── ssh/             # SSH client configuration
 │   └── .ssh/
 │       └── config
@@ -85,7 +95,7 @@ dotfiles/
 ## Prerequisites
 
 - [GNU Stow](https://www.gnu.org/software/stow/)
-- [Oh My Zsh](https://ohmyzsh.sh/) (for shell configuration)
+- [Oh My Zsh](https://ohmyzsh.sh/) (optional, for Zsh plugins/theme)
 - [Neovim](https://neovim.io/) (for nvim config)
 
 ### Install Stow
@@ -120,14 +130,16 @@ sudo pacman -S stow
    ```
 
 3. **Install packages from Brewfile:**
-   ```bash
-   brew bundle install --file=homebrew/Brewfile
-   ```
+    ```bash
+    brew bundle install --file=homebrew/Brewfile
+    ```
+
+   On Linux, install the shell dependencies you want manually (`zsh`, `fnm`, `zoxide`, `fastfetch`, etc.) or with your distro package manager.
 
 4. **Stow packages individually:**
    ```bash
     stow git        # Git configuration
-    stow shell      # Zsh, profile, functions
+     stow shell      # Cross-platform Zsh, Bash, profile, functions
     stow vim        # Vim configuration
     stow config     # Neovim, Zed, and Hyprland configuration
     stow ghostty    # Ghostty terminal configuration
@@ -161,6 +173,14 @@ If you already have some configs and want to adopt them:
    ```
 
 ## Usage
+
+### Zsh Layout
+
+- `~/.zshrc` detects the OS and loads shared config first
+- `~/.config/zsh/common.zsh` holds portable aliases, tool init, and function loading
+- `~/.config/zsh/macos.zsh` holds Homebrew and macOS-specific behavior
+- `~/.config/zsh/linux.zsh` holds Linux clipboard and path behavior
+- `~/.config/zsh/local.zsh` is optional and stays machine-specific
 
 ### Raspberry Pi Pi-hole Rebuild
 
