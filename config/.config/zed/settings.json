@@ -26,7 +26,7 @@
       "model": "claude-sonnet-4"
     }
   },
-  "buffer_font_size": 10.5,
+  "buffer_font_size": 11.0,
   "ui_font_size": 13,
   "theme": {
     "mode": "dark",

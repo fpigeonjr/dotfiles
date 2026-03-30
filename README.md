@@ -42,31 +42,44 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 - `scripts/install-lid-wakeup-fix.sh`: Installs a small systemd service that disables ACPI lid wakeup on boot for laptops that immediately wake from suspend with the lid open.
 - This is intentionally managed as an install script plus service template instead of a stowed `~/.config` file, because it writes to `/etc/systemd/system/` and is machine-specific.
 
+### Worktrunk for OPRE OPS
+- **Local override**: `~/.config/worktrunk/config.toml` includes a repo-specific override for `github.com/HHS/OPRE-OPS`
+- **Why**: Worktrunk's default sibling worktree naming can preserve uppercase repo names, which breaks Podman/Lazydocker compose project naming
+- **Behavior**: New OPRE OPS worktrees are created under `.worktrees/{{ branch | sanitize_db }}` so paths stay lowercase-safe
+
+### OpenCode
+- **Global config**: `config/.config/opencode/opencode.json` is stowed to `~/.config/opencode/opencode.json`
+- **Custom agents**: Store reusable agents in `config/.config/opencode/agents/`
+- **Current custom agent**: `study.md` adds a primary study mode focused on guided learning, hints, and knowledge checks
+- **Apply changes**: Run `stow -R config` from `~/dotfiles` after adding or updating OpenCode config files
+
 ## Structure
 
 ```
 dotfiles/
 ├── config/          # Modern config files (~/.config/)
 │   └── .config/
+│       ├── ghostty/ # Ghostty terminal configuration
+│       ├── opencode/ # OpenCode config and custom agents
 │       ├── hypr/    # Hyprland window manager (OMArchy)
 │       ├── nvim/    # Neovim configuration (LazyVim + GitHub Copilot)
 │       ├── waybar/  # Waybar status bar (OMArchy) with VPN module
 │       └── zed/     # Zed editor settings and keymaps
-├── ghostty/         # Ghostty terminal configuration
-│   └── config       # Terminal settings, colors, fonts
 ├── git/             # Git configuration
 │   ├── .gitconfig
 │   └── .gitignore_global
 ├── homebrew/        # Homebrew package management
 │   └── Brewfile     # List of installed packages
 ├── logseq/          # Logseq knowledge management
-│   ├── config/
-│   │   ├── config.edn    # Global shortcuts and settings
-│   │   └── plugins.edn   # Installed plugins list
-│   ├── settings/
-│   │   ├── logseq-everforest-theme.json
-│   │   └── logseq-journals-calendar.json
-│   └── preferences.json  # UI preferences and themes
+│   ├── .logseq/
+│   │   ├── config/
+│   │   │   ├── config.edn    # Global shortcuts and settings
+│   │   │   └── plugins.edn   # Installed plugins list
+│   │   ├── custom.css        # Optional Logseq custom styling
+│   │   ├── settings/
+│   │   │   ├── logseq-everforest-theme.json
+│   │   │   └── logseq-journals-calendar.json
+│   │   └── preferences.json  # UI preferences and themes
 ├── shell/           # Shell configuration
 │   ├── .bash_functions/
 │   │   └── image-tools.bash  # Bash image utilities
@@ -141,8 +154,7 @@ sudo pacman -S stow
     stow git        # Git configuration
      stow shell      # Cross-platform Zsh, Bash, profile, functions
     stow vim        # Vim configuration
-    stow config     # Neovim, Zed, and Hyprland configuration
-    stow ghostty    # Ghostty terminal configuration
+     stow config     # App configs including Ghostty, Neovim, Zed, and Hyprland
     stow ssh        # SSH client config
     stow vscode     # VS Code settings and keybindings
     stow vscode-insiders # VS Code Insiders settings
@@ -389,12 +401,11 @@ cp -r ~/config-backup/YYYYMMDD/* ~/
 | `git` | .gitconfig, .gitignore_global | Git settings and global ignores |
 | `shell` | .bashrc, .bash_profile, .zshrc, .env.local, functions | Shell configuration (bash for Arch/OMArchy, zsh for macOS) |
 | `vim` | .vimrc | Traditional Vim settings |
-| `config` | .config/nvim/, .config/zed/, .config/hypr/, .config/waybar/ | Modern app configurations (Neovim includes GitHub Copilot) |
-| `ghostty` | config | Terminal emulator settings and themes |
+| `config` | .config/nvim/, .config/zed/, .config/hypr/, .config/waybar/, .config/ghostty/ | Modern app configurations (Neovim includes GitHub Copilot) |
 | `ssh` | .ssh/config | SSH client settings (no keys) |
 | `vscode` | settings.json, keybindings.json | VS Code configuration |
 | `vscode-insiders` | settings.json, keybindings.json | VS Code Insiders configuration |
-| `logseq` | config.edn, plugins.edn, preferences.json | Logseq knowledge management settings and plugins |
+| `logseq` | .logseq/config/, .logseq/custom.css, .logseq/settings/, .logseq/preferences.json | Logseq knowledge management settings and plugins |
 | `homebrew` | Brewfile | Homebrew package list for easy setup |
 
 ## Dependencies
