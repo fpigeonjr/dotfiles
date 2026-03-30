@@ -1,0 +1,6 @@
+:root {
+  --ls-font-family: 'MonoLisa';
+  --ls-page-text-size: 13px;   /* normal page text */
+  --ls-title-text-size: 18px;  /* page title */
+  --ls-block-bullet-size: 10px; /* bullet dot */
+}

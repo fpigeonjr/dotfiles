@@ -1,0 +1,10 @@
+# Only sync config files, exclude all app data
+*
+!.gitignore
+!.logseq/
+!.logseq/**
+!Library/
+!Library/**
+
+# Keep machine-specific UI state local.
+.logseq/preferences.json
