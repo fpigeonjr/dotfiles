@@ -11,6 +11,7 @@
     }
   },
   "enabled_providers": ["openai", "amazon-bedrock"],
+  "plugin": ["@mohak34/opencode-notifier@latest"],
   "provider": {
     "amazon-bedrock": {
       "models": {

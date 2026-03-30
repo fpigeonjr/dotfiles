@@ -1,0 +1,32 @@
+{
+  "sound": true,
+  "notification": true,
+  "suppressWhenFocused": true,
+  "events": {
+    "permission": false,
+    "complete": {
+      "sound": true,
+      "notification": false
+    },
+    "subagent_complete": false,
+    "error": {
+      "sound": true,
+      "notification": true
+    },
+    "question": {
+      "sound": true,
+      "notification": true
+    },
+    "user_cancelled": false
+  },
+  "sounds": {
+    "complete": "/System/Library/Sounds/Tink.aiff",
+    "error": "/System/Library/Sounds/Sosumi.aiff",
+    "question": "/System/Library/Sounds/Ping.aiff"
+  },
+  "volumes": {
+    "complete": 0.3,
+    "error": 0.55,
+    "question": 0.45
+  }
+}
