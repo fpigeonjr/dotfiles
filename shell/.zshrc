@@ -102,3 +102,5 @@ fi
 [[ -r "$ZDOTFILES_CONFIG_DIR/common.zsh" ]] && source "$ZDOTFILES_CONFIG_DIR/common.zsh"
 [[ -r "$ZDOTFILES_CONFIG_DIR/$DOTFILES_OS.zsh" ]] && source "$ZDOTFILES_CONFIG_DIR/$DOTFILES_OS.zsh"
 [[ -r "$ZDOTFILES_CONFIG_DIR/local.zsh" ]] && source "$ZDOTFILES_CONFIG_DIR/local.zsh"
+
+if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
