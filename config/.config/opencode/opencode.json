@@ -39,7 +39,21 @@
         "gpt-5.2-codex": {},
         "gpt-5-mini": {},
         "gpt-5.1": {},
-        "gpt-5.2": {}
+        "gpt-5.2": {},
+        "claude-sonnet-4.6": { "disabled": true },
+        "claude-opus-4.1": { "disabled": true },
+        "gpt-4.1": { "disabled": true },
+        "gpt-4o": { "disabled": true },
+        "gpt-5": { "disabled": true },
+        "gpt-5.1-codex": { "disabled": true },
+        "gpt-5.1-codex-max": { "disabled": true },
+        "gpt-5.1-codex-mini": { "disabled": true },
+        "gpt-5.3-codex": { "disabled": true },
+        "gpt-5.4": { "disabled": true },
+        "gpt-5.4-mini": { "disabled": true },
+        "gemini-3-pro-preview": { "disabled": true },
+        "gemini-3.1-pro-preview": { "disabled": true },
+        "grok-code-fast-1": { "disabled": true }
       }
     }
   },
