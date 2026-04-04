@@ -151,15 +151,16 @@ sudo pacman -S stow
 
 4. **Stow packages individually:**
    ```bash
-    stow git        # Git configuration
-     stow shell      # Cross-platform Zsh, Bash, profile, functions
-    stow vim        # Vim configuration
-     stow config     # App configs including Ghostty, Neovim, Zed, and Hyprland
-    stow ssh        # SSH client config
-    stow vscode     # VS Code settings and keybindings
-    stow vscode-insiders # VS Code Insiders settings
-    stow logseq     # Logseq configuration
-    stow homebrew   # Homebrew Brewfile
+   stow git          # Git configuration
+   stow shell        # Cross-platform Zsh, Bash, profile, functions
+   stow vim          # Vim configuration
+   stow config       # App configs including Ghostty, Neovim, Zed, and Hyprland
+   stow ssh          # SSH client config
+   stow aws          # AWS CLI config (SSO profile for Flexion Bedrock)
+   stow vscode       # VS Code settings and keybindings
+   stow vscode-insiders # VS Code Insiders settings
+   stow logseq       # Logseq configuration
+   stow homebrew     # Homebrew Brewfile
    ```
 
 5. **Or stow all packages at once:**
@@ -403,6 +404,7 @@ cp -r ~/config-backup/YYYYMMDD/* ~/
 | `vim` | .vimrc | Traditional Vim settings |
 | `config` | .config/nvim/, .config/zed/, .config/hypr/, .config/waybar/, .config/ghostty/ | Modern app configurations (Neovim includes GitHub Copilot) |
 | `ssh` | .ssh/config | SSH client settings (no keys) |
+| `aws` | .aws/config | AWS CLI SSO profile for Flexion Bedrock access |
 | `vscode` | settings.json, keybindings.json | VS Code configuration |
 | `vscode-insiders` | settings.json, keybindings.json | VS Code Insiders configuration |
 | `logseq` | .logseq/config/, .logseq/custom.css, .logseq/settings/, .logseq/preferences.json | Logseq knowledge management settings and plugins |

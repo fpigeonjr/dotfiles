@@ -77,6 +77,12 @@ flexion_bedrock_login() {
   export AWS_REGION="$FLEXION_BEDROCK_REGION"
   export AWS_DEFAULT_REGION="$FLEXION_BEDROCK_REGION"
 
+  if ! aws configure list-profiles 2>/dev/null | grep -q "^${FLEXION_BEDROCK_PROFILE}$"; then
+    echo "❌ AWS profile '${FLEXION_BEDROCK_PROFILE}' not found in ~/.aws/config"
+    echo "   Fix: run 'stow aws' from ~/dotfiles"
+    return 1
+  fi
+
   echo "🚀 Logging into AWS SSO for profile: $AWS_PROFILE"
   aws sso login || {
     echo "❌ AWS SSO login failed"
