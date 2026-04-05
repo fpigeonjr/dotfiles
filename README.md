@@ -163,6 +163,17 @@ sudo pacman -S stow
    stow homebrew     # Homebrew Brewfile
    ```
 
+   **Important**: After stowing `shell`, verify the zsh config directory is properly linked:
+   ```bash
+   ls -la ~/.config/zsh  # Should show: ~/.config/zsh -> ../dotfiles/shell/.config/zsh
+   ```
+   
+   This symlink is critical for the modular zsh configuration to work. If it's missing, run:
+   ```bash
+   cd ~/dotfiles
+   stow -R shell
+   ```
+
 5. **Or stow all packages at once:**
    ```bash
    stow */

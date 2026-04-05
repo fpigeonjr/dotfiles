@@ -8,6 +8,21 @@ if [[ -d /usr/local/bin ]]; then
   path=(/usr/local/bin /usr/local/sbin $path)
 fi
 
+# macOS-specific Ruby paths (Homebrew)
+if [[ -d /opt/homebrew/opt/ruby/bin ]]; then
+  path=(/opt/homebrew/opt/ruby/bin $path)
+fi
+
+if [[ -d /opt/homebrew/lib/ruby/gems/3.4.0/bin ]]; then
+  path=(/opt/homebrew/lib/ruby/gems/3.4.0/bin $path)
+fi
+
+# macOS clipboard
 if command -v pbcopy >/dev/null 2>&1; then
   alias clip='pbcopy'
 fi
+
+# macOS-specific aliases
+alias code='code-insiders'
+alias work='cd ~/Code/OPRE-OPS/frontend'
+alias graph="cd ~/Library/Mobile\ Documents/iCloud~com~logseq~logseq/Documents/Graph"

@@ -1,9 +1,22 @@
 # Enhanced Bash Configuration
 # OMArchy integration + robbyrussell-inspired theme + directory persistence
 
-# ===== OMArchy Integration =====
+# ===== OS Detection =====
+DOTFILES_OS="unknown"
+case "$(uname -s)" in
+  Darwin)
+    DOTFILES_OS="macos"
+    ;;
+  Linux)
+    DOTFILES_OS="linux"
+    ;;
+esac
+
+# ===== OMArchy Integration (Linux only) =====
 # Source OMArchy defaults (keep existing functionality)
-source ~/.local/share/omarchy/default/bash/rc
+if [[ "$DOTFILES_OS" == "linux" ]] && [[ -f ~/.local/share/omarchy/default/bash/rc ]]; then
+  source ~/.local/share/omarchy/default/bash/rc
+fi
 
 # ===== Environment Setup =====
 export EDITOR="nvim"
@@ -83,7 +96,9 @@ if ! shopt -oq posix; then
 fi
 
 # ===== fnm (Fast Node Manager) =====
-eval "$(fnm env --use-on-cd --shell bash)"
+if command -v fnm &> /dev/null; then
+  eval "$(fnm env --use-on-cd --shell bash)"
+fi
 
 # ===== Aliases =====
 # Navigation

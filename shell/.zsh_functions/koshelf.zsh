@@ -1,40 +1,58 @@
 # KOShelf server management functions
+
+# Poll until a command succeeds or timeout is reached.
+# Usage: _koshelf_wait_for <timeout_seconds> <description> <command...>
+_koshelf_wait_for() {
+  local timeout=$1
+  local description=$2
+  shift 2
+  local i=0
+  while ! "$@" >/dev/null 2>&1; do
+    (( i++ ))
+    if (( i >= timeout )); then
+      echo "  Timed out waiting for $description after ${timeout}s"
+      return 1
+    fi
+    printf "."
+    sleep 1
+  done
+  echo " ready"
+}
+
 # Start KOShelf server with Podman machine and docker-compose
 start_koshelf() {
-  echo "🚀 Starting KOShelf server..."
-  
-  # Check if we're in the right directory
+  echo "Starting KOShelf server..."
+
   local koshelf_dir="$HOME/Code/koshelf"
-  
+
   # Start Podman machine
   echo "Starting Podman machine..."
   podman machine start || {
-    echo "❌ Failed to start Podman machine"
+    echo "Failed to start Podman machine"
     return 1
   }
-  
-  # Wait a moment for machine to fully initialize
-  sleep 3
-  
-  # Navigate to KOShelf directory and start services
+
+  # Wait for Podman machine to be responsive (up to 30s)
+  printf "Waiting for Podman machine"
+  _koshelf_wait_for 30 "Podman machine" podman info || return 1
+
+  # Start KOShelf services
   echo "Starting KOShelf services..."
   (cd "$koshelf_dir" && podman-compose up -d) || {
-    echo "❌ Failed to start KOShelf services"
+    echo "Failed to start KOShelf services"
     return 1
   }
-  
-  # Wait for services to be ready
-  sleep 5
-  
-  # Test connectivity
-  echo "Testing server connectivity..."
-  if curl -s -I http://127.0.0.1:8090 >/dev/null 2>&1; then
-    echo "✅ KOShelf server is running!"
-    echo "📚 Access your library at: http://koshelf.books"
-    echo "🔗 Direct access: http://localhost:8090"
-  else
-    echo "⚠️  Services started but server not responding yet. Check with: podman ps"
-  fi
+
+  # Wait for HTTP server to respond (up to 30s)
+  printf "Waiting for KOShelf server"
+  _koshelf_wait_for 30 "KOShelf server" curl -sf http://127.0.0.1:8090 || {
+    echo "Services started but server not responding. Check with: podman ps"
+    return 1
+  }
+
+  echo "KOShelf server is running!"
+  echo "  Library : http://koshelf.books"
+  echo "  Direct  : http://localhost:8090"
 }
 
 # Stop KOShelf services

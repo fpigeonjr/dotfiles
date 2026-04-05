@@ -46,7 +46,7 @@ quick-terminal-animation-duration = 0.1
 - **If wrong key**: Use `grave_accent` not `grave`
 
 ## Files
-- **Config**: `/Users/fpigeon/dotfiles/config/.config/ghostty/config` (symlinked)
-- **Old scripts**: Archived in `/Users/fpigeon/dotfiles/scripts/archive/`
+- **Config**: `~/dotfiles/config/.config/ghostty/config` (symlinked)
+- **Old scripts**: Archived in `~/dotfiles/scripts/archive/`
 
 **✅ MISSION ACCOMPLISHED: `Cmd+~` from anywhere = instant fullscreen terminal on current desktop**
