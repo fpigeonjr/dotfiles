@@ -43,5 +43,6 @@
       }
     }
   },
-  "model": "github-copilot/claude-sonnet-4.5"
+  "model": "openai/gpt-5.4",
+  "small_model": "openai/gpt-5.4-mini"
 }
