@@ -4,3 +4,5 @@
 **/*.local
 **/local.***/*token*
 shell/.profile
+aws/.aws/cli/
+aws/.aws/sso/
