@@ -24,6 +24,9 @@
         },
         "claude-3-7-sonnet": {
           "id": "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
+        },
+        "claude-haiku-4-5": {
+          "id": "us.anthropic.claude-haiku-4-5"
         }
       }
     },
@@ -43,6 +46,6 @@
       }
     }
   },
-  "model": "openai/gpt-5.4",
-  "small_model": "openai/gpt-5.4-mini"
+  "model": "amazon-bedrock/claude-sonnet-4-6",
+  "small_model": "amazon-bedrock/claude-haiku-4-5"
 }
