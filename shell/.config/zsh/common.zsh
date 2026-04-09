@@ -74,3 +74,9 @@ fi
 if command -v wt >/dev/null 2>&1; then
   eval "$(command wt config shell init zsh)"
 fi
+
+# Ghostty shell integration - ensures PWD reporting works in all shells
+# (not just directly-spawned ones), enabling window-inherit-working-directory
+if [[ -n $GHOSTTY_RESOURCES_DIR ]]; then
+  source "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration"
+fi
