@@ -53,6 +53,16 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 - **Current custom agent**: `study.md` adds a primary study mode focused on guided learning, hints, and knowledge checks
 - **Apply changes**: Run `stow -R config` from `~/dotfiles` after adding or updating OpenCode config files
 
+### Amazon Bedrock Model Access
+- **Profile**: `ClaudeCodeAccess-FlexionLLM` in `us-east-2` (managed by Flexion org via AWS IAM Identity Center)
+- **Permitted providers**: Anthropic (Claude), DeepSeek, Meta Llama, Amazon Nova, Mistral, Qwen, MiniMax, Moonshot AI (Kimi), Z.AI (GLM), NVIDIA Nemotron, Google Gemma, Writer Palmyra, OpenAI OSS, TwelveLabs Pegasus
+- **Auto-discovery caveat**: `bedrock:ListFoundationModels` is not permitted, so OpenCode pulls models from its global catalog — not your actual available models. Models shown in the picker may not be accessible in `us-east-2`. Explicitly define working models in `opencode.json` to avoid invalid model errors
+- **Verified working** (tool calls + streaming): `qwen3-coder-480b`, `nova-pro`, `kimi-k2.5`, `minimax-m2`, `glm-4.7`, `ministral-14b`
+- **Requires inference profile** (use `us.` prefix): `llama4-maverick` — bare model ID errors, must use `us.meta.llama4-maverick-17b-instruct-v1:0`
+- **DeepSeek**: IAM policy permits `deepseek.*` but only `deepseek.r1-v1:0` is available in `us-east-2` — and R1 doesn't support tool calls in streaming mode; V3 variants are not deployed in this region
+- **Tool call limitation**: Some non-Anthropic models via Bedrock may fail due to an [open OpenCode bug](https://github.com/anomalyco/opencode/pull/20040)
+- **Adding new models**: Find the Bedrock model ID in the [AWS docs](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html) and add an entry under `provider.amazon-bedrock.models` in `opencode.json`
+
 ## Structure
 
 ```
