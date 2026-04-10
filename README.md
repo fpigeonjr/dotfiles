@@ -75,11 +75,13 @@ dotfiles/
 │   │   ├── config/
 │   │   │   ├── config.edn    # Global shortcuts and settings
 │   │   │   └── plugins.edn   # Installed plugins list
-│   │   ├── custom.css        # Optional Logseq custom styling
+│   │   ├── custom.css        # Global Logseq custom styling (fallback)
 │   │   ├── settings/
 │   │   │   ├── logseq-everforest-theme.json
 │   │   │   └── logseq-journals-calendar.json
 │   │   └── preferences.json  # UI preferences and themes
+│   └── Notes/logseq/
+│       └── custom.css        # Graph-level custom CSS (active — takes precedence)
 ├── shell/           # Shell configuration
 │   ├── .bash_functions/
 │   │   └── image-tools.bash  # Bash image utilities
@@ -418,7 +420,7 @@ cp -r ~/config-backup/YYYYMMDD/* ~/
 | `aws` | .aws/config | AWS CLI SSO profile for Flexion Bedrock access |
 | `vscode` | settings.json, keybindings.json | VS Code configuration |
 | `vscode-insiders` | settings.json, keybindings.json | VS Code Insiders configuration |
-| `logseq` | .logseq/config/, .logseq/custom.css, .logseq/settings/, .logseq/preferences.json | Logseq knowledge management settings and plugins |
+| `logseq` | .logseq/config/, .logseq/custom.css, .logseq/settings/, .logseq/preferences.json, Notes/logseq/custom.css | Logseq knowledge management settings, plugins, and graph-level CSS (graph CSS takes precedence over global) |
 | `homebrew` | Brewfile | Homebrew package list for easy setup |
 
 ## Dependencies

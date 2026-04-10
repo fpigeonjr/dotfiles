@@ -5,6 +5,9 @@
 !.logseq/**
 !Library/
 !Library/**
+!Notes/
+!Notes/logseq/
+!Notes/logseq/custom.css
 
 # Keep machine-specific UI state local.
 .logseq/preferences.json

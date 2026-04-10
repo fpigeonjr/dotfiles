@@ -1,12 +1,13 @@
 :root {
-  --ls-page-text-size: 13px;   /* normal page text */
-  --ls-title-text-size: 18px;  /* page title */
-  --ls-block-bullet-size: 10px; /* bullet dot */
+  --ls-font-family: 'MonoLisa Nerd Font';
+  --ls-page-text-size: 13px;
+  --ls-title-text-size: 18px;
+  --ls-block-bullet-size: 10px;
 }
 
 /* Blockquotes / pull quotes */
 blockquote {
-  font-size: 1.15em !important;
+  font-size: 1.05em !important;
   font-weight: 500 !important;
   padding: 6px 16px !important;
   margin: 4px 0 !important;

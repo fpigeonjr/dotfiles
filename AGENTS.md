@@ -89,6 +89,14 @@
 - Check for broken symlinks: `find ~ -maxdepth 1 -type l ! -exec test -e {} \; -print`
 - Verify current stow status: `ls -la ~ | grep dotfiles`
 
+### Logseq CSS
+- Two `custom.css` files exist in the `logseq` stow package:
+  - `logseq/.logseq/custom.css` → `~/.logseq/custom.css` (global fallback)
+  - `logseq/Notes/logseq/custom.css` → `~/Notes/logseq/custom.css` (graph-level, **active**)
+- LogSeq reads the graph-level file first; always edit `logseq/Notes/logseq/custom.css`
+- Keep both files in sync when making style changes
+- Reload LogSeq after CSS changes: `Cmd+Shift+R`
+
 ### Git Configuration
 - **Email conflicts**: Check per-repo settings with `git config user.email`
 - **Authentication**: Test with `ssh -T git@github.com`
