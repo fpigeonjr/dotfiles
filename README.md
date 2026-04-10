@@ -63,6 +63,32 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 - **Tool call limitation**: Some non-Anthropic models via Bedrock may fail due to an [open OpenCode bug](https://github.com/anomalyco/opencode/pull/20040)
 - **Adding new models**: Find the Bedrock model ID in the [AWS docs](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html) and add an entry under `provider.amazon-bedrock.models` in `opencode.json`
 
+### Model Cheat Sheet
+
+| Model | Best For | Speed | Notes |
+|---|---|---|---|
+| `kimi-k2.5` | General coding, default | Medium | Current default |
+| `qwen3-coder-480b` | Complex coding, large refactors | Slow | Largest coding-specific model |
+| `qwen3-coder-30b` | Everyday coding, faster Qwen | Fast | Good balance of speed/quality |
+| `gpt-oss-120b` | General coding, alternative to Kimi | Medium | OpenAI open-weight on Bedrock |
+| `gpt-oss-20b` | Fast tasks, lightweight coding | Fast | Smaller GPT OSS variant |
+| `nova-pro` | General purpose, AWS-native | Fast | Amazon's flagship, reliable |
+| `ministral-14b` | Titles, summaries, small tasks | Fast | Current `small_model` |
+| `mistral-large` | Reasoning-heavy tasks | Medium | Mistral's flagship |
+| `devstral` | Coding-specific (Mistral) | Medium | Worth testing more |
+| `llama4-maverick` | Multimodal, general | Medium | 8192 token output cap |
+| `llama3-3-70b` | General coding, open-source | Medium | Solid workhorse |
+| `kimi-k2-thinking` | Hard problems, deep reasoning | Slow | Burns more tokens |
+| `minimax-m2` | Experimental | Medium | Less proven for coding |
+| `glm-4.7` | Experimental | Medium | Less proven for coding |
+| `claude-sonnet-4-6` | Fallback, maximum reliability | Medium | Always available |
+
+**Quick picks:**
+- Default everyday work → `kimi-k2.5`
+- Hard problem / big codebase → `qwen3-coder-480b`
+- Need speed → `gpt-oss-20b` or `nova-pro`
+- Claude reliability → `claude-sonnet-4-6`
+
 ## Structure
 
 ```
