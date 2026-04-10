@@ -55,6 +55,7 @@ library() {
 
 if command -v fnm >/dev/null 2>&1; then
   eval "$(fnm env --use-on-cd --shell zsh)"
+  fnm use default --silent-if-unchanged 2>/dev/null
 fi
 
 [[ -f ~/.env.local ]] && source ~/.env.local

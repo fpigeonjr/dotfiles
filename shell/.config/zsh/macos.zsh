@@ -4,6 +4,10 @@ if [[ -d /opt/homebrew/bin ]]; then
   path=(/opt/homebrew/bin /opt/homebrew/sbin $path)
 fi
 
+# Re-prepend fnm's active node bin after Homebrew PATH manipulation so fnm beats
+# the Homebrew node formula. FNM_MULTISHELL_PATH is set by `fnm env` in common.zsh.
+[[ -n "$FNM_MULTISHELL_PATH" ]] && path=("$FNM_MULTISHELL_PATH/bin" $path)
+
 if [[ -d /usr/local/bin ]]; then
   path=(/usr/local/bin /usr/local/sbin $path)
 fi
