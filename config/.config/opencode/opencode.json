@@ -72,6 +72,12 @@
         },
         "glm-4.7": {
           "id": "zai.glm-4.7"
+        },
+        "gpt-oss-120b": {
+          "id": "openai.gpt-oss-120b-1:0"
+        },
+        "gpt-oss-20b": {
+          "id": "openai.gpt-oss-20b-1:0"
         }
       }
     },
