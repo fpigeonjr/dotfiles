@@ -67,11 +67,14 @@
         "kimi-k2.5": {
           "id": "moonshotai.kimi-k2.5"
         },
-        "minimax-m2": {
-          "id": "minimax.minimax-m2.1"
+        "minimax-m2.5": {
+          "id": "minimax.minimax-m2.5"
         },
-        "glm-4.7": {
-          "id": "zai.glm-4.7"
+        "glm-5": {
+          "id": "zai.glm-5"
+        },
+        "gemma-3-27b": {
+          "id": "google.gemma-3-27b-it"
         },
         "gpt-oss-120b": {
           "id": "openai.gpt-oss-120b-1:0"
@@ -98,5 +101,5 @@
     }
   },
   "model": "amazon-bedrock/kimi-k2.5",
-  "small_model": "amazon-bedrock/ministral-14b"
+  "small_model": "amazon-bedrock/minimax-m2.5"
 }

@@ -56,10 +56,12 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 ### Amazon Bedrock Model Access
 - **Profile**: `ClaudeCodeAccess-FlexionLLM` in `us-east-2` (managed by Flexion org via AWS IAM Identity Center)
 - **Permitted providers**: Anthropic (Claude), DeepSeek, Meta Llama, Amazon Nova, Mistral, Qwen, MiniMax, Moonshot AI (Kimi), Z.AI (GLM), NVIDIA Nemotron, Google Gemma, Writer Palmyra, OpenAI OSS, TwelveLabs Pegasus
-- **Auto-discovery caveat**: `bedrock:ListFoundationModels` is not permitted, so OpenCode pulls models from its global catalog — not your actual available models. Models shown in the picker may not be accessible in `us-east-2`. Explicitly define working models in `opencode.json` to avoid invalid model errors
-- **Verified working** (tool calls + streaming): `qwen3-coder-480b`, `nova-pro`, `kimi-k2.5`, `minimax-m2`, `glm-4.7`, `ministral-14b`, `gpt-oss-120b`, `gpt-oss-20b`
-- **Requires inference profile** (use `us.` prefix): `llama4-maverick` — bare model ID errors, must use `us.meta.llama4-maverick-17b-instruct-v1:0`
-- **DeepSeek**: IAM policy permits `deepseek.*` but only `deepseek.r1-v1:0` is available in `us-east-2` — and R1 doesn't support tool calls in streaming mode; V3 variants are not deployed in this region
+- **Auto-discovery**: `bedrock:ListFoundationModels` is now permitted — OpenCode will discover models available in `us-east-2`. However, discovered models may still fail if they require an inference profile or don't support tool call streaming
+- **Verified working** (tool calls + streaming): `qwen3-coder-480b`, `qwen3-235b`, `nova-pro`, `kimi-k2.5`, `minimax-m2.5`, `glm-5`, `gemma-3-27b`, `ministral-14b`, `gpt-oss-120b`, `gpt-oss-20b`
+- **Requires inference profile** (use `us.` prefix): `llama4-maverick` — must use `us.meta.llama4-maverick-17b-instruct-v1:0`
+- **DeepSeek**: IAM policy permits `deepseek.*` but no V3 inference profile exists in `us-east-2`; R1 doesn't support tool calls in streaming mode
+- **Nova Premier**: Access denied — requires 30 days of prior active usage per AWS policy
+- **Magistral Small**: Works but over-eager, makes unnecessary tool calls for simple tasks
 - **Tool call limitation**: Some non-Anthropic models via Bedrock may fail due to an [open OpenCode bug](https://github.com/anomalyco/opencode/pull/20040)
 - **Adding new models**: Find the Bedrock model ID in the [AWS docs](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html) and add an entry under `provider.amazon-bedrock.models` in `opencode.json`
 
@@ -70,23 +72,25 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 | `kimi-k2.5` | General coding, default | Medium | Current default |
 | `qwen3-coder-480b` | Complex coding, large refactors | Slow | Largest coding-specific model |
 | `qwen3-coder-30b` | Everyday coding, faster Qwen | Fast | Good balance of speed/quality |
+| `qwen3-235b` | General coding, fast | Very fast | 2.5s, MoE architecture |
 | `gpt-oss-120b` | General coding, alternative to Kimi | Medium | OpenAI open-weight on Bedrock |
 | `gpt-oss-20b` | Fast tasks, lightweight coding | Fast | Smaller GPT OSS variant |
 | `nova-pro` | General purpose, AWS-native | Fast | Amazon's flagship, reliable |
-| `ministral-14b` | Titles, summaries, small tasks | Fast | Current `small_model` |
+| `gemma-3-27b` | General coding | Medium | Google, clean responses |
+| `glm-5` | General coding | Medium | Z.AI, good quality |
+| `minimax-m2.5` | Titles, summaries, small tasks | Very fast | Current `small_model`, 3.4s |
+| `ministral-14b` | Lightweight coding tasks | Fast | Mistral small model |
 | `mistral-large` | Reasoning-heavy tasks | Medium | Mistral's flagship |
 | `devstral` | Coding-specific (Mistral) | Medium | Worth testing more |
 | `llama4-maverick` | Multimodal, general | Medium | 8192 token output cap |
 | `llama3-3-70b` | General coding, open-source | Medium | Solid workhorse |
 | `kimi-k2-thinking` | Hard problems, deep reasoning | Slow | Burns more tokens |
-| `minimax-m2` | Experimental | Medium | Less proven for coding |
-| `glm-4.7` | Experimental | Medium | Less proven for coding |
 | `claude-sonnet-4-6` | Fallback, maximum reliability | Medium | Always available |
 
 **Quick picks:**
 - Default everyday work → `kimi-k2.5`
 - Hard problem / big codebase → `qwen3-coder-480b`
-- Need speed → `gpt-oss-20b` or `nova-pro`
+- Need speed → `qwen3-235b` or `minimax-m2.5`
 - Claude reliability → `claude-sonnet-4-6`
 
 ## Structure
