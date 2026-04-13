@@ -30,9 +30,6 @@
         "claude-sonnet-4-6": {
           "id": "us.anthropic.claude-sonnet-4-6"
         },
-        "claude-3-7-sonnet": {
-          "id": "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
-        },
         "claude-haiku-4-5": {
           "id": "us.anthropic.claude-haiku-4-5"
         },
@@ -42,9 +39,6 @@
             "context": 1048576,
             "output": 8192
           }
-        },
-        "llama3-3-70b": {
-          "id": "meta.llama3-3-70b-instruct-v1:0"
         },
         "mistral-large": {
           "id": "mistral.mistral-large-3-675b-instruct"

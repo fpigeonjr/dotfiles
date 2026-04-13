@@ -71,7 +71,7 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 |---|---|---|---|
 | `kimi-k2.5` | General coding, default | Medium | Current default |
 | `qwen3-coder-480b` | Complex coding, large refactors | Slow | Largest coding-specific model |
-| `qwen3-coder-30b` | Everyday coding, faster Qwen | Fast | Good balance of speed/quality |
+| `qwen3-coder-30b` | Everyday coding, faster Qwen | Fast | Can hallucinate on simple tasks |
 | `qwen3-235b` | General coding, fast | Very fast | 2.5s, MoE architecture |
 | `gpt-oss-120b` | General coding, alternative to Kimi | Medium | OpenAI open-weight on Bedrock |
 | `gpt-oss-20b` | Fast tasks, lightweight coding | Fast | Smaller GPT OSS variant |
@@ -80,10 +80,9 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 | `glm-5` | General coding | Medium | Z.AI, good quality |
 | `minimax-m2.5` | Titles, summaries, small tasks | Very fast | Current `small_model`, 3.4s |
 | `ministral-14b` | Lightweight coding tasks | Fast | Mistral small model |
-| `mistral-large` | Reasoning-heavy tasks | Medium | Mistral's flagship |
-| `devstral` | Coding-specific (Mistral) | Medium | Worth testing more |
+| `mistral-large` | Reasoning-heavy tasks | Medium | Mistral's flagship, 4.4s |
+| `devstral` | Coding-specific (Mistral) | Fast | Mistral coding model, 4.4s |
 | `llama4-maverick` | Multimodal, general | Medium | 8192 token output cap |
-| `llama3-3-70b` | General coding, open-source | Medium | Solid workhorse |
 | `kimi-k2-thinking` | Hard problems, deep reasoning | Slow | Burns more tokens |
 | `claude-sonnet-4-6` | Fallback, maximum reliability | Medium | Always available |
 
