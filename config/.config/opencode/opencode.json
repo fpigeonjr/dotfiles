@@ -31,7 +31,7 @@
           "id": "us.anthropic.claude-sonnet-4-6"
         },
         "claude-haiku-4-5": {
-          "id": "us.anthropic.claude-haiku-4-5"
+          "id": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
         },
         "llama4-maverick": {
           "id": "us.meta.llama4-maverick-17b-instruct-v1:0",
