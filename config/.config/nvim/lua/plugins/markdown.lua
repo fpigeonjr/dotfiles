@@ -1,6 +1,6 @@
 return {
   { "neovim/nvim-lspconfig", opts = { servers = { marksman = {} } } },
-  { "williamboman/mason.nvim", opts = { ensure_installed = { "marksman" } } },
+  { "mason-org/mason.nvim", opts = { ensure_installed = { "marksman" } } },
   {
     "stevearc/conform.nvim",
     opts = {
