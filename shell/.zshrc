@@ -38,5 +38,5 @@ fi
 [[ -r "$ZDOTFILES_CONFIG_DIR/$DOTFILES_OS.zsh" ]] && source "$ZDOTFILES_CONFIG_DIR/$DOTFILES_OS.zsh"
 [[ -r "$ZDOTFILES_CONFIG_DIR/local.zsh" ]] && source "$ZDOTFILES_CONFIG_DIR/local.zsh"
 
-# OpenClaw Completion
-source "/Users/fpigeonjr/.openclaw/completions/openclaw.zsh"
+# OpenClaw Completion (only source if file exists)
+[[ -r "$HOME/.openclaw/completions/openclaw.zsh" ]] && source "$HOME/.openclaw/completions/openclaw.zsh"
