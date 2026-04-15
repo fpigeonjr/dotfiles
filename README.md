@@ -109,6 +109,10 @@ dotfiles/
 │   └── .gitignore_global
 ├── homebrew/        # Homebrew package management
 │   └── Brewfile     # List of installed packages
+├── scripts/         # Utility scripts
+│   ├── wt-clean.sh  # Clean up stale worktrunk worktrees
+│   ├── pi-pihole-restore.sh # Restore Pi-hole configuration
+│   └── install-lid-wakeup-fix.sh # Systemd service for lid wakeup fix
 ├── logseq/          # Logseq knowledge management
 │   ├── .logseq/
 │   │   ├── config/
@@ -256,6 +260,31 @@ After flashing a fresh Bookworm card, enabling SSH, and installing Pi-hole, you 
 ```
 
 The script expects the backup set at `~/Downloads/pi-pre-upgrade-backups/20260310-150325` by default and can target a different host or backup directory with `--host` and `--backup-dir`.
+
+### Cleaning Up Stale Worktrunk Worktrees
+
+Use the `wt-clean` helper script to remove stale git worktrees created with [worktrunk](https://worktrunk.dev):
+
+```bash
+# Interactive mode (shows what will be removed, asks for confirmation)
+wt-clean
+
+# Dry run (see what would be removed without actually removing)
+wt-clean --dry-run
+
+# Remove without confirmation
+wt-clean --force
+
+# Verbose output
+wt-clean -v
+```
+
+The script identifies and removes:
+- **Prunable worktrees**: Directories that were manually deleted with stale metadata
+- **Integrated worktrees**: Branches merged into main (safe to delete)
+- **Empty worktrees**: Same commit as main with clean working tree
+
+Requirements: `wt` (worktrunk) and `jq` installed (both available via Homebrew).
 
 ### Adding New Configurations
 
