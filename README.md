@@ -286,6 +286,12 @@ The script identifies and removes:
 
 Requirements: `wt` (worktrunk) and `jq` installed (both available via Homebrew).
 
+The script lives in `scripts/wt-clean.sh`. To make it available on PATH, symlink it to `~/.local/bin` (the convention used in this repo):
+
+```bash
+ln -sf ~/dotfiles/scripts/wt-clean.sh ~/.local/bin/wt-clean
+```
+
 ### Adding New Configurations
 
 1. **Create a new package directory:**
