@@ -69,10 +69,11 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 - **Auto-discovery**: `bedrock:ListFoundationModels` is now permitted — OpenCode will discover models available in `us-east-2`. However, discovered models may still fail if they require an inference profile or don't support tool call streaming
 - **Verified working** (tool calls + streaming): `qwen3-coder-480b`, `qwen3-235b`, `nova-pro`, `kimi-k2.5`, `minimax-m2.5`, `glm-5`, `gemma-3-27b`, `ministral-14b`, `gpt-oss-120b`, `gpt-oss-20b`
 - **Requires inference profile** (use `us.` prefix): `llama4-maverick` — must use `us.meta.llama4-maverick-17b-instruct-v1:0`
-- **DeepSeek**: IAM policy permits `deepseek.*` but no V3 inference profile exists in `us-east-2`; R1 doesn't support tool calls in streaming mode
+- **DeepSeek**: IAM policy permits `deepseek.*`; R1 (`deepseek-r1`) is configured with `tool_call: false` — useful for reasoning/analysis but not agentic tasks
 - **Nova Premier**: Access denied — requires 30 days of prior active usage per AWS policy
 - **Magistral Small**: Works but over-eager, makes unnecessary tool calls for simple tasks
-- **Tool call limitation**: Some non-Anthropic models via Bedrock may fail due to an [open OpenCode bug](https://github.com/anomalyco/opencode/pull/20040)
+- **Tool call limitation**: `tool_call: false` in the config is currently ignored by upstream OpenCode — tools are always sent, causing failures on models that don't support streaming + tool use. Tracked upstream at [anomalyco/opencode#19966](https://github.com/anomalyco/opencode/issues/19966), fix pending in [anomalyco/opencode#20040](https://github.com/anomalyco/opencode/pull/20040). A colleague's Flexion fork ([flexion/opencode, `flex` branch](https://github.com/flexion/opencode/tree/flex)) already ships this fix — worth watching for when it merges upstream
+- **Models with `tool_call: false`**: `llama4-maverick`, `llama4-scout`, `deepseek-r1` — usable for read-only/chat queries now, but will fail in agentic sessions until the upstream fix lands
 - **Adding new models**: Find the Bedrock model ID in the [AWS docs](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html) and add an entry under `provider.amazon-bedrock.models` in `opencode.json`
 
 ### Model Cheat Sheet
@@ -92,7 +93,9 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 | `ministral-14b` | Lightweight coding tasks | Fast | Mistral small model |
 | `mistral-large` | Reasoning-heavy tasks | Medium | Mistral's flagship, 4.4s |
 | `devstral` | Coding-specific (Mistral) | Fast | Mistral coding model, 4.4s |
-| `llama4-maverick` | Multimodal, general | Medium | 8192 token output cap |
+| `llama4-maverick` | Multimodal, general | Medium | No tool calls on Bedrock; chat/read-only only |
+| `llama4-scout` | Huge context, multi-doc analysis | Medium | 10M token context; no tool calls on Bedrock |
+| `deepseek-r1` | Hard reasoning, math, STEM | Slow | Chain-of-thought; no tool calls on Bedrock; 64K context |
 | `kimi-k2-thinking` | Hard problems, deep reasoning | Slow | Burns more tokens |
 | `claude-sonnet-4-6` | Fallback, maximum reliability | Medium | Always available |
 
