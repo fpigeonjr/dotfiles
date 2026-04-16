@@ -97,6 +97,6 @@
       }
     }
   },
-  "model": "amazon-bedrock/kimi-k2.5",
-  "small_model": "amazon-bedrock/minimax-m2.5"
+  "model": "amazon-bedrock/claude-sonnet-4-6",
+  "small_model": "amazon-bedrock/claude-haiku-4-5"
 }
