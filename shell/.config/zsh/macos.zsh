@@ -26,6 +26,11 @@ if command -v pbcopy >/dev/null 2>&1; then
   alias clip='pbcopy'
 fi
 
+# cmux CLI — add app bundle bin to PATH so cmux works outside the app
+if [[ -x "/Applications/cmux.app/Contents/Resources/bin/cmux" ]]; then
+  path=("/Applications/cmux.app/Contents/Resources/bin" $path)
+fi
+
 # macOS-specific aliases
 alias code='code-insiders'
 alias work='cd ~/Code/OPRE-OPS/frontend'

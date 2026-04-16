@@ -49,7 +49,9 @@
 - Zsh as default shell
 - Keychain integration for SSH keys
 - VS Code/VS Code Insiders configurations in Library/Application Support/
-- Ghostty terminal emulator
+- cmux terminal (native macOS app built on libghostty) — reads `~/.config/ghostty/config`
+- cmux CLI added to PATH via `shell/.config/zsh/macos.zsh` (app bundle bin directory)
+- OpenCode plugins auto-loaded from `config/.config/opencode/plugins/` — no config entry required
 
 ### OMArchy/Linux (Arch-based)
 - Use pacman for system packages (`sudo pacman -S`)

@@ -51,7 +51,17 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 - **Global config**: `config/.config/opencode/opencode.json` is stowed to `~/.config/opencode/opencode.json`
 - **Custom agents**: Store reusable agents in `config/.config/opencode/agents/`
 - **Current custom agent**: `study.md` adds a primary study mode focused on guided learning, hints, and knowledge checks
+- **Plugins**: Global plugins live in `config/.config/opencode/plugins/` and are auto-loaded at startup (no config entry needed)
+- **Current plugin**: `cmux-notify.js` fires `cmux notify` on `session.idle`, `session.error`, and `permission.asked` — triggers the blue pane ring and sidebar badge in cmux. Safe outside cmux (gated on `CMUX_SOCKET_PATH`)
 - **Apply changes**: Run `stow -R config` from `~/dotfiles` after adding or updating OpenCode config files
+
+### cmux
+- **What it is**: Native macOS terminal built on libghostty with vertical tabs, notification rings, and an in-app browser — designed for running multiple AI coding agents in parallel
+- **Reads existing Ghostty config**: No separate cmux config needed; it uses `~/.config/ghostty/config` for fonts, themes, and colors
+- **CLI on PATH**: `macos.zsh` adds `/Applications/cmux.app/Contents/Resources/bin` to PATH automatically when cmux is installed
+- **OpenCode integration**: `cmux omo` launches OpenCode with the `oh-my-opencode` plugin in a shadow config — each subagent gets its own native cmux pane. Your `~/.config/opencode/` is never modified
+- **Notification ring**: `cmux-notify.js` plugin bridges OpenCode session events to cmux's visual pane ring
+- **Install**: `brew tap manaflow-ai/cmux && brew install --cask cmux`
 
 ### Amazon Bedrock Model Access
 - **Profile**: `ClaudeCodeAccess-FlexionLLM` in `us-east-2` (managed by Flexion org via AWS IAM Identity Center)
@@ -489,7 +499,7 @@ cp -r ~/config-backup/YYYYMMDD/* ~/
 | `git` | .gitconfig, .gitignore_global | Git settings and global ignores |
 | `shell` | .bashrc, .bash_profile, .zshrc, .env.local, functions | Shell configuration (bash for Arch/OMArchy, zsh for macOS) |
 | `vim` | .vimrc | Traditional Vim settings |
-| `config` | .config/nvim/, .config/zed/, .config/hypr/, .config/waybar/, .config/ghostty/ | Modern app configurations (Neovim includes GitHub Copilot) |
+| `config` | .config/nvim/, .config/zed/, .config/hypr/, .config/waybar/, .config/ghostty/, .config/opencode/ | Modern app configurations (Neovim includes GitHub Copilot; OpenCode config, agents, and plugins) |
 | `ssh` | .ssh/config | SSH client settings (no keys) |
 | `aws` | .aws/config | AWS CLI SSO profile for Flexion Bedrock access |
 | `vscode` | settings.json, keybindings.json | VS Code configuration |
