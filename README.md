@@ -306,6 +306,45 @@ The script lives in `scripts/wt-clean.sh`. To make it available on PATH, symlink
 ln -sf ~/dotfiles/scripts/wt-clean.sh ~/.local/bin/wt-clean
 ```
 
+### LogSeq Asset Compression (`scripts/compress-logseq-assets.sh`)
+
+Compresses PNG, JPEG, and HEIC images in a LogSeq `assets/` directory to WebP format and updates all markdown link references in `pages/` and `journals/`. Handles all four LogSeq link patterns (`![alt](../assets/...)`, `![[filename]]`, `file::`, and `file-path::`).
+
+**Two modes:**
+
+- `--migrate`: One-time full migration of all existing images. Creates a `asset-compression` git branch, handles HEIC files via `sips`, and requires a clean working tree.
+- `--incremental`: Only converts new images (those without an existing `.webp` sibling). Safe to re-run; idempotent.
+
+Both modes accept `--dry-run` (default, no changes) or `--execute` (performs the conversion).
+
+**Requirements:** `cwebp` (`brew install webp`), `sips` (built into macOS, needed for `--migrate` only).
+
+**Initial migration (run once):**
+```bash
+# Preview
+compress-logseq-assets --migrate --dry-run
+
+# Execute (creates asset-compression branch, converts everything, updates links)
+compress-logseq-assets --migrate --execute
+```
+
+**Symlink to PATH:**
+```bash
+ln -sf ~/dotfiles/scripts/compress-logseq-assets.sh ~/.local/bin/compress-logseq-assets
+```
+
+**Cron job (Mac Mini — run weekly to compress newly added images):**
+
+Add to crontab on the Mac Mini (`crontab -e`):
+```cron
+# Compress new LogSeq images to WebP (Sundays at 3am)
+0 3 * * 0 /Users/fpigeon/dotfiles/scripts/compress-logseq-assets.sh --cron
+```
+
+The `--cron` flag implies `--incremental --execute`, sets the Homebrew PATH, and logs to `~/.local/share/logs/compress-logseq-assets.log`. New images pasted into LogSeq during the week are compressed before the next iCloud sync picks them up.
+
+**Recovery:** If anything goes wrong, the Notes repo has a `pre-asset-compression-YYYYMMDD` git tag to restore from.
+
 ### Adding New Configurations
 
 1. **Create a new package directory:**
