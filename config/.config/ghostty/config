@@ -52,11 +52,11 @@ background-blur = true
 macos-window-shadow = true
 
 # =============================================================================
-# QUICK TERMINAL CONFIGURATION (Global Terminal Access)  
+# QUICK TERMINAL CONFIGURATION (Global Terminal Access)
 # =============================================================================
 # Quick terminal positioning and behavior - FULLSCREEN ATTEMPT 2
 quick-terminal-size = 100%
-quick-terminal-autohide = false  
+quick-terminal-autohide = false
 quick-terminal-animation-duration = 0.1
 
 # Global keybind for system-wide quick terminal access (~ key / grave accent)
@@ -87,7 +87,7 @@ macos-titlebar-proxy-icon = visible
 macos-non-native-fullscreen = true
 
 # =============================================================================
-# KEYBINDINGS  
+# KEYBINDINGS
 # =============================================================================
 # Window management shortcuts
 keybind = super+shift+f=toggle_window_float_on_top
@@ -98,3 +98,6 @@ keybind = super+shift+enter=toggle_fullscreen
 # =============================================================================
 click-repeat-interval = 500
 auto-update-channel = stable
+
+# Copy selected text to clipboard automatically on mouse highlight
+copy-on-select = clipboard
