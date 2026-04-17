@@ -405,31 +405,29 @@ update_links() {
     return
   fi
 
-  # Build a combined sed script: one substitution per converted file.
-  # Each rule replaces the exact old filename with the .webp version.
-  # Using | as delimiter to avoid clashing with / in filenames.
-  local sed_script=""
+  # Build a sed script file: one substitution per converted file.
+  # Using a file avoids macOS sed's argument-length limits with large batches.
+  # We use \x01 as the sed delimiter (unlikely to appear in filenames).
+  local sed_script_file pattern_file
+  sed_script_file=$(mktemp /tmp/compress-logseq-sed.XXXXXX)
+  pattern_file=$(mktemp /tmp/compress-logseq-patterns.XXXXXX)
+  trap 'rm -f "$sed_script_file" "$pattern_file"' RETURN
+
   for old_filename in "${CONVERTED_FILES[@]}"; do
     local base="${old_filename%.*}"
     local new_filename="${base}.webp"
-    # Escape any special sed regex characters in the filename (dots, brackets, etc.)
-    local escaped_old
-    escaped_old=$(printf '%s' "$old_filename" | sed 's/[[\.*^$()+?{|]/\\&/g')
-    sed_script+="s|${escaped_old}|${new_filename}|g;"
+    # Escape characters special to sed BRE (not the delimiter).
+    # We use \x01 as delimiter so only need to escape \x01 itself (never in filenames).
+    local escaped_old escaped_new
+    escaped_old=$(printf '%s' "$old_filename" | sed 's/[[\.*^$]/\\&/g')
+    escaped_new=$(printf '%s' "$new_filename" | sed 's/[[\.*^$]/\\&/g')
+    printf 's\x01%s\x01%s\x01g\n' "$escaped_old" "$escaped_new" >> "$sed_script_file"
+    # Also add to grep pattern file for fast pre-filtering
+    printf '%s\n' "$old_filename" >> "$pattern_file"
   done
 
   log "  Scanning ${#md_files[@]} markdown files for ${#CONVERTED_FILES[@]} converted filename(s)..."
   log ""
-
-  # Write all old filenames to a temp pattern file for fast grep -F -f matching.
-  # This turns O(files × filenames) grep calls into O(files) calls.
-  local pattern_file
-  pattern_file=$(mktemp /tmp/compress-logseq-patterns.XXXXXX)
-  trap 'rm -f "$pattern_file"' RETURN
-
-  for old_filename in "${CONVERTED_FILES[@]}"; do
-    printf '%s\n' "$old_filename" >> "$pattern_file"
-  done
 
   local total_files_changed=0
   local total_refs_changed=0
@@ -451,8 +449,8 @@ update_links() {
       continue
     fi
 
-    # Apply all substitutions in a single sed pass (sed_script built above)
-    sed -i '' "$sed_script" "$md"
+    # Apply all substitutions in a single sed pass using the script file
+    sed -i '' -f "$sed_script_file" "$md"
     log "  ${GREEN}✓${NC} $(basename "$md") -- updated $refs_before reference(s)"
     (( total_files_changed++ )) || true
     (( total_refs_changed += refs_before )) || true
