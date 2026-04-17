@@ -31,9 +31,6 @@ if [[ -x "/Applications/cmux.app/Contents/Resources/bin/cmux" ]]; then
   path=("/Applications/cmux.app/Contents/Resources/bin" $path)
 fi
 
-# wt (worktrunk) shell integration — enables auto-cd on wt switch + completions
-if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
-
 # macOS-specific aliases
 alias code='code-insiders'
 alias work='cd ~/Code/OPRE-OPS/frontend'
