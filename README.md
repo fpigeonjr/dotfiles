@@ -338,7 +338,7 @@ ln -sf ~/dotfiles/scripts/compress-logseq-assets.sh ~/.local/bin/compress-logseq
 Add to crontab on the Mac Mini (`crontab -e`):
 ```cron
 # Compress new LogSeq images to WebP (Sundays at 3am)
-0 3 * * 0 /Users/fpigeon/dotfiles/scripts/compress-logseq-assets.sh --cron
+0 3 * * 0 $HOME/dotfiles/scripts/compress-logseq-assets.sh --cron
 ```
 
 The `--cron` flag implies `--incremental --execute`, sets the Homebrew PATH, and logs to `~/.local/share/logs/compress-logseq-assets.log`. New images pasted into LogSeq during the week are compressed before the next iCloud sync picks them up.

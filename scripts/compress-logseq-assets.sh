@@ -23,7 +23,7 @@
 #   compress-logseq-assets.sh --cron
 #
 # Cron entry (Mac Mini, Sundays at 3am):
-#   0 3 * * 0 /Users/fpigeon/dotfiles/scripts/compress-logseq-assets.sh --cron
+#   0 3 * * 0 $HOME/dotfiles/scripts/compress-logseq-assets.sh --cron
 #
 # Backup / recovery:
 #   The --migrate mode creates a git branch 'asset-compression' and requires
