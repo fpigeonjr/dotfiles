@@ -46,6 +46,7 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 - **Local override**: `~/.config/worktrunk/config.toml` includes a repo-specific override for `github.com/HHS/OPRE-OPS`
 - **Why**: Worktrunk's default sibling worktree naming can preserve uppercase repo names, which breaks Podman/Lazydocker compose project naming
 - **Behavior**: New OPRE OPS worktrees are created under `.worktrees/{{ branch | sanitize_db }}` so paths stay lowercase-safe
+- **Shell integration**: Loaded in `shell/.config/zsh/common.zsh` — enables auto-cd after `wt switch` and tab completions (no-op if `wt` is not installed)
 
 ### OpenCode
 - **Global config**: `config/.config/opencode/opencode.json` is stowed to `~/.config/opencode/opencode.json`
