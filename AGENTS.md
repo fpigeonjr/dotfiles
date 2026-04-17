@@ -99,6 +99,13 @@
 - Keep both files in sync when making style changes
 - Reload LogSeq after CSS changes: `Cmd+Shift+R`
 
+### Ghostty Configuration
+- **Reload config**: `Cmd+Shift+,` in Ghostty (no restart needed)
+- **Verify active config**: `ghostty +show-config --default=false` (only shows non-default values)
+- **Trailing whitespace causes silent truncation**: Ghostty stops parsing the config file at any line with trailing whitespace. All settings after that line are silently ignored. Always check with `rg "\s+$" config/.config/ghostty/config` before debugging missing settings.
+- **`copy-on-select = clipboard` on macOS**: On macOS the selection clipboard is not supported, so `copy-on-select = true` (default) falls back to the system clipboard. The `clipboard` value targets both clipboards and is the correct setting, but has been reported broken in some HEAD builds (fixed in 1.3.1). Workaround: use `Cmd+C` after selecting.
+- **Config file is a symlink**: `~/.config/ghostty/config` → dotfiles repo (already stowed); no re-stow needed after edits.
+
 ### Git Configuration
 - **Email conflicts**: Check per-repo settings with `git config user.email`
 - **Authentication**: Test with `ssh -T git@github.com`

@@ -460,6 +460,24 @@ cp ~/config-backup/YYYYMMDD/.configfile ~/.configfile
 
 ### Other Common Issues
 
+### Other Common Issues
+
+**Ghostty config settings being silently ignored:**
+
+Ghostty stops parsing the config file at any line with trailing whitespace — all settings after that line are dropped with no error. Symptoms include settings appearing in the file but having no effect.
+
+```bash
+# Check for trailing whitespace
+rg "\s+$" config/.config/ghostty/config
+
+# Verify what Ghostty actually loaded
+ghostty +show-config --default=false
+```
+
+**`copy-on-select = clipboard` not working on macOS:**
+
+This is a known bug in Ghostty builds prior to 1.3.1. The `clipboard` value is the correct setting (copies selection to the system clipboard automatically), but may be silently ignored on affected builds. Workaround: use `Cmd+C` after selecting text, then `Cmd+V` to paste.
+
 **Broken Symlinks:**
 ```bash
 # Find broken symlinks
