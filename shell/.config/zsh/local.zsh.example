@@ -1,5 +1,16 @@
 # Copy this file to ~/.config/zsh/local.zsh for machine-specific settings.
 # Keep secrets and host-only overrides out of git.
+# This file is intentionally NOT tracked in git.
 
 # export MY_ENV_VAR="value"
 # alias work='cd ~/Code/work-project'
+
+# --- Prompt: show friendly machine name instead of real hostname ---
+# Replace "my-machine-name" with something meaningful (e.g. flexion-mbp, macMini)
+# This is display-only — no system hostname change.
+#
+# export LANG="en_US.UTF-8"   # uncomment if ➜ renders as ? over SSH
+# export LC_ALL="en_US.UTF-8"
+#
+# PROMPT="%(?:%{$fg_bold[green]%}➜ :%{$fg_bold[red]%}➜ ) %{$fg_bold[yellow]%}%n@my-machine-name%{$reset_color%} %{$fg[cyan]%}%c%{$reset_color%}"
+# PROMPT+=' $(git_prompt_info)'
