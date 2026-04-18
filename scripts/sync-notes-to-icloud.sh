@@ -19,8 +19,10 @@ fi
 RSYNC_ARGS=(
   --recursive
   --links
-  --times
   --omit-dir-times
+  --no-times
+  --size-only
+  --inplace
   --no-perms
   --no-owner
   --no-group
@@ -54,9 +56,10 @@ cleanup() {
 }
 trap cleanup EXIT
 
-TMP_DEST="${DEST%/}.tmp/"
+STAGING_ROOT="$HOME/.local/state/sync-notes-to-icloud-staging"
+TMP_DEST="$STAGING_ROOT/Graph/"
 
-rm -rf "$TMP_DEST"
+rm -rf "$STAGING_ROOT"
 mkdir -p "$TMP_DEST"
 
 "$RSYNC_BIN" \
@@ -72,7 +75,21 @@ if [ $EXIT_CODE -eq 0 ]; then
   EXIT_CODE=$?
 fi
 
-rm -rf "$TMP_DEST"
+JOURNAL_REL="journals/$(date '+%Y_%m_%d').md"
+SRC_FILE="${SOURCE%/}/$JOURNAL_REL"
+DST_FILE="${DEST%/}/$JOURNAL_REL"
+if [ -f "$SRC_FILE" ]; then
+  SRC_SIZE=$(stat -f '%z' "$SRC_FILE" 2>/dev/null || echo '')
+  DST_SIZE=$(stat -f '%z' "$DST_FILE" 2>/dev/null || echo '')
+  if [ -z "$DST_SIZE" ] || [ "$SRC_SIZE" != "$DST_SIZE" ]; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Verification FAILED for $JOURNAL_REL (src size=$SRC_SIZE, dst size=$DST_SIZE)." >> "$LOG_FILE"
+    EXIT_CODE=1
+  else
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Verification passed for $JOURNAL_REL (size $SRC_SIZE)." >> "$LOG_FILE"
+  fi
+fi
+
+rm -rf "$STAGING_ROOT"
 FINISH_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 
 if [ $EXIT_CODE -eq 0 ]; then
