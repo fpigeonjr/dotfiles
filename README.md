@@ -333,15 +333,54 @@ compress-logseq-assets --migrate --execute
 ln -sf ~/dotfiles/scripts/compress-logseq-assets.sh ~/.local/bin/compress-logseq-assets
 ```
 
-**Cron job (Mac Mini — run weekly to compress newly added images):**
+**LaunchAgent job (Mac Mini — run weekly to compress newly added images):**
 
-Add to crontab on the Mac Mini (`crontab -e`):
-```cron
-# Compress new LogSeq images to WebP (Sundays at 3am)
-0 3 * * 0 $HOME/dotfiles/scripts/compress-logseq-assets.sh --cron
+Install the bundled LaunchAgent and load it in the user domain:
+```bash
+mkdir -p ~/Library/LaunchAgents ~/.local/share/logs
+ln -sf ~/dotfiles/scripts/com.fpigeon.compress-logseq-assets.plist \
+  ~/Library/LaunchAgents/com.fpigeon.compress-logseq-assets.plist
+launchctl bootout "gui/$(id -u)" ~/Library/LaunchAgents/com.fpigeon.compress-logseq-assets.plist 2>/dev/null || true
+launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.fpigeon.compress-logseq-assets.plist
+launchctl enable "gui/$(id -u)/com.fpigeon.compress-logseq-assets"
+launchctl kickstart -k "gui/$(id -u)/com.fpigeon.compress-logseq-assets"
 ```
 
-The `--cron` flag implies `--incremental --execute`, sets the Homebrew PATH, and logs to `~/.local/share/logs/compress-logseq-assets.log`. New images pasted into LogSeq during the week are compressed before the next iCloud sync picks them up.
+This LaunchAgent runs every Sunday at `03:00`, uses the same `--incremental --execute` behavior as the old cron entry, injects the Homebrew-friendly PATH, and logs to `~/.local/share/logs/compress-logseq-assets.log`. New images pasted into LogSeq during the week are compressed before the next iCloud sync picks them up.
+
+**Sync job (every 15 minutes):**
+```bash
+mkdir -p ~/Library/LaunchAgents ~/.local/share/logs ~/.local/state
+ln -sf ~/dotfiles/scripts/com.fpigeon.sync-notes-to-icloud.plist \
+  ~/Library/LaunchAgents/com.fpigeon.sync-notes-to-icloud.plist
+launchctl bootout "gui/$(id -u)" ~/Library/LaunchAgents/com.fpigeon.sync-notes-to-icloud.plist 2>/dev/null || true
+launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.fpigeon.sync-notes-to-icloud.plist
+launchctl enable "gui/$(id -u)/com.fpigeon.sync-notes-to-icloud"
+launchctl kickstart -k "gui/$(id -u)/com.fpigeon.sync-notes-to-icloud"
+```
+
+This LaunchAgent runs every 15 minutes and once when loaded. The script still writes its own detailed sync log to `~/.local/share/logs/sync-notes-to-icloud.log`, and `launchd` stdout/stderr go to `~/.local/share/logs/launchd-sync-notes-to-icloud.log`.
+
+After both agents are loaded, remove the old cron entries with `crontab -e` or `crontab -r` after confirming the LaunchAgents are running.
+
+**Troubleshooting findings (2026-04-17):**
+
+- The old cron-based sync was running on schedule, but failed against `~/Library/Mobile Documents/...` with `Operation not permitted`.
+- The failure was not caused by Unix file permissions. Script execute bits, ownership, and log directory permissions were already correct.
+- The root cause was macOS privacy/TCC access for the non-interactive job context. Moving the sync from `cron` to a user `LaunchAgent` was the correct scheduler change for iCloud Drive access.
+- The minimum practical permission change for this setup was granting `Full Disk Access` to `/bin/bash` and `rsync`, because those are the executables the LaunchAgent runs during sync. After that change, the iCloud permission error stopped.
+- The built-in macOS `/usr/bin/rsync` was still unreliable for this workload and produced `mmap: Resource deadlock avoided` errors on files in `~/Notes`.
+- Installing Homebrew `rsync` fixed the remaining sync failures. The sync script now prefers `/opt/homebrew/bin/rsync` automatically when available and logs which binary it used on each run.
+- A successful verification run completed at `2026-04-17 21:26:14`, with the log showing `Using rsync binary: /opt/homebrew/bin/rsync` followed by `Sync completed successfully.`
+
+**Recommended macOS setup for `sync-notes-to-icloud.sh`:**
+
+- Scheduler: user `LaunchAgent`, not `cron`
+- Permissions: `Full Disk Access` for `/bin/bash` and `rsync`
+- `rsync`: Homebrew `rsync` (`brew install rsync`), not the system `/usr/bin/rsync`
+- Verification:
+  - `launchctl print "gui/$(id -u)/com.fpigeon.sync-notes-to-icloud"`
+  - `tail -n 20 ~/.local/share/logs/sync-notes-to-icloud.log`
 
 **Recovery:** If anything goes wrong, the Notes repo has a `pre-asset-compression-YYYYMMDD` git tag to restore from.
 

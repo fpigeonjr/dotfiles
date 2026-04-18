@@ -86,6 +86,12 @@
 - **Syntax errors**: Use `zsh -n` or `bash -n` to check
 - **Repo shell helpers**: Validate scripts in `scripts/` with `bash -n path/to/script.sh`
 
+### LaunchAgent / Cron Issues
+- **iCloud sync on macOS**: Prefer a user `LaunchAgent` over `cron` for jobs that read or write `~/Library/Mobile Documents/...` or other TCC-protected locations.
+- **Minimum practical permissions**: Grant `Full Disk Access` to `/bin/bash` and `rsync` for the `sync-notes-to-icloud` LaunchAgent workflow.
+- **System `rsync` is not sufficient here**: Prefer Homebrew `rsync` (`/opt/homebrew/bin/rsync`, `brew install rsync`) because the macOS-provided `/usr/bin/rsync` can fail with `mmap: Resource deadlock avoided` during large note syncs.
+- **Verification**: `launchctl print "gui/$(id -u)/com.fpigeon.sync-notes-to-icloud"` and `tail -n 20 ~/.local/share/logs/sync-notes-to-icloud.log`
+
 ### Stow Conflicts
 - Use backup and manual resolution (see README.md)
 - Check for broken symlinks: `find ~ -maxdepth 1 -type l ! -exec test -e {} \; -print`

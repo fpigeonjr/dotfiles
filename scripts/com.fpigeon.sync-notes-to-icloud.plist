@@ -2,27 +2,28 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>Label</key>
-    <string>com.fpigeon.sync-notes-to-icloud</string>
+  <key>Label</key>
+  <string>com.fpigeon.sync-notes-to-icloud</string>
 
-    <key>ProgramArguments</key>
-    <array>
-        <string>/bin/bash</string>
-        <string>/Users/fpigeon/dotfiles/scripts/sync-notes-to-icloud.sh</string>
-    </array>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/fpigeonjr/dotfiles/scripts/sync-notes-to-icloud.sh</string>
+  </array>
 
-    <!-- Run every 15 minutes -->
-    <key>StartInterval</key>
-    <integer>900</integer>
+  <key>RunAtLoad</key>
+  <true/>
 
-    <!-- Also run once immediately when loaded -->
-    <key>RunAtLoad</key>
-    <true/>
+  <key>StartInterval</key>
+  <integer>900</integer>
 
-    <key>StandardOutPath</key>
-    <string>/Users/fpigeon/.local/share/logs/sync-notes-to-icloud.log</string>
+  <key>WorkingDirectory</key>
+  <string>/Users/fpigeonjr/dotfiles</string>
 
-    <key>StandardErrorPath</key>
-    <string>/Users/fpigeon/.local/share/logs/sync-notes-to-icloud.log</string>
+  <key>StandardOutPath</key>
+  <string>/Users/fpigeonjr/.local/share/logs/launchd-sync-notes-to-icloud.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/Users/fpigeonjr/.local/share/logs/launchd-sync-notes-to-icloud.log</string>
 </dict>
 </plist>
