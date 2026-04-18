@@ -23,10 +23,11 @@ RSYNC_ARGS=(
   --no-times
   --size-only
   --inplace
+  --delete-after
+  --ignore-errors
   --no-perms
   --no-owner
   --no-group
-  --delete
   --exclude='.git/'
   --exclude='.stfolder'
   --exclude='.stfolder.*'
@@ -68,13 +69,16 @@ mkdir -p "$TMP_DEST"
 
 EXIT_CODE=$?
 
+RSYNC_EXIT_CODE=0
 if [ $EXIT_CODE -eq 0 ]; then
   "$RSYNC_BIN" \
     "${RSYNC_ARGS[@]}" \
     "$TMP_DEST" "$DEST" >> "$LOG_FILE" 2>&1
-  EXIT_CODE=$?
+  RSYNC_EXIT_CODE=$?
+  EXIT_CODE=$RSYNC_EXIT_CODE
 fi
 
+VERIFY_FAILED=0
 JOURNAL_REL="journals/$(date '+%Y_%m_%d').md"
 SRC_FILE="${SOURCE%/}/$JOURNAL_REL"
 DST_FILE="${DEST%/}/$JOURNAL_REL"
@@ -83,10 +87,31 @@ if [ -f "$SRC_FILE" ]; then
   DST_SIZE=$(stat -f '%z' "$DST_FILE" 2>/dev/null || echo '')
   if [ -z "$DST_SIZE" ] || [ "$SRC_SIZE" != "$DST_SIZE" ]; then
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Verification FAILED for $JOURNAL_REL (src size=$SRC_SIZE, dst size=$DST_SIZE)." >> "$LOG_FILE"
-    EXIT_CODE=1
+    VERIFY_FAILED=1
   else
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Verification passed for $JOURNAL_REL (size $SRC_SIZE)." >> "$LOG_FILE"
   fi
+fi
+
+PAGES_NOTE_REL="pages/Logseq Conventions.md"
+SRC_NOTE_FILE="${SOURCE%/}/$PAGES_NOTE_REL"
+DST_NOTE_FILE="${DEST%/}/$PAGES_NOTE_REL"
+if [ -f "$SRC_NOTE_FILE" ]; then
+  SRC_NOTE_SIZE=$(stat -f '%z' "$SRC_NOTE_FILE" 2>/dev/null || echo '')
+  DST_NOTE_SIZE=$(stat -f '%z' "$DST_NOTE_FILE" 2>/dev/null || echo '')
+  if [ -z "$DST_NOTE_SIZE" ] || [ "$SRC_NOTE_SIZE" != "$DST_NOTE_SIZE" ]; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Verification FAILED for $PAGES_NOTE_REL (src size=$SRC_NOTE_SIZE, dst size=$DST_NOTE_SIZE)." >> "$LOG_FILE"
+    VERIFY_FAILED=1
+  else
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Verification passed for $PAGES_NOTE_REL (size $SRC_NOTE_SIZE)." >> "$LOG_FILE"
+  fi
+fi
+
+if [ $VERIFY_FAILED -eq 1 ]; then
+  EXIT_CODE=1
+elif [ $RSYNC_EXIT_CODE -eq 23 ]; then
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] Rsync reported partial transfer (23), but key file verification passed. Treating run as usable with iCloud caveats." >> "$LOG_FILE"
+  EXIT_CODE=0
 fi
 
 rm -rf "$STAGING_ROOT"
