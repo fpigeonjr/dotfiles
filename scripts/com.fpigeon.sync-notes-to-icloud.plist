@@ -8,7 +8,7 @@
   <key>ProgramArguments</key>
   <array>
     <string>/bin/bash</string>
-    <string>/Users/fpigeonjr/dotfiles/scripts/sync-notes-to-icloud.sh</string>
+    <string>/Users/fpigeonjr/dotfiles/scripts/sync-notes-to-icloud-export.sh</string>
   </array>
 
   <key>RunAtLoad</key>

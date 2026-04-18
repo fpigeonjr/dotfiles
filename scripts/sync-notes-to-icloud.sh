@@ -36,6 +36,9 @@ RSYNC_ARGS=(
   --exclude='.DS_Store'
   --exclude='AGENTS.md'
   --exclude='node_modules/'
+  --exclude='BibleStudyState.json'
+  --exclude='*.tmp'
+  --exclude='*.lock'
 )
 
 # Ensure log directory exists
