@@ -105,6 +105,10 @@
 - **Trailing whitespace causes silent truncation**: Ghostty stops parsing the config file at any line with trailing whitespace. All settings after that line are silently ignored. Always check with `rg "\s+$" config/.config/ghostty/config` before debugging missing settings.
 - **`copy-on-select = clipboard` on macOS**: On macOS the selection clipboard is not supported, so `copy-on-select = true` (default) falls back to the system clipboard. The `clipboard` value targets both clipboards and is the correct setting, but has been reported broken in some HEAD builds (fixed in 1.3.1). Workaround: use `Cmd+C` after selecting.
 - **Config file is a symlink**: `~/.config/ghostty/config` → dotfiles repo (already stowed); no re-stow needed after edits.
+- **cmux bundles its own Ghostty**: The `ghostty` binary in PATH comes from `/Applications/cmux.app/Contents/Resources/bin/ghostty` (a HEAD build), not from the Homebrew `Ghostty.app`. `brew upgrade ghostty` does not affect the version used by cmux.
+- **SSH doubled keystrokes from cmux**: cmux's bundled Ghostty HEAD build sets `TERM=xterm-ghostty` in SSH sessions, which causes every keystroke to be doubled on the remote host. Workaround: add `SetEnv TERM=xterm-256color` to the SSH host entry in `ssh/.ssh/config`. Filed upstream: https://github.com/manaflow-ai/cmux/issues/2969
+- **Ghostty shell integration guard**: `common.zsh` only sources the Ghostty shell integration if `$GHOSTTY_RESOURCES_DIR` is set AND `$GHOSTTY_SHELL_INTEGRATION_FEATURES` is unset AND `$SSH_CONNECTION` is unset AND `$TERM_PROGRAM == ghostty`. This prevents double-registering ZLE hooks over SSH or in non-Ghostty terminals.
+- **Global quick terminal hotkey**: `keybind = global:super+grave_accent=toggle_quick_terminal` — the `global:` prefix is the documented way to register a system-wide hotkey on macOS. Requires Accessibility permissions: System Settings → Privacy & Security → Accessibility.
 
 ### Git Configuration
 - **Email conflicts**: Check per-repo settings with `git config user.email`
