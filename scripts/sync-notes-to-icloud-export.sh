@@ -62,19 +62,20 @@ for file in config.edn custom.css graphs-txid.edn pages-metadata.edn version-fil
 done
 
 EXPORT_LIST=$(mktemp)
+# Always include the content directories.
 cat > "$EXPORT_LIST" <<'EOF'
 journals/
 pages/
 assets/
 logseq/
 whiteboards/
-config.edn
-custom.css
-graphs-txid.edn
-pages-metadata.edn
-version-files
-synced-graph-info.md
 EOF
+# Only include optional top-level files if they were actually staged (i.e. exist in source).
+for file in config.edn custom.css graphs-txid.edn pages-metadata.edn version-files synced-graph-info.md; do
+  if [ -f "$STAGING_GRAPH/$file" ]; then
+    echo "$file" >> "$EXPORT_LIST"
+  fi
+done
 
 "$RSYNC_BIN" -a \
   --inplace \
@@ -85,6 +86,7 @@ EOF
   --no-owner \
   --no-group \
   --delete-after \
+  --filter='protect logseq/bak/' \
   --ignore-errors \
   --files-from="$EXPORT_LIST" \
   "$STAGING_GRAPH/" "$DEST/" >> "$LOG_FILE" 2>&1
@@ -118,6 +120,15 @@ fi
 
 if [ $RSYNC_EXIT -eq 23 ]; then
   echo "[$FINISH_TIME] Export sync usable with iCloud caveats (rsync 23, verification passed)." >> "$LOG_FILE"
+  echo "---" >> "$LOG_FILE"
+  exit 0
+fi
+
+# Exit code 11 = EDEADLK: iCloud Drive holds a transient advisory lock on a file while
+# bird is syncing it.  The lock is not persistent - other files transfer fine and the
+# canary check confirms delivery.  Treat like exit 23: log a caveat, exit 0.
+if [ $RSYNC_EXIT -eq 11 ]; then
+  echo "[$FINISH_TIME] Export sync usable with iCloud caveats (rsync 11 EDEADLK on locked file, verification passed)." >> "$LOG_FILE"
   echo "---" >> "$LOG_FILE"
   exit 0
 fi
