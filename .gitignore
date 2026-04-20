@@ -7,3 +7,5 @@ shell/.profile
 aws/.aws/cli/
 aws/.aws/sso/
 shell/.config/zsh/local.zsh
+config/.config/nvim/lazyvim.json
+session-*.md
