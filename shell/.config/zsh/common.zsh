@@ -5,6 +5,10 @@ if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
   export PATH="$PATH:$HOME/.local/bin"
 fi
 
+# pi coding agent (https://github.com/badlogic/pi-mono) — point it at XDG config
+# instead of the default ~/.pi/agent so config lives under version control.
+export PI_CODING_AGENT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/pi/agent"
+
 alias zshell="$EDITOR ~/.zshrc"
 alias ohmyzsh="$EDITOR ~/.oh-my-zsh"
 alias new="source ~/.zshrc"

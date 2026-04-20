@@ -121,6 +121,18 @@
 - **Authentication**: Test with `ssh -T git@github.com`
 - **Branch issues**: Default branch is `main`, not `master`
 
+### Pi Coding Agent
+- **Install**: `brew install pi-coding-agent` (tracked in `homebrew/Brewfile`); auth via `/login` after launching `pi`
+- **Flexion Bedrock auth**: run `flexion-pi` (wrapper in `shell/.zsh_functions/flexion-claude.zsh`) instead of `pi` directly — it performs AWS SSO login against `ClaudeCodeAccess-FlexionLLM` and passes `--provider amazon-bedrock --model "$PI_MODEL"`
+- **Config location**: `$PI_CODING_AGENT_DIR` is exported in `shell/.config/zsh/common.zsh` as `$XDG_CONFIG_HOME/pi/agent` (resolves to `~/.config/pi/agent`), backed by the `pi/` stow package
+- **Philosophy**: Keep the config minimal. Pi is built to be extended via prompt templates, skills, and TypeScript extensions rather than via large config files. Only add things when a real task demands them.
+- **Prompt templates**: Markdown files in `pi/.config/pi/agent/prompts/` are invoked as `/<filename-without-extension>` in interactive mode. Use `{{args}}` for arguments (pi native syntax).
+- **Stow**: `stow pi` from the repo root
+- **Verify config is loaded**: launch `pi`, then `/settings` to inspect the active settings, or `/reload` after editing files
+- **Not a substitute for opencode**: `config/.config/opencode/` stays as-is; pi runs alongside. No config is shared between the two.
+- **Bedrock model whitelist (Flexion endpoint)**: The Flexion Bedrock endpoint rejects pi's `thinking.display` field on the legacy `thinking: { type: "enabled", budget_tokens }` request shape — error: `thinking.enabled.display: Extra inputs are not permitted`. Pi only uses the newer `thinking: { type: "adaptive" }` shape (which Flexion accepts) for models whose ID contains `opus-4-6/4.6`, `opus-4-7/4.7`, or `sonnet-4-6/4.6` (see `supportsAdaptiveThinking` in `pi-ai/dist/providers/amazon-bedrock.js`). Use those IDs (e.g. `us.anthropic.claude-sonnet-4-6`). Older IDs like `us.anthropic.claude-sonnet-4-20250514-v1:0` only work with `thinkingLevel: off`.
+
+
 ## Security Guidelines
 - **Never commit**: SSH keys, tokens, passwords, API keys
 - **Use .env.local**: For sensitive environment variables

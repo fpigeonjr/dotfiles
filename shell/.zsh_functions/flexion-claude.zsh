@@ -2,11 +2,13 @@
 # Usage:
 #   flexion-claude
 #   flexion-opencode
+#   flexion-pi
 
 FLEXION_BEDROCK_PROFILE="ClaudeCodeAccess-FlexionLLM"
 FLEXION_BEDROCK_REGION="us-east-2"
 FLEXION_CLAUDE_MODEL="us.anthropic.claude-sonnet-4-20250514-v1:0"
 FLEXION_OPENCODE_MODEL="amazon-bedrock/claude-sonnet-4-6"
+FLEXION_PI_MODEL="us.anthropic.claude-sonnet-4-6"
 
 flexion_require_bin() {
   local bin=$1
@@ -138,4 +140,25 @@ flexion-opencode() {
   echo "   update ~/.config/opencode/opencode.json to map it."
 
   opencode "$@"
+}
+
+flexion-pi() {
+  flexion_require_bin pi || return 1
+  flexion_bedrock_login 0 || return 1
+
+  echo "⚙️  Setting pi environment variables..."
+  export PI_MODEL="${PI_MODEL:-$FLEXION_PI_MODEL}"
+
+  echo ""
+  echo "✅ Environment setup complete!"
+  echo "🤖 Launching 'pi' against AWS Bedrock"
+  echo ""
+  echo "Environment variables set:"
+  echo "  AWS_PROFILE=$AWS_PROFILE"
+  echo "  AWS_REGION=$AWS_REGION"
+  echo "  PI_MODEL=$PI_MODEL"
+  echo ""
+  echo "💡 Override the model for this run by passing --model <id>."
+
+  pi --provider amazon-bedrock --model "$PI_MODEL" "$@"
 }

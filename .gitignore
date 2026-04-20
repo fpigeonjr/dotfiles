@@ -9,3 +9,10 @@ aws/.aws/sso/
 shell/.config/zsh/local.zsh
 config/.config/nvim/lazyvim.json
 session-*.md
+
+# pi coding agent runtime state — not dotfiles
+pi/.config/pi/agent/auth.json
+pi/.config/pi/agent/sessions/
+pi/.config/pi/agent/git/
+pi/.config/pi/agent/npm/
+pi/.config/pi/agent/keybindings.json

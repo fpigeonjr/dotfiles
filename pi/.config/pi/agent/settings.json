@@ -1,0 +1,7 @@
+{
+  "$comment": "Pi coding agent settings. Keep this file minimal per pi philosophy — add customization only when a real task demands it. See https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/settings.md",
+  "defaultProvider": "amazon-bedrock",
+  "defaultModel": "us.anthropic.claude-sonnet-4-6",
+  "thinkingLevel": "medium",
+  "enableInstallTelemetry": false
+}
