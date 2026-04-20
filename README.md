@@ -361,6 +361,16 @@ launchctl kickstart -k "gui/$(id -u)/com.fpigeon.sync-notes-to-icloud"
 
 This LaunchAgent runs every 15 minutes and once when loaded. The script still writes its own detailed sync log to `~/.local/share/logs/sync-notes-to-icloud.log`, and `launchd` stdout/stderr go to `~/.local/share/logs/launchd-sync-notes-to-icloud.log`.
 
+### Export-Style Sync Behavior
+
+The sync script uses an **export-style** approach that minimizes iCloud Drive traversal issues:
+
+1. **Staging**: Creates a clean staging area at `~/.local/state/sync-notes-to-icloud-staging/`
+2. **Selective copy**: Only copies `journals/`, `pages/`, `assets/`, `logseq/`, `whiteboards/` and select top-level files (config files are optional — only included if they exist)
+3. **Protected paths**: The `logseq/bak/` directory is protected from deletion (preserves Logseq's automatic backups)
+4. **Verification**: After sync, verifies key files (today's journal, conventions page) by size to ensure delivery
+5. **Error handling**: Treats rsync exit codes 23 (partial transfer) and 11 (EDEADLK - iCloud file locks) as success if verification passes
+
 After both agents are loaded, remove the old cron entries with `crontab -e` or `crontab -r` after confirming the LaunchAgents are running.
 
 **Troubleshooting findings (2026-04-17):**
