@@ -68,7 +68,10 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 - **Profile**: `ClaudeCodeAccess-FlexionLLM` in `us-east-2` (managed by Flexion org via AWS IAM Identity Center)
 - **Permitted providers**: Anthropic (Claude), DeepSeek, Meta Llama, Amazon Nova, Mistral, Qwen, MiniMax, Moonshot AI (Kimi), Z.AI (GLM), NVIDIA Nemotron, Google Gemma, Writer Palmyra, OpenAI OSS, TwelveLabs Pegasus
 - **Auto-discovery**: `bedrock:ListFoundationModels` is now permitted — OpenCode will discover models available in `us-east-2`. However, discovered models may still fail if they require an inference profile or don't support tool call streaming
-- **Verified working** (tool calls + streaming): `qwen3-coder-480b`, `qwen3-235b`, `nova-pro`, `kimi-k2.5`, `minimax-m2.5`, `glm-5`, `gemma-3-27b`, `ministral-14b`, `gpt-oss-120b`, `gpt-oss-20b`
+- **Verified working** (tool calls + streaming): `qwen3-coder-480b`, `nova-pro`, `kimi-k2.5`, `minimax-m2.5`, `glm-5`, `gemma-3-27b`, `ministral-14b`, `gpt-oss-120b`, `gpt-oss-20b`
+- **Confirmed working recently**: `nova-2-lite`, `qwen3-next-80b`
+- **Blocked by IAM in `us-east-2`**: `kimi-k2-thinking` — denied on `bedrock:InvokeModelWithResponseStream` for `moonshot.kimi-k2-thinking`
+- **Configured but not yet verified here**: `claude-opus-4-6`, `mistral-large`, `devstral`, `qwen3-coder-30b`, `llama4-scout`
 - **Requires inference profile** (use `us.` prefix): `llama4-maverick` — must use `us.meta.llama4-maverick-17b-instruct-v1:0`
 - **DeepSeek**: IAM policy permits `deepseek.*`; R1 (`deepseek-r1`) is configured with `tool_call: false` — useful for reasoning/analysis but not agentic tasks
 - **Nova Premier**: Access denied — requires 30 days of prior active usage per AWS policy
@@ -81,30 +84,33 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 
 | Model | Best For | Speed | Notes |
 |---|---|---|---|
-| `kimi-k2.5` | General coding, default | Medium | Current default |
+| `claude-sonnet-4-6` | Default, highest reliability | Medium | Current default |
+| `claude-haiku-4-5` | Small model, cheap follow-ups | Fast | Current `small_model` |
+| `kimi-k2.5` | General coding, alternative default | Medium | Good Bedrock non-Claude default |
 | `qwen3-coder-480b` | Complex coding, large refactors | Slow | Largest coding-specific model |
 | `qwen3-coder-30b` | Everyday coding, faster Qwen | Fast | Can hallucinate on simple tasks |
-| `qwen3-235b` | General coding, fast | Very fast | 2.5s, MoE architecture |
+| `qwen3-next-80b` | General coding, faster Qwen | Fast | Good candidate for cheaper day-to-day use |
 | `gpt-oss-120b` | General coding, alternative to Kimi | Medium | OpenAI open-weight on Bedrock |
 | `gpt-oss-20b` | Fast tasks, lightweight coding | Fast | Smaller GPT OSS variant |
+| `nova-2-lite` | Long-context reasoning, AWS-native | Fast | Newer Nova option with large context window |
 | `nova-pro` | General purpose, AWS-native | Fast | Amazon's flagship, reliable |
 | `gemma-3-27b` | General coding | Medium | Google, clean responses |
 | `glm-5` | General coding | Medium | Z.AI, good quality |
-| `minimax-m2.5` | Titles, summaries, small tasks | Very fast | Current `small_model`, 3.4s |
+| `minimax-m2.5` | Titles, summaries, small tasks | Very fast | Fast Bedrock utility model |
 | `ministral-14b` | Lightweight coding tasks | Fast | Mistral small model |
 | `mistral-large` | Reasoning-heavy tasks | Medium | Mistral's flagship, 4.4s |
 | `devstral` | Coding-specific (Mistral) | Fast | Mistral coding model, 4.4s |
 | `llama4-maverick` | Multimodal, general | Medium | No tool calls on Bedrock; chat/read-only only |
 | `llama4-scout` | Huge context, multi-doc analysis | Medium | 10M token context; no tool calls on Bedrock |
 | `deepseek-r1` | Hard reasoning, math, STEM | Slow | Chain-of-thought; no tool calls on Bedrock; 64K context |
-| `kimi-k2-thinking` | Hard problems, deep reasoning | Slow | Burns more tokens |
-| `claude-sonnet-4-6` | Fallback, maximum reliability | Medium | Always available |
+| `claude-opus-4-6` | Hardest coding and review tasks | Slow | Strong upgrade path when Sonnet is not enough |
 
 **Quick picks:**
-- Default everyday work → `kimi-k2.5`
+- Default everyday work → `claude-sonnet-4-6`
 - Hard problem / big codebase → `qwen3-coder-480b`
-- Need speed → `qwen3-235b` or `minimax-m2.5`
-- Claude reliability → `claude-sonnet-4-6`
+- Need speed → `claude-haiku-4-5`, `qwen3-next-80b`, or `minimax-m2.5`
+- AWS-native long context → `nova-2-lite`
+- Claude reliability → `claude-sonnet-4-6` or `claude-opus-4-6`
 
 ## Structure
 

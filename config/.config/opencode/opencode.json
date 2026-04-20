@@ -36,6 +36,9 @@
         "claude-opus-4-6": {
           "id": "us.anthropic.claude-opus-4-6-v1"
         },
+        "claude-opus-4-7": {
+          "id": "us.anthropic.claude-opus-4-7"
+        },
         "llama4-maverick": {
           "id": "us.meta.llama4-maverick-17b-instruct-v1:0",
           "tool_call": false,
@@ -75,8 +78,14 @@
         "qwen3-coder-30b": {
           "id": "qwen.qwen3-coder-30b-a3b-v1:0"
         },
+        "qwen3-next-80b": {
+          "id": "qwen.qwen3-next-80b-a3b"
+        },
         "nova-pro": {
           "id": "amazon.nova-pro-v1:0"
+        },
+        "nova-2-lite": {
+          "id": "amazon.nova-2-lite-v1:0"
         },
         "kimi-k2.5": {
           "id": "moonshotai.kimi-k2.5"
