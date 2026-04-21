@@ -1,14 +1,13 @@
 {
-  "$comment": "Pi coding agent settings. Keep this file minimal per pi philosophy — add customization only when a real task demands it. See https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/settings.md",
+  "$comment": "Pi coding agent settings. Keep this file minimal per pi philosophy — add customization only when a real task demands it. See https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/settings.json",
   "defaultProvider": "amazon-bedrock",
-  "defaultModel": "moonshotai.kimi-k2.5",
+  "defaultModel": "us.anthropic.claude-sonnet-4-6",
   "defaultThinkingLevel": "medium",
   "enabledModels": [
-    "amazon-bedrock/us.anthropic.claude-sonnet-4-6",
-    "amazon-bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0",
-    "amazon-bedrock/us.anthropic.claude-opus-4-7",
-    "amazon-bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0"
+    "us.anthropic.claude-sonnet-4-6",
+    "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+    "us.anthropic.claude-opus-4-7",
+    "us.anthropic.claude-haiku-4-5-20251001-v1:0"
   ],
-  "enableInstallTelemetry": false,
-  "lastChangelogVersion": "0.67.68"
+  "enableInstallTelemetry": false
 }

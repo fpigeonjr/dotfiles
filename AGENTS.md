@@ -130,6 +130,7 @@
 - **Stow**: `stow pi` from the repo root
 - **Verify config is loaded**: launch `pi`, then `/settings` to inspect the active settings, or `/reload` after editing files
 - **Not a substitute for opencode**: `config/.config/opencode/` stays as-is; pi runs alongside. No config is shared between the two.
+- **pi rewrites settings.json**: Pi merges runtime state (`n` = last changelog version, `defaultModel`, `defaultProvider`, `enabledModels` with provider-prefixed IDs) back into `settings.json` on every session. Always review `git diff pi/` before committing — revert any pi-written drift back to the intentional values in this file.
 - **Bedrock model whitelist (Flexion endpoint)**: The Flexion Bedrock endpoint rejects pi's `thinking.display` field on the legacy `thinking: { type: "enabled", budget_tokens }` request shape for the oldest Claude 4 IDs (e.g., `us.anthropic.claude-sonnet-4-20250514-v1:0`) — error: `thinking.enabled.display: Extra inputs are not permitted`. Confirmed working with `thinkingLevel: medium` on `us.anthropic.claude-sonnet-4-6`, `us.anthropic.claude-sonnet-4-5-20250929-v1:0`, `us.anthropic.claude-opus-4-7`, and `us.anthropic.claude-haiku-4-5-20251001-v1:0`. These four are pinned in `enabledModels` so Ctrl+P cycles among them. Sonnet 4.6 and Opus 4.7 use the newer `adaptive` thinking shape (see `supportsAdaptiveThinking` in `pi-ai/dist/providers/amazon-bedrock.js`); Sonnet 4.5 and Haiku 4.5 use the legacy shape but the Flexion endpoint still accepts `display` on those model IDs.
 
 
