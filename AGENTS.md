@@ -123,7 +123,7 @@
 
 ### Pi Coding Agent
 - **Install**: `npm install -g @mariozechner/pi-coding-agent` (not Homebrew — pi.dev only documents npm, the Homebrew formula is community-maintained and lags behind); auth via `/login` after launching `pi`
-- **Flexion Bedrock auth**: run `flexion-pi` (wrapper in `shell/.zsh_functions/flexion-claude.zsh`) instead of `pi` directly — it performs AWS SSO login against `ClaudeCodeAccess-FlexionLLM` and passes `--provider amazon-bedrock --model "$PI_MODEL"`
+- **Flexion Bedrock auth**: run `flexion-pi` (wrapper in `shell/.zsh_functions/flexion-claude.zsh`) instead of `pi` directly — it performs AWS SSO login against `ClaudeCodeAccess-FlexionLLM`, exports raw `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`/`AWS_SESSION_TOKEN` (so pi gets a fully region-scoped SigV4 credential), and passes `--provider amazon-bedrock --model "$PI_MODEL"`
 - **Config location**: `$PI_CODING_AGENT_DIR` is exported in `shell/.config/zsh/common.zsh` as `$XDG_CONFIG_HOME/pi/agent` (resolves to `~/.config/pi/agent`), backed by the `pi/` stow package
 - **Philosophy**: Keep the config minimal. Pi is built to be extended via prompt templates, skills, and TypeScript extensions rather than via large config files. Only add things when a real task demands them.
 - **Prompt templates**: Markdown files in `pi/.config/pi/agent/prompts/` are invoked as `/<filename-without-extension>` in interactive mode. Use `{{args}}` for arguments (pi native syntax).

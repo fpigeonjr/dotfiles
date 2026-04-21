@@ -144,7 +144,7 @@ flexion-opencode() {
 
 flexion-pi() {
   flexion_require_bin pi || return 1
-  flexion_bedrock_login 0 || return 1
+  flexion_bedrock_login 1 || return 1
 
   echo "⚙️  Setting pi environment variables..."
   export PI_MODEL="${PI_MODEL:-$FLEXION_PI_MODEL}"
@@ -154,8 +154,8 @@ flexion-pi() {
   echo "🤖 Launching 'pi' against AWS Bedrock"
   echo ""
   echo "Environment variables set:"
-  echo "  AWS_PROFILE=$AWS_PROFILE"
   echo "  AWS_REGION=$AWS_REGION"
+  echo "  AWS credentials exported from SSO"
   echo "  PI_MODEL=$PI_MODEL"
   echo ""
   echo "💡 Override the model for this run by passing --model <id>."
