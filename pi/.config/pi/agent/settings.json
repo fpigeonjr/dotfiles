@@ -9,5 +9,6 @@
     "us.anthropic.claude-opus-4-7",
     "us.anthropic.claude-haiku-4-5-20251001-v1:0"
   ],
-  "enableInstallTelemetry": false
+  "enableInstallTelemetry": false,
+  "lastChangelogVersion": "0.67.68"
 }
