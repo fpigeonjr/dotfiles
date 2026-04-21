@@ -26,9 +26,17 @@ echo "[$TIMESTAMP] Starting export sync: $SOURCE -> $DEST" >> "$LOG_FILE"
 echo "[$TIMESTAMP] Using rsync binary: $RSYNC_BIN" >> "$LOG_FILE"
 
 if ! mkdir "$LOCK_DIR" 2>/dev/null; then
-  echo "[$TIMESTAMP] Skipping run, previous sync still in progress." >> "$LOG_FILE"
-  echo "---" >> "$LOG_FILE"
-  exit 0
+  # Stale-lock guard: if the lock is older than 30 minutes, it's orphaned.
+  LOCK_AGE=$(( $(date +%s) - $(stat -f '%m' "$LOCK_DIR" 2>/dev/null || echo 0) ))
+  if [ "$LOCK_AGE" -gt 1800 ]; then
+    echo "[$TIMESTAMP] Stale lock detected (age ${LOCK_AGE}s), removing and proceeding." >> "$LOG_FILE"
+    rmdir "$LOCK_DIR" 2>/dev/null || true
+    mkdir "$LOCK_DIR" 2>/dev/null || true
+  else
+    echo "[$TIMESTAMP] Skipping run, previous sync still in progress." >> "$LOG_FILE"
+    echo "---" >> "$LOG_FILE"
+    exit 0
+  fi
 fi
 
 cleanup() {
@@ -40,7 +48,7 @@ rm -rf "$STAGING_ROOT"
 mkdir -p "$STAGING_GRAPH"
 
 # Build a clean export set in staging.
-for dir in journals pages assets logseq whiteboards; do
+for dir in journals pages assets whiteboards; do
   if [ -d "$SOURCE/$dir" ]; then
     mkdir -p "$STAGING_GRAPH/$dir"
     "$RSYNC_BIN" -a --delete \
@@ -67,7 +75,6 @@ cat > "$EXPORT_LIST" <<'EOF'
 journals/
 pages/
 assets/
-logseq/
 whiteboards/
 EOF
 # Only include optional top-level files if they were actually staged (i.e. exist in source).
@@ -78,7 +85,6 @@ for file in config.edn custom.css graphs-txid.edn pages-metadata.edn version-fil
 done
 
 "$RSYNC_BIN" -a \
-  --inplace \
   --size-only \
   --omit-dir-times \
   --no-times \
@@ -86,6 +92,7 @@ done
   --no-owner \
   --no-group \
   --delete-after \
+  --exclude='logseq/' \
   --filter='protect logseq/bak/' \
   --ignore-errors \
   --files-from="$EXPORT_LIST" \
