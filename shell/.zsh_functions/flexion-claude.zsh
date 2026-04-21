@@ -63,6 +63,12 @@ flexion_export_aws_credentials() {
   done <<< "$aws_creds"
 }
 
+flexion_sso_session_valid() {
+  # Returns 0 (true) if existing SSO credentials are still valid
+  aws configure export-credentials --profile "$FLEXION_BEDROCK_PROFILE" --format json \
+    >/dev/null 2>&1
+}
+
 flexion_bedrock_login() {
   local export_credentials=${1:-1}
   local aws_var
@@ -85,11 +91,15 @@ flexion_bedrock_login() {
     return 1
   fi
 
-  echo "🚀 Logging into AWS SSO for profile: $AWS_PROFILE"
-  aws sso login || {
-    echo "❌ AWS SSO login failed"
-    return 1
-  }
+  if flexion_sso_session_valid; then
+    echo "✅ SSO session still valid — skipping login"
+  else
+    echo "🚀 Logging into AWS SSO for profile: $AWS_PROFILE"
+    aws sso login || {
+      echo "❌ AWS SSO login failed"
+      return 1
+    }
+  fi
 
   if [[ "$export_credentials" != "1" ]]; then
     return 0
