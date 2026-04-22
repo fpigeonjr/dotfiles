@@ -92,6 +92,13 @@
 - **System `rsync` is not sufficient here**: Prefer Homebrew `rsync` (`/opt/homebrew/bin/rsync`, `brew install rsync`) because the macOS-provided `/usr/bin/rsync` can fail with `mmap: Resource deadlock avoided` during large note syncs.
 - **Verification**: `launchctl print "gui/$(id -u)/com.fpigeon.sync-notes-to-icloud"` and `tail -n 20 ~/.local/share/logs/sync-notes-to-icloud.log`
 
+### Stow — How It Works in This Repo
+- **Stow uses directory folding**: entire directories are symlinked, not individual files. For example, `~/.config/zsh` is a symlink to `~/dotfiles/shell/.config/zsh`, and `~/.zsh_functions` is a symlink to `~/dotfiles/shell/.zsh_functions`. Files inside those directories appear as regular files under `~` but they ARE the dotfiles repo files.
+- **Editing dotfiles repo files = live immediately**: because `~/.config/zsh/macos.zsh` resolves to `~/dotfiles/shell/.config/zsh/macos.zsh` via directory symlink, edits take effect on next shell source — no restow needed.
+- **`ls -la` on a file inside a folded dir shows `-rw-r--r--` (regular file), not `lrwxr-xr-x`**: this is expected and correct. Check the parent to confirm: `ls -la ~/.config/zsh` should show `lrwxr-xr-x ... -> ../dotfiles/shell/.config/zsh`.
+- **Never `rm` a home-path file to force restow**: since the directory is folded, `rm ~/.config/zsh/somefile` deletes the actual dotfiles repo file. Always check the parent symlink first with `ls -la <parent-dir>`.
+- **Verify folding is active**: `ls -la ~/.config/zsh ~/.zsh_functions ~/.config/ghostty` — all should show as symlinks into `~/dotfiles/`.
+
 ### Stow Conflicts
 - Use backup and manual resolution (see README.md)
 - Check for broken symlinks: `find ~ -maxdepth 1 -type l ! -exec test -e {} \; -print`
