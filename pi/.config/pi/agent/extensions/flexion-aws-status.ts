@@ -178,6 +178,15 @@ export default function (pi: ExtensionAPI) {
 
   // ─── Events ─────────────────────────────────────────────────────────────
 
+  // ─── /exit alias for /quit ─────────────────────────────────────────────────
+
+  pi.registerCommand("exit", {
+    description: "Exit pi (alias for /quit)",
+    handler: async (_args, ctx) => {
+      ctx.shutdown();
+    },
+  });
+
   pi.on("session_start", async (_event, ctx) => {
     await refreshAws();
     setupFooter(ctx);
