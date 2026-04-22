@@ -1,0 +1,13 @@
+{
+  "awsAuthRefresh": "aws sso login --profile ClaudeCodeAccess-FlexionLLM",
+  "env": {
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_USE_BEDROCK": "1",
+    "AWS_PROFILE": "ClaudeCodeAccess-FlexionLLM",
+    "AWS_REGION": "us-east-2"
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  }
+}

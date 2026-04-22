@@ -155,6 +155,21 @@ flexion-opencode() {
   opencode "$@"
 }
 
+# ─── Shell launch aliases with auto-auth ─────────────────────────────────────
+# Ensures a valid SSO session before launching each AI tool.
+# - claude: SSO check only (AWS_PROFILE + awsAuthRefresh baked into ~/.claude/settings.json)
+# - opencode: SSO check only (profile baked into ~/.config/opencode/opencode.json)
+# - pi: handled separately via alias pi='flexion-pi' in macos.zsh (needs raw cred export)
+
+_flexion_ensure_sso() {
+  if ! flexion_sso_session_valid; then
+    aws sso login --profile "$FLEXION_BEDROCK_PROFILE"
+  fi
+}
+
+alias claude='_flexion_ensure_sso && command claude'
+alias opencode='_flexion_ensure_sso && command opencode'
+
 flexion-pi() {
   flexion_require_bin pi || return 1
   flexion_bedrock_login 1 || return 1
