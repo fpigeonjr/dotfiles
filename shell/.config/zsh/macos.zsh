@@ -32,6 +32,8 @@ if [[ -x "/Applications/cmux.app/Contents/Resources/bin/cmux" ]]; then
 fi
 
 # macOS-specific aliases
+# Redirect bare `pi` to the Flexion Bedrock wrapper so AWS SSO auth happens automatically.
+alias pi='flexion-pi'
 alias code='code-insiders'
 alias work='cd ~/Code/OPRE-OPS/frontend'
 alias graph="cd ~/Library/Mobile\ Documents/iCloud~com~logseq~logseq/Documents/Graph"

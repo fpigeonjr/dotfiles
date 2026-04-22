@@ -64,8 +64,11 @@ flexion_export_aws_credentials() {
 }
 
 flexion_sso_session_valid() {
-  # Returns 0 (true) if existing SSO credentials are still valid
-  aws configure export-credentials --profile "$FLEXION_BEDROCK_PROFILE" --format json \
+  # Returns 0 (true) if existing SSO credentials are still valid.
+  # Uses --format env-no-export (instead of json) because the JSON format triggers
+  # a spurious SSO login prompt on some awscli versions when the session is expired,
+  # whereas env-no-export fails cleanly with a non-zero exit code.
+  aws configure export-credentials --profile "$FLEXION_BEDROCK_PROFILE" --format env-no-export \
     >/dev/null 2>&1
 }
 
