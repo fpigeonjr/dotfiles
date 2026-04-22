@@ -24,11 +24,11 @@
     "default_profile": "ask",
     "inline_assistant_model": {
       "provider": "copilot_chat",
-      "model": "claude-sonnet-4",
+      "model": "claude-sonnet-4.6",
     },
     "default_model": {
       "provider": "copilot_chat",
-      "model": "claude-sonnet-4",
+      "model": "claude-sonnet-4.6",
     },
   },
   "buffer_font_size": 11.0,
