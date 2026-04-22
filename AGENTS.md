@@ -52,6 +52,7 @@
 - cmux terminal (native macOS app built on libghostty) — reads `~/.config/ghostty/config`
 - cmux CLI added to PATH via `shell/.config/zsh/macos.zsh` (app bundle bin directory)
 - OpenCode plugins auto-loaded from `config/.config/opencode/plugins/` — no config entry required
+- **`aws-auth-check.js` plugin**: checks AWS SSO credential expiry every 5 min on `session.idle`; warns via console + cmux notification when credentials expire within 30 min or have already expired; deduplicates warnings per token so you only see each warning once
 
 ### OMArchy/Linux (Arch-based)
 - Use pacman for system packages (`sudo pacman -S`)
@@ -66,6 +67,8 @@
 - Shared Zsh layers in `shell/.config/zsh/` with `common.zsh`, `macos.zsh`, and `linux.zsh`
 - Editor configs in respective directories
 - Custom functions in language-specific subdirectories
+- Claude Code config in `claude/.claude/` (stow package: `stow claude`)
+- Pi extensions in `pi/.config/pi/agent/extensions/` (live via directory folding — no restow needed)
 
 ## Development Workflow
 1. Edit configuration files directly
@@ -128,6 +131,15 @@
 - **Authentication**: Test with `ssh -T git@github.com`
 - **Branch issues**: Default branch is `main`, not `master`
 
+### Claude Code
+- **Config location**: `claude/.claude/` stow package → `~/.claude/settings.json` and `~/.claude/statusline.sh`
+- **Stow**: `stow claude` from repo root
+- **Bedrock settings baked in**: `CLAUDE_CODE_USE_BEDROCK=1`, `AWS_PROFILE=ClaudeCodeAccess-FlexionLLM`, `AWS_REGION=us-east-2` set via `env` block in `settings.json` — no need to run `flexion-claude` before launching
+- **Auto-authentication on launch**: `alias claude='_flexion_ensure_sso && command claude'` in `flexion-claude.zsh` checks SSO session validity before every launch
+- **Mid-session auth refresh**: `awsAuthRefresh` in `settings.json` triggers `aws sso login` automatically when credentials expire during a long session
+- **Status bar**: `statusLine.command` in `settings.json` points to `~/.claude/statusline.sh` which renders: `[model] 📁 dir | 🌿 branch` / `████░░ 40% | $0.05 | ⏱ 5m 23s | 🔐 AWS: expires at 4:15 PM EDT`
+- **Don't set `model`**: omitted from `settings.json` intentionally — Claude Code defaults to its built-in model selection for Bedrock
+
 ### Pi Coding Agent
 - **Install**: `npm install -g @mariozechner/pi-coding-agent` (not Homebrew — pi.dev only documents npm, the Homebrew formula is community-maintained and lags behind); auth via `/login` after launching `pi`
 - **Flexion Bedrock auth**: run `flexion-pi` (wrapper in `shell/.zsh_functions/flexion-claude.zsh`) instead of `pi` directly — it performs AWS SSO login against `ClaudeCodeAccess-FlexionLLM`, exports raw `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`/`AWS_SESSION_TOKEN` (so pi gets a fully region-scoped SigV4 credential), and passes `--provider amazon-bedrock --model "$PI_MODEL"`
@@ -135,6 +147,8 @@
 - **SSO session check uses `env-no-export` format**: `flexion_sso_session_valid` calls `aws configure export-credentials --format env-no-export` (not `json`) because the JSON format can trigger a spurious interactive SSO login prompt on some awscli versions when credentials are expired; `env-no-export` fails cleanly with a non-zero exit code instead
 - **Current version: v0.68.1**: Upgraded from pinned v0.67.68 on 2026-04-21. The v0.68.0 `InvalidSignatureException` regression (PR #3402 / issues #3487/#3488) was fixed in v0.68.1.
 - **Config location**: `$PI_CODING_AGENT_DIR` is exported in `shell/.config/zsh/common.zsh` as `$XDG_CONFIG_HOME/pi/agent` (resolves to `~/.config/pi/agent`), backed by the `pi/` stow package
+- **Extensions**: `pi/.config/pi/agent/extensions/` — auto-discovered, live via directory folding, no restow needed after adding files
+- **`flexion-aws-status.ts` extension**: renders a two-line custom footer showing `[model] 📁 dir | 🌿 branch` / `███░░ 80% | $0.05 | ⏱ 5m 23s | 🔐 AWS: expires at 4:15 PM EDT`; also warns on session_start if credentials are expired or expiring within 30 min; AWS expiry is cached for 5 min and refreshed after each agent turn
 - **Philosophy**: Keep the config minimal. Pi is built to be extended via prompt templates, skills, and TypeScript extensions rather than via large config files. Only add things when a real task demands them.
 - **Prompt templates**: Markdown files in `pi/.config/pi/agent/prompts/` are invoked as `/<filename-without-extension>` in interactive mode. Use `{{args}}` for arguments (pi native syntax).
 - **Stow**: `stow pi` from the repo root
@@ -142,6 +156,11 @@
 - **Not a substitute for opencode**: `config/.config/opencode/` stays as-is; pi runs alongside. No config is shared between the two.
 - **pi rewrites settings.json**: Pi merges runtime state (`n` = last changelog version, `defaultModel`, `defaultProvider`, `enabledModels` with provider-prefixed IDs) back into `settings.json` on every session. Always review `git diff pi/` before committing — revert any pi-written drift back to the intentional values in this file.
 - **Bedrock model whitelist (Flexion endpoint)**: The `us.` short inference profile IDs are required (`us.anthropic.claude-sonnet-4-6` etc.) — bare model IDs fail with `ValidationException: Invocation of model ID with on-demand throughput isn't supported`. These four are pinned in `enabledModels` so Ctrl+P cycles among them. The endpoint also rejects `thinking.display` on the legacy `thinking: { type: "enabled", budget_tokens }` shape — error: `thinking.enabled.display: Extra inputs are not permitted`. Sonnet 4.6 and Opus 4.7 use the newer `adaptive` thinking shape (see `supportsAdaptiveThinking` in `pi-ai/dist/providers/amazon-bedrock.js`); Sonnet 4.5 and Haiku 4.5 use the legacy shape but the endpoint accepts `display` on those IDs.
+- **Other ACTIVE models on the Flexion Bedrock endpoint (as of 2026-04-22)** — not yet tested with pi but available to add to `enabledModels` for experimentation. Use bare model IDs (no `us.` prefix) for non-Anthropic models; test each before pinning as the Flexion endpoint may not support all of them:
+  - **Anthropic**: `anthropic.claude-opus-4-6-v1` (Opus 4.6), `anthropic.claude-opus-4-5-20251101-v1:0` (Opus 4.5), `anthropic.claude-opus-4-1-20250805-v1:0` (Opus 4.1)
+  - **Mistral**: `mistral.mistral-large-3-675b-instruct` (Large 3, 675B), `mistral.devstral-2-123b` (Devstral 2, coding-focused 123B), `mistral.magistral-small-2509` (Magistral Small, reasoning), `mistral.voxtral-small-24b-2507` / `mistral.voxtral-mini-3b-2507` (audio/speech)
+  - **Meta**: `meta.llama4-scout-17b-instruct-v1:0` (Llama 4 Scout 17B MoE), `meta.llama4-maverick-17b-instruct-v1:0` (Llama 4 Maverick 17B MoE)
+  - **Amazon Nova**: `amazon.nova-2-lite-v1:0` (Nova 2 Lite), `amazon.nova-2-sonic-v1:0` (Nova 2 Sonic, realtime audio)
 
 
 ## Security Guidelines
