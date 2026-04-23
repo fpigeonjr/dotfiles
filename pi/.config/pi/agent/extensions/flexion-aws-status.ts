@@ -73,7 +73,23 @@ export default function (pi: ExtensionAPI) {
   //   claude-sonnet-4-6               →  unchanged
 
   function friendlyModel(id: string): string {
-    return id.replace(/^(\w[\w-]*\.)+/, "") || id;
+    // Strip leading pure-alpha dot-namespaced provider segments
+    // e.g. "us.anthropic." or "deepseek." but NOT "v3." (has a digit — part of the model name)
+    const segs = id.split(".");
+    let i = 0;
+    while (i < segs.length - 1 && /^[a-zA-Z]+$/.test(segs[i])) {
+      i++;
+    }
+    const provider = i > 0 ? segs[i - 1] : "";
+    const model = segs.slice(i).join(".");
+
+    // If the remaining name starts with a bare version tag (v3, r1, etc.) the provider
+    // name would be lost entirely — prepend it so "deepseek.v3.2" → "deepseek-v3.2"
+    // and "deepseek.r1-v1:0" → "deepseek-r1-v1:0" rather than just "v3.2" / "r1-v1:0".
+    if (provider && /^[vr]\d/.test(model)) {
+      return `${provider}-${model}`;
+    }
+    return model || id;
   }
 
   // ─── cmux notifications ──────────────────────────────────────────────────

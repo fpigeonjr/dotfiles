@@ -103,6 +103,7 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 | `llama4-maverick` | Multimodal, general | Medium | No tool calls on Bedrock; chat/read-only only |
 | `llama4-scout` | Huge context, multi-doc analysis | Medium | 10M token context; no tool calls on Bedrock |
 | `deepseek-r1` | Hard reasoning, math, STEM | Slow | Chain-of-thought; no tool calls on Bedrock; 64K context |
+| `deepseek-v3.2` | Coding, general (latest DeepSeek) | Medium | Newer/stronger than V3; bare model ID `deepseek.v3.2` |
 | `claude-opus-4-6` | Hardest coding and review tasks | Slow | Strong upgrade path when Sonnet is not enough |
 
 **Quick picks:**
@@ -116,6 +117,10 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 
 ```
 dotfiles/
+├── claude/          # Claude Code configuration
+│   └── .claude/
+│       ├── settings.json  # Bedrock/SSO settings, status bar command
+│       └── statusline.sh  # Status bar renderer
 ├── config/          # Modern config files (~/.config/)
 │   └── .config/
 │       ├── ghostty/ # Ghostty terminal configuration
@@ -129,6 +134,13 @@ dotfiles/
 │   └── .gitignore_global
 ├── homebrew/        # Homebrew package management
 │   └── Brewfile     # List of installed packages
+├── pi/              # Pi coding agent configuration
+│   └── .config/pi/agent/
+│       ├── AGENTS.md        # Global system prompt additions
+│       ├── settings.json    # Model whitelist, provider, thinking level
+│       ├── extensions/      # Auto-discovered TypeScript extensions
+│       │   └── flexion-aws-status.ts  # Footer, AWS expiry, cmux notify
+│       └── prompts/         # Slash-command prompt templates
 ├── scripts/         # Utility scripts
 │   ├── wt-clean.sh  # Clean up stale worktrunk worktrees
 │   ├── pi-pihole-restore.sh # Restore Pi-hole configuration
@@ -226,6 +238,8 @@ sudo pacman -S stow
    stow vscode-insiders # VS Code Insiders settings
    stow logseq       # Logseq configuration
    stow homebrew     # Homebrew Brewfile
+   stow claude       # Claude Code settings and statusline
+   stow pi           # Pi coding agent config, extensions, and prompts
    ```
 
    **Important**: After stowing `shell`, verify the zsh config directory is properly linked:
@@ -622,6 +636,8 @@ cp -r ~/config-backup/YYYYMMDD/* ~/
 | `vscode-insiders` | settings.json, keybindings.json | VS Code Insiders configuration |
 | `logseq` | .logseq/config/, .logseq/custom.css, .logseq/settings/, .logseq/preferences.json, Notes/logseq/custom.css | Logseq knowledge management settings, plugins, and graph-level CSS (graph CSS takes precedence over global) |
 | `homebrew` | Brewfile | Homebrew package list for easy setup |
+| `claude` | .claude/settings.json, .claude/statusline.sh | Claude Code Bedrock/SSO config and status bar renderer |
+| `pi` | .config/pi/agent/ | Pi coding agent settings, extensions, and prompt templates |
 
 ## Dependencies
 
