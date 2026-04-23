@@ -29,6 +29,12 @@ export default function (pi: ExtensionAPI) {
   let awsLastCheck = 0;
   let footerTui: { requestRender(): void } | null = null;
 
+  // Cached model ID — updated via session_start and model_select so the
+  // footer render() closure never needs to touch the session-bound ctx.model.
+  // Guards against the v0.69.0 stale-ctx throw when a timer fires after quit.
+  let modelId = "no-model";
+  let isActive = false;
+
   // ─── AWS credential helpers ──────────────────────────────────────────────
 
   async function refreshAws(): Promise<void> {
@@ -134,8 +140,12 @@ export default function (pi: ExtensionAPI) {
         },
         invalidate() {},
         render(width: number): string[] {
+          // Bail out if the session has already shut down — a pending TUI timer
+          // can fire after ctx is invalidated, causing a stale-ctx throw.
+          if (!isActive) return ["", ""];
+
           // ── Model + directory + branch (line 1) ──
-          const model = friendlyModel(ctx.model?.id ?? "no-model");
+          const model = friendlyModel(modelId);
           const dirName = ctx.cwd.split("/").pop() || ctx.cwd;
           const branch = footerData.getGitBranch();
           const branchStr = branch ? theme.fg("dim", ` | 🌿 ${branch}`) : "";
@@ -203,7 +213,9 @@ export default function (pi: ExtensionAPI) {
     },
   });
 
-  pi.on("session_start", async (_event, ctx) => {
+  pi.on("session_start", async (event, ctx) => {
+    isActive = true;
+    modelId = ctx.model?.id ?? "no-model";
     await refreshAws();
     setupFooter(ctx);
 
@@ -233,12 +245,14 @@ export default function (pi: ExtensionAPI) {
     audioNotify();
   });
 
-  // Update footer when model changes
-  pi.on("model_select", async (_event) => {
+  // Update cached model ID and re-render footer when model changes
+  pi.on("model_select", async (event) => {
+    modelId = event.model.id;
     footerTui?.requestRender();
   });
 
   pi.on("session_shutdown", async () => {
+    isActive = false;
     footerTui = null;
   });
 }
