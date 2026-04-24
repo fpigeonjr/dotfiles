@@ -8,4 +8,5 @@
  :logseq-awesome-props {:version "v1.10.0", :repo "yoyurec/logseq-awesome-props", :effect true, :theme false}
  :logseq-tabs {:version "v1.19.4", :repo "pengx17/logseq-plugin-tabs", :effect true, :theme false}
  :nord-theme {:version "0.0.19", :repo "Bad3r/Logseq-Nord-Theme", :effect false, :theme true}
- :logseq-everforest-theme {:version "v0.1.4", :repo "khoulihan/logseq-everforest-theme", :effect false, :theme true}}
+ :logseq-everforest-theme {:version "v0.1.4", :repo "khoulihan/logseq-everforest-theme", :effect false, :theme true}
+ :logseq-copy-code-plugin {:version "v.1.2.0", :repo "vyleung/logseq-copy-code-plugin", :effect true, :theme false}}
