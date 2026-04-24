@@ -171,7 +171,8 @@ export default function (pi: ExtensionAPI) {
 
           // ── Session duration ──
           const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
-          const mins = Math.floor(elapsed / 60);
+          const hours = Math.floor(elapsed / 3600);
+          const mins = Math.floor((elapsed % 3600) / 60);
           const secs = elapsed % 60;
 
           // ── Context bar with color ──
@@ -191,7 +192,7 @@ export default function (pi: ExtensionAPI) {
           const parts: string[] = [
             `${barColored} ${pct}%`,
             theme.fg("muted", `$${totalCost.toFixed(3)}`),
-            theme.fg("dim", `⏱ ${mins}m ${secs < 10 ? "0" : ""}${secs}s`),
+            theme.fg("dim", `⏱ ${hours > 0 ? `${hours}h ` : ""}${mins}m ${secs < 10 ? "0" : ""}${secs}s`),
           ];
           if (awsStr) parts.push(awsStr);
           const line2 = parts.join(sep);
