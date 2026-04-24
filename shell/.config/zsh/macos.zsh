@@ -31,6 +31,12 @@ if [[ -x "/Applications/cmux.app/Contents/Resources/bin/cmux" ]]; then
   path=("/Applications/cmux.app/Contents/Resources/bin" $path)
 fi
 
+# Go
+export GOPATH="$HOME/go"
+if [[ -d "$GOPATH/bin" ]]; then
+  path=("$GOPATH/bin" $path)
+fi
+
 # macOS-specific aliases
 # Redirect bare `pi` to the Flexion Bedrock wrapper so AWS SSO auth happens automatically.
 alias pi='flexion-pi'
