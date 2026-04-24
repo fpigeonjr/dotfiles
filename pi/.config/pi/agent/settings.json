@@ -10,5 +10,8 @@
     "us.anthropic.claude-haiku-4-5-20251001-v1:0"
   ],
   "enableInstallTelemetry": false,
-  "lastChangelogVersion": "0.69.0"
+  "terminal": {
+    "showTerminalProgress": true
+  },
+  "lastChangelogVersion": "0.70.0"
 }
