@@ -16,5 +16,10 @@
   "terminal": {
     "showTerminalProgress": true
   },
+  "retry": {
+    "provider": {
+      "timeoutMs": 3600000
+    }
+  },
   "lastChangelogVersion": "0.70.0"
 }
