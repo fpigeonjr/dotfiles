@@ -150,7 +150,6 @@
 - **Extensions**: `pi/.config/pi/agent/extensions/` — auto-discovered, live via directory folding, no restow needed after adding files
 - **Global AGENTS.md**: `pi/.config/pi/agent/AGENTS.md` — appended to the system prompt for every session; currently instructs the agent to ask clarifying questions one at a time instead of dumping a numbered list
 - **`flexion-aws-status.ts` extension**: renders a two-line custom footer showing `[model] 📁 dir | 🌿 branch` / `███░░ 80% | $0.05 | ⏱ 5m 23s | 🔐 AWS: expires at 4:15 PM EDT`; also warns on session_start if credentials are expired or expiring within 30 min; AWS expiry is cached for 5 min and refreshed after each agent turn
-- **`web-browse.ts` extension**: registers two LLM-callable tools — `web_fetch` (fetch any URL, returns cleaned readable text) and `web_search` (DuckDuckGo Lite search, returns results list); no API keys required; lets the agent look up AWS announcements, docs, GitHub files, etc. on demand
 - **Philosophy**: Keep the config minimal. Pi is built to be extended via prompt templates, skills, and TypeScript extensions rather than via large config files. Only add things when a real task demands them.
 - **Prompt templates**: Markdown files in `pi/.config/pi/agent/prompts/` are invoked as `/<filename-without-extension>` in interactive mode. Use `{{args}}` for arguments (pi native syntax).
 - **Stow**: `stow pi` from the repo root
