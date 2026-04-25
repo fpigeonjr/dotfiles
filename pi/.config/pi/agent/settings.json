@@ -7,7 +7,6 @@
     "us.anthropic.claude-sonnet-4-6",
     "us.anthropic.claude-opus-4-7",
     "us.anthropic.claude-haiku-4-5-20251001-v1:0",
-    "amazon.nova-premier-v1:0",
     "deepseek.v3.2",
     "qwen.qwen3-coder-480b-a35b-v1:0",
     "moonshotai.kimi-k2.5"
@@ -21,5 +20,5 @@
       "timeoutMs": 3600000
     }
   },
-  "lastChangelogVersion": "0.70.0"
+  "lastChangelogVersion": "0.70.2"
 }
