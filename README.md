@@ -494,6 +494,31 @@ cp ~/.logseq/preferences.json ~/config-backup/$(date +%Y%m%d)/ 2>/dev/null || tr
 echo "Backup created in ~/config-backup/$(date +%Y%m%d)/"
 ```
 
+### How Stow Works (Directory Folding)
+
+Stow uses **directory folding** — rather than symlinking individual files, it symlinks entire directories when it can. For example, after `stow shell`, `~/.config/zsh` is a symlink pointing to `~/dotfiles/shell/.config/zsh`. Files inside that directory appear as regular files under `~` but *are* the repo files.
+
+```bash
+# Confirm a directory is folded (look for -> in output)
+ls -la ~/.config/zsh
+# lrwxr-xr-x ... ~/.config/zsh -> ../dotfiles/shell/.config/zsh
+
+# A file inside a folded dir shows as a regular file — this is correct
+ls -la ~/.config/zsh/common.zsh
+# -rw-r--r-- ... (not a symlink, but edits go directly into the repo)
+```
+
+**Key implications:**
+- Editing a file inside a folded directory edits the dotfiles repo file directly — changes are live immediately, no restow needed.
+- **Never `rm` a file inside a folded stow path** — it deletes the actual repo file, not a symlink.
+- If you need to add a new file to a package that's already stowed, just create it in the repo and run `stow -R <package>` to pick it up.
+
+```bash
+# Verify key directories are properly folded
+ls -la ~/.config/zsh ~/.config/ghostty ~/.zsh_functions
+# All should show as symlinks into ~/dotfiles/
+```
+
 ### Stow Conflicts
 
 When stow reports "cannot stow over existing target", you have three options:
@@ -568,7 +593,34 @@ cp ~/config-backup/YYYYMMDD/.configfile ~/.configfile
 
 ### Other Common Issues
 
-### Other Common Issues
+**Code Style Reference:**
+
+| Language | Style | Formatter |
+|----------|-------|-----------|
+| Lua (Neovim) | 2-space indent, 120 col width | `stylua --config ~/.config/nvim/stylua.toml .` |
+| Shell (Bash/Zsh) | `[[ ]]` conditionals, `command -v` guards, snake_case locals | `shellcheck` (if available) |
+| JavaScript/TypeScript | Prettier defaults | `npx prettier --write .` + `npx eslint .` |
+
+Syntax-check shell configs before sourcing:
+```bash
+zsh -n ~/.zshrc          # Zsh syntax check
+bash -n ~/.bashrc         # Bash syntax check
+bash -n scripts/foo.sh   # Any script in scripts/
+```
+
+**Neovim / GitHub Copilot keybindings** (plugin: `zbirenbaum/copilot.lua`):
+
+| Mode | Key | Action |
+|------|-----|--------|
+| Normal | `<leader>ct` | Toggle auto-suggest |
+| Normal | `<leader>cd` | Disable Copilot |
+| Normal | `<leader>ce` | Enable Copilot |
+| Normal | `<leader>cp` | Open suggestions panel |
+| Insert | `Ctrl+j` | Accept suggestion |
+| Insert | `Ctrl+l` | Accept next word |
+| Insert | `Ctrl+e` | Dismiss suggestion |
+
+Copilot is disabled for: `yaml`, `gitcommit`, `help` filetypes. Run `:Copilot auth` if authentication is needed.
 
 **Ghostty config settings being silently ignored:**
 
