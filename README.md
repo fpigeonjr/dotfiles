@@ -80,11 +80,16 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 - **Models with `tool_call: false`**: `llama4-maverick`, `llama4-scout`, `deepseek-r1` — usable for read-only/chat queries now, but will fail in agentic sessions until the upstream fix lands
 - **Adding new models**: Find the Bedrock model ID in the [AWS docs](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html) and add an entry under `provider.amazon-bedrock.models` in `opencode.json`
 
+### Pi Agent `models.json`
+- **Do not create `~/.config/pi/agent/models.json` to override Bedrock model metadata.** The `pi-ai` package ships a bundled `models.generated.js` with correct `contextWindow`, `maxTokens`, and real per-token `cost` values for all Bedrock models.
+- Overriding with a local `models.json` (even with zeros or conservative window sizes) silently replaces the bundled values — causing the context fill bar to saturate too early, premature compaction, and `$0.000` cost in the footer.
+- Only add `models.json` for genuinely custom providers (Ollama, vLLM, proxies) or models not yet in the bundled registry. Check `node_modules/@mariozechner/pi-ai/dist/models.generated.js` first before adding any entry.
+
 ### Model Cheat Sheet
 
 | Model | Best For | Speed | Notes |
 |---|---|---|---|
-| `claude-sonnet-4-6` | Default, highest reliability | Medium | Current default |
+| `claude-sonnet-4-6` | Reliable everyday work | Medium | Previous default |
 | `claude-haiku-4-5` | Small model, cheap follow-ups | Fast | Current `small_model` |
 | `kimi-k2.5` | General coding, alternative default | Medium | Good Bedrock non-Claude default |
 | `qwen3-coder-480b` | Complex coding, large refactors | Slow | Largest coding-specific model |
@@ -104,14 +109,15 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 | `llama4-scout` | Huge context, multi-doc analysis | Medium | 10M token context; no tool calls on Bedrock |
 | `deepseek-r1` | Hard reasoning, math, STEM | Slow | Chain-of-thought; no tool calls on Bedrock; 64K context |
 | `deepseek-v3.2` | Coding, general (latest DeepSeek) | Medium | Newer/stronger than V3; bare model ID `deepseek.v3.2` |
+| `claude-opus-4-7` | Default, highest reliability | Medium | **Current default** (pi) |
 | `claude-opus-4-6` | Hardest coding and review tasks | Slow | Strong upgrade path when Sonnet is not enough |
 
 **Quick picks:**
-- Default everyday work → `claude-sonnet-4-6`
+- Default everyday work → `claude-opus-4-7` (pi), `claude-sonnet-4-6` (OpenCode)
 - Hard problem / big codebase → `qwen3-coder-480b`
 - Need speed → `claude-haiku-4-5`, `qwen3-next-80b`, or `minimax-m2.5`
 - AWS-native long context → `nova-2-lite`
-- Claude reliability → `claude-sonnet-4-6` or `claude-opus-4-6`
+- Claude reliability → `claude-opus-4-7` or `claude-sonnet-4-6`
 
 ## Structure
 
