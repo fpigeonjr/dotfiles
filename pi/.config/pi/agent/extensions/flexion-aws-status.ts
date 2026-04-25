@@ -14,7 +14,6 @@
  */
 
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
-import type { AssistantMessage } from "@mariozechner/pi-ai";
 import { truncateToWidth } from "@mariozechner/pi-tui";
 
 const PROFILE = "ClaudeCodeAccess-FlexionLLM";
@@ -154,20 +153,18 @@ export default function (pi: ExtensionAPI) {
             theme.fg("dim", ` 📁 ${dirName}`) +
             branchStr;
 
-          // ── Cost from session branch ──
+          // ── Cost from all session entries (pre- and post-compaction) ──
           let totalCost = 0;
-          for (const entry of ctx.sessionManager.getBranch()) {
+          for (const entry of ctx.sessionManager.getEntries()) {
             if (entry.type === "message" && entry.message.role === "assistant") {
-              const m = entry.message as AssistantMessage;
-              totalCost += m.usage?.cost?.total ?? 0;
+              totalCost += (entry.message as any).usage?.cost?.total ?? 0;
             }
           }
 
           // ── Context usage ──
+          // Use pre-computed percent (tokens can be null right after compaction)
           const usage = ctx.getContextUsage();
-          const pct = usage
-            ? Math.min(100, Math.round((usage.tokens / usage.contextWindow) * 100))
-            : 0;
+          const pct = usage?.percent != null ? Math.min(100, Math.round(usage.percent)) : 0;
 
           // ── Session duration ──
           const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
