@@ -5,8 +5,8 @@
  * three-model instant → thinking → pro ladder.
  *
  *   /a  Anthropic via Bedrock   haiku → sonnet → opus
- *   /e  Experiment via Bedrock  nova-2-lite → qwen3-coder-480b → kimi-k2.5
- *   /g  Google via Gemini CLI   2.0-flash → 2.5-flash → 2.5-pro
+ *   /e  Experiment via Bedrock  qwen3-coder-30b → qwen3-coder-480b → kimi-k2.5
+ *   /g  Google via Gemini CLI   2.5-flash/off → 2.5-flash/medium → 2.5-pro
  *   /o  OpenAI via Codex        gpt-5.4-mini → gpt-5.4 → gpt-5.5
  *
  * Usage:
@@ -14,8 +14,15 @@
  *   /a thinking     → jumps directly to thinking tier
  *   Ctrl+P          → advance to next tier within active family
  *   Shift+Ctrl+P    → back to previous tier within active family
+ *   /tiers          → toggle tier table widget above editor
  *
- * Footer shows active family and tier, e.g. "a·thinking".
+ * Footer shows active family and tier, e.g. "a·thinking" (via pi.events
+ * cross-extension comms with flexion-aws-status).
+ *
+ * Editor border color reflects the thinking level natively via
+ * pi.setThinkingLevel() — no extra code needed.
+ *
+ * State persists across session resume/fork via pi.appendEntry().
  * Selecting a model via /model (Ctrl+L) clears family tracking.
  */
 
@@ -36,6 +43,11 @@ interface Family {
   tiers: [Tier, Tier, Tier];
 }
 
+interface PersistedState {
+  family: string;
+  index: number;
+}
+
 const TIER_NAMES: TierName[] = ["instant", "thinking", "pro"];
 
 const FAMILIES: Record<string, Family> = {
@@ -43,20 +55,21 @@ const FAMILIES: Record<string, Family> = {
     label: "a",
     provider: "amazon-bedrock",
     tiers: [
-      { name: "instant", model: "us.anthropic.claude-haiku-4-5-20251001-v1:0", thinking: "off" },
-      { name: "thinking", model: "us.anthropic.claude-sonnet-4-6", thinking: "medium" },
-      { name: "pro", model: "us.anthropic.claude-opus-4-7", thinking: "high" },
+      { name: "instant",  model: "us.anthropic.claude-haiku-4-5-20251001-v1:0", thinking: "off" },
+      { name: "thinking", model: "us.anthropic.claude-sonnet-4-6",              thinking: "medium" },
+      { name: "pro",      model: "us.anthropic.claude-opus-4-7",                thinking: "high" },
     ],
   },
   e: {
     label: "e",
     provider: "amazon-bedrock",
     tiers: [
-      // Amazon Nova models require inference profiles not in pi's registry.
+      // Amazon Nova models require inference profiles not in pi registry.
       // Using qwen3-coder-30b — smaller/faster coding model, same family as thinking tier.
-      { name: "instant", model: "qwen.qwen3-coder-30b-a3b-v1:0", thinking: "off" },
-      { name: "thinking", model: "qwen.qwen3-coder-480b-a35b-v1:0", thinking: "off" },
-      { name: "pro", model: "moonshotai.kimi-k2.5", thinking: "high" },
+      { name: "instant",  model: "qwen.qwen3-coder-30b-a3b-v1:0",      thinking: "off" },
+      // qwen3-coder-480b marked thinking=no in pi registry; reasoning is internal.
+      { name: "thinking", model: "qwen.qwen3-coder-480b-a35b-v1:0",     thinking: "off" },
+      { name: "pro",      model: "moonshotai.kimi-k2.5",                thinking: "high" },
     ],
   },
   g: {
@@ -75,9 +88,9 @@ const FAMILIES: Record<string, Family> = {
     label: "o",
     provider: "openai-codex",
     tiers: [
-      { name: "instant", model: "gpt-5.4-mini", thinking: "off" },
-      { name: "thinking", model: "gpt-5.4", thinking: "medium" },
-      { name: "pro", model: "gpt-5.5", thinking: "high" },
+      { name: "instant",  model: "gpt-5.4-mini", thinking: "off" },
+      { name: "thinking", model: "gpt-5.4",       thinking: "medium" },
+      { name: "pro",      model: "gpt-5.5",       thinking: "high" },
     ],
   },
 };
@@ -87,6 +100,8 @@ export default function (pi: ExtensionAPI) {
   let tierIndex = 0;
   // Guard: suppress model_select handler when we triggered the change
   let _ownSwitch = false;
+  // Track /tiers widget visibility
+  let tiersWidgetVisible = false;
 
   // ─── Status bar ────────────────────────────────────────────────────────────
 
@@ -126,6 +141,7 @@ export default function (pi: ExtensionAPI) {
         ctx.ui.notify(`model-tiers: no auth for ${family.provider}/${tier.model}`, "error");
         return;
       }
+      // setThinkingLevel drives the editor border color natively.
       pi.setThinkingLevel(tier.thinking);
     } finally {
       _ownSwitch = false;
@@ -149,13 +165,53 @@ export default function (pi: ExtensionAPI) {
         const arg = args?.trim().toLowerCase() as TierName | undefined;
         const index = arg ? TIER_NAMES.indexOf(arg) : 0;
         if (arg && index === -1) {
-          ctx.ui.notify(`model-tiers: unknown tier "${arg}" — use instant, thinking, or pro`, "error");
+          ctx.ui.notify(
+            `model-tiers: unknown tier "${arg}" — use instant, thinking, or pro`,
+            "error",
+          );
           return;
         }
         await activateTier(key, index, ctx);
       },
     });
   }
+
+  // ─── /tiers — toggle tier table widget ─────────────────────────────────────
+
+  pi.registerCommand("tiers", {
+    description: "Show all tier stacks (toggle)",
+    handler: async (_args, ctx) => {
+      if (tiersWidgetVisible) {
+        ctx.ui.setWidget("model-tiers-table", undefined);
+        tiersWidgetVisible = false;
+        return;
+      }
+
+      const rows: string[] = [];
+      for (const [key, family] of Object.entries(FAMILIES)) {
+        const isActiveFamily = key === activeFamily;
+        rows.push(`${isActiveFamily ? "▶" : " "} /${key}  (${family.provider})`);
+        for (let i = 0; i < family.tiers.length; i++) {
+          const tier = family.tiers[i];
+          const isCurrent = isActiveFamily && i === tierIndex;
+          rows.push(`    ${isCurrent ? "→" : " "} ${tier.name.padEnd(9)}${tier.model}`);
+        }
+        rows.push("");
+      }
+      rows.pop(); // remove trailing blank line
+
+      ctx.ui.setWidget("model-tiers-table", rows);
+      tiersWidgetVisible = true;
+    },
+  });
+
+  // Auto-clear /tiers widget when the user sends a message
+  pi.on("agent_start", async (_event, ctx) => {
+    if (tiersWidgetVisible) {
+      ctx.ui.setWidget("model-tiers-table", undefined);
+      tiersWidgetVisible = false;
+    }
+  });
 
   // ─── Ctrl+P / Shift+Ctrl+P — tier cycling ─────────────────────────────────
 
@@ -181,9 +237,38 @@ export default function (pi: ExtensionAPI) {
     },
   });
 
-  // ─── Session restore — auto-detect family from current model ───────────────
+  // ─── Session persistence ───────────────────────────────────────────────────
+
+  // Save state at the start of each turn so resume restores exactly where we left off.
+  pi.on("turn_start", async () => {
+    if (activeFamily !== undefined) {
+      pi.appendEntry<PersistedState>("model-tiers-state", {
+        family: activeFamily,
+        index: tierIndex,
+      });
+    }
+  });
 
   pi.on("session_start", async (_event, ctx) => {
+    // 1. Try to restore from the most recent persisted entry.
+    const entries = ctx.sessionManager.getEntries();
+    for (let i = entries.length - 1; i >= 0; i--) {
+      const entry = entries[i] as any;
+      if (entry.type === "custom" && entry.customType === "model-tiers-state") {
+        const { family, index } = (entry.data ?? {}) as Partial<PersistedState>;
+        if (family && FAMILIES[family] && typeof index === "number") {
+          activeFamily = family;
+          tierIndex = index;
+          // Restore thinking level — pi doesn't persist it across sessions.
+          pi.setThinkingLevel(FAMILIES[family].tiers[index].thinking);
+          updateStatus(ctx);
+          return;
+        }
+        break;
+      }
+    }
+
+    // 2. Fall back: auto-detect family from the current model ID.
     const currentId = ctx.model?.id;
     if (currentId) {
       outer: for (const [key, family] of Object.entries(FAMILIES)) {
@@ -203,8 +288,9 @@ export default function (pi: ExtensionAPI) {
 
   pi.on("model_select", async (event, ctx) => {
     if (_ownSwitch || event.source === "restore") return;
-    // User picked something manually via /model or Ctrl+L — check if it
-    // still maps to one of our tiers, otherwise clear family tracking.
+    // User picked something manually via /model or Ctrl+L.
+    // Re-sync family tracking in case they picked one of our tier models,
+    // otherwise clear it.
     const id = event.model.id;
     let matched = false;
     outer: for (const [key, family] of Object.entries(FAMILIES)) {
