@@ -15,4 +15,3 @@ pi/.config/pi/agent/auth.json
 pi/.config/pi/agent/sessions/
 pi/.config/pi/agent/git/
 pi/.config/pi/agent/npm/
-pi/.config/pi/agent/keybindings.json

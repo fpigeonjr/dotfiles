@@ -28,11 +28,20 @@ export default function (pi: ExtensionAPI) {
   let awsLastCheck = 0;
   let footerTui: { requestRender(): void } | null = null;
 
+  // Tier label from model-tiers extension (injected via pi.events)
+  let tierLabel: string | undefined;
+
   // Cached model ID — updated via session_start and model_select so the
   // footer render() closure never needs to touch the session-bound ctx.model.
   // Guards against the v0.69.0 stale-ctx throw when a timer fires after quit.
   let modelId = "no-model";
   let isActive = false;
+
+  // ─── Cross-extension: receive tier label from model-tiers ──────────────────
+  pi.events.on("model-tiers:change", (data: { label: string | undefined }) => {
+    tierLabel = data.label;
+    footerTui?.requestRender();
+  });
 
   // ─── AWS credential helpers ──────────────────────────────────────────────
 
@@ -148,8 +157,10 @@ export default function (pi: ExtensionAPI) {
           const dirName = ctx.cwd.split("/").pop() || ctx.cwd;
           const branch = footerData.getGitBranch();
           const branchStr = branch ? theme.fg("dim", ` | 🌿 ${branch}`) : "";
+          const tierStr = tierLabel ? " " + theme.fg("accent", tierLabel) : "";
           const line1 =
             theme.fg("accent", `[${model}]`) +
+            tierStr +
             theme.fg("dim", ` 📁 ${dirName}`) +
             branchStr;
 

@@ -1,0 +1,7 @@
+{
+  "$comment": "Clear all built-in Ctrl+P bindings — model-tiers extension owns this key.",
+  "app.model.cycleForward": [],
+  "app.model.cycleBackward": [],
+  "app.models.toggleProvider": [],
+  "app.session.togglePath": []
+}

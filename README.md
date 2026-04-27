@@ -85,6 +85,23 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 - Overriding with a local `models.json` (even with zeros or conservative window sizes) silently replaces the bundled values — causing the context fill bar to saturate too early, premature compaction, and `$0.000` cost in the footer.
 - Only add `models.json` for genuinely custom providers (Ollama, vLLM, proxies) or models not yet in the bundled registry. Check `node_modules/@mariozechner/pi-ai/dist/models.generated.js` first before adding any entry.
 
+### Pi Model Tiers
+
+The `model-tiers` extension registers four provider families. Each family scopes `Ctrl+P` to an instant → thinking → pro ladder.
+
+| command | instant | thinking | pro |
+|---|---|---|---|
+| `/a` Anthropic·Bedrock | haiku-4-5 | sonnet-4-6 | opus-4-7 |
+| `/e` Experiment·Bedrock | qwen3-coder-30b | qwen3-coder-480b | kimi-k2.5 |
+| `/g` Google·Gemini CLI | gemini-2.5-flash (thinking off) | gemini-2.5-flash (thinking medium) | gemini-2.5-pro |
+| `/o` OpenAI·Codex | gpt-5.4-mini | gpt-5.4 | gpt-5.5 |
+
+- `/a thinking` — jump directly to a named tier
+- `Ctrl+P` / `Shift+Ctrl+P` — cycle forward / backward within the active family
+- Footer shows active family and tier: `a·instant`, `e·thinking`, `g·pro`
+- Thinking levels baked in: instant=`off`, thinking=`medium`, pro=`high`
+- `/model` (Ctrl+L) escapes the tier system back to free selection
+
 ### Model Cheat Sheet
 
 | Model | Best For | Speed | Notes |
@@ -112,12 +129,18 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 | `claude-opus-4-7` | Default, highest reliability | Medium | **Current default** (pi) |
 | `claude-opus-4-6` | Hardest coding and review tasks | Slow | Strong upgrade path when Sonnet is not enough |
 
-**Quick picks:**
-- Default everyday work → `claude-opus-4-7` (pi), `claude-sonnet-4-6` (OpenCode)
+**Quick picks (pi — use tier commands):**
+- Start any session → `/a` (Anthropic instant), then `Ctrl+P` to escalate
+- Explore non-Anthropic → `/e` (experiment stack: nova → qwen → kimi)
+- Google context window → `/g` (Gemini CLI: 1M ctx across all tiers)
+- OpenAI reasoning → `/o` (Codex: gpt-5.4-mini → 5.4 → 5.5)
+- Hard problem / big codebase → `/a pro` or `/e pro`
+
+**Quick picks (OpenCode):**
+- Default everyday work → `claude-sonnet-4-6`
 - Hard problem / big codebase → `qwen3-coder-480b`
 - Need speed → `claude-haiku-4-5`, `qwen3-next-80b`, or `minimax-m2.5`
 - AWS-native long context → `nova-2-lite`
-- Claude reliability → `claude-opus-4-7` or `claude-sonnet-4-6`
 
 ## Structure
 
@@ -145,7 +168,9 @@ dotfiles/
 │       ├── AGENTS.md        # Global system prompt additions
 │       ├── settings.json    # Model whitelist, provider, thinking level
 │       ├── extensions/      # Auto-discovered TypeScript extensions
-│       │   └── flexion-aws-status.ts  # Footer, AWS expiry, cmux notify
+│       │   ├── flexion-aws-status.ts  # Footer, AWS expiry, cmux notify
+│       │   └── model-tiers.ts         # /a /e /g /o tier commands + Ctrl+P cycling
+│       ├── keybindings.json # Clears built-in Ctrl+P (owned by model-tiers)
 │       └── prompts/         # Slash-command prompt templates
 ├── scripts/         # Utility scripts
 │   ├── wt-clean.sh  # Clean up stale worktrunk worktrees
