@@ -92,7 +92,7 @@ The `model-tiers` extension registers four provider families. Each family scopes
 | command | instant | thinking | pro |
 |---|---|---|---|
 | `/a` Anthropic·Bedrock | haiku-4-5 | sonnet-4-6 | opus-4-7 |
-| `/e` Experiment·Bedrock | qwen3-coder-30b | qwen3-coder-480b | kimi-k2.5 |
+| `/e` Experiment·Bedrock | qwen3-coder-30b | qwen3-coder-480b | deepseek.v3.2 |
 | `/g` Google·Gemini CLI | gemini-2.5-flash (thinking off) | gemini-2.5-flash (thinking medium) | gemini-2.5-pro |
 | `/o` OpenAI·Codex | gpt-5.4-mini | gpt-5.4 | gpt-5.5 |
 
@@ -108,7 +108,7 @@ The `model-tiers` extension registers four provider families. Each family scopes
 |---|---|---|---|
 | `claude-sonnet-4-6` | Reliable everyday work | Medium | Previous default |
 | `claude-haiku-4-5` | Small model, cheap follow-ups | Fast | Current `small_model` |
-| `kimi-k2.5` | General coding, alternative default | Medium | Good Bedrock non-Claude default |
+| `kimi-k2.5` | General coding, alternative default | Medium (but can stall) | Good Bedrock non-Claude default; occasional high-latency stalls — give it 10m before Esc |
 | `qwen3-coder-480b` | Complex coding, large refactors | Slow | Largest coding-specific model |
 | `qwen3-coder-30b` | Everyday coding, faster Qwen | Fast | Can hallucinate on simple tasks |
 | `qwen3-next-80b` | General coding, faster Qwen | Fast | Good candidate for cheaper day-to-day use |

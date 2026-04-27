@@ -69,7 +69,7 @@ const FAMILIES: Record<string, Family> = {
       { name: "instant",  model: "qwen.qwen3-coder-30b-a3b-v1:0",      thinking: "off" },
       // qwen3-coder-480b marked thinking=no in pi registry; reasoning is internal.
       { name: "thinking", model: "qwen.qwen3-coder-480b-a35b-v1:0",     thinking: "off" },
-      { name: "pro",      model: "moonshotai.kimi-k2.5",                thinking: "high" },
+      { name: "pro",      model: "deepseek.v3.2",                          thinking: "high" },
     ],
   },
   g: {
