@@ -191,25 +191,25 @@ export default function (pi: ExtensionAPI) {
         return;
       }
 
-      ctx.ui.setWidget("model-tiers-table", (_tui, theme) => ({
-        invalidate() {},
-        render(_width: number) {
-          return Object.entries(FAMILIES).map(([key, family]) => {
-            const isActiveFamily = key === activeFamily;
-            const prefix = isActiveFamily ? theme.fg("accent", "▶") : " ";
-            const slash = isActiveFamily ? theme.fg("accent", `/${key}`) : theme.fg("muted", `/${key}`);
-            const tierLabels = family.tiers
-              .map((t, i) =>
-                isActiveFamily && i === tierIndex
-                  ? theme.fg("accent", `[${t.short}]`)
-                  : theme.fg("dim", t.short),
-              )
-              .join(theme.fg("dim", " / "));
-            const provider = theme.fg("dim", family.provider);
-            return `${prefix} ${slash}  ${tierLabels}  ${provider}`;
-          });
-        },
-      }));
+      const { theme } = ctx.ui;
+      const rows = Object.entries(FAMILIES).map(([key, family]) => {
+        const isActiveFamily = key === activeFamily;
+        const prefix = isActiveFamily ? theme.fg("accent", "▶") : " ";
+        const slash = isActiveFamily
+          ? theme.fg("accent", `/${key}`)
+          : theme.fg("muted", `/${key}`);
+        const tierLabels = family.tiers
+          .map((t, i) =>
+            isActiveFamily && i === tierIndex
+              ? theme.fg("accent", `[${t.short}]`)
+              : theme.fg("dim", t.short),
+          )
+          .join(theme.fg("dim", " / "));
+        const provider = theme.fg("dim", family.provider);
+        return `${prefix} ${slash}  ${tierLabels}  ${provider}`;
+      });
+
+      ctx.ui.setWidget("model-tiers-table", rows);
       tiersWidgetVisible = true;
     },
   });
