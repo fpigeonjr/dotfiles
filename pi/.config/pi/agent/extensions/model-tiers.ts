@@ -5,7 +5,7 @@
  * three-model instant → thinking → pro ladder.
  *
  *   /a  Anthropic via Bedrock   haiku → sonnet → opus
- *   /e  Experiment via Bedrock  qwen3-coder-30b → qwen3-coder-480b → deepseek-v3.2
+ *   /e  Experiment via Bedrock  qwen3-coder-30b → qwen3-next-80b → deepseek-v3.2
  *   /g  Google via Gemini CLI   2.5-flash/off → 2.5-flash/medium → 2.5-pro
  *   /o  OpenAI via Codex        gpt-5.4-mini → gpt-5.4 → gpt-5.5
  *
@@ -69,12 +69,12 @@ const FAMILIES: Record<string, Family> = {
     provider: "amazon-bedrock",
     tiers: [
       // Amazon Nova models require inference profiles not in pi registry.
-      // Using qwen3-coder-30b — smaller/faster coding model, same family as thinking tier.
+      // Using qwen3-coder-30b — smaller/faster coding model.
       { name: "instant",  model: "qwen.qwen3-coder-30b-a3b-v1:0",  thinking: "off",  short: "qwen-30b"  },
-      // qwen3-coder-480b marked thinking=no in pi registry; reasoning is internal.
-      { name: "thinking", model: "qwen.qwen3-coder-480b-a35b-v1:0", thinking: "off",  short: "qwen-480b" },
-      // kimi-k2.5 stalls frequently; deepseek.v3.2 is verified working.
-      { name: "pro",      model: "deepseek.v3.2",                   thinking: "high", short: "deepseek"  },
+      // qwen3-next-80b-a3b: reasoning:false, 262k context/output, streaming+tools verified.
+      { name: "thinking", model: "qwen.qwen3-next-80b-a3b",          thinking: "off",  short: "qwen-80b"  },
+      // deepseek.v3.2: proven reliable with tool streaming.
+      { name: "pro",      model: "deepseek.v3.2",                     thinking: "off",  short: "deepseek" },
     ],
   },
   g: {
@@ -266,11 +266,20 @@ export default function (pi: ExtensionAPI) {
       if (entry.type === "custom" && entry.customType === "model-tiers-state") {
         const { family, index } = (entry.data ?? {}) as Partial<PersistedState>;
         if (family && FAMILIES[family] && typeof index === "number") {
-          activeFamily = family;
-          tierIndex = index;
-          // Restore thinking level — pi doesn't persist it across sessions.
-          pi.setThinkingLevel(FAMILIES[family].tiers[index].thinking);
-          updateStatus(ctx);
+          const expectedModel = FAMILIES[family].tiers[index].model;
+          const currentModel = ctx.model?.id;
+          if (currentModel !== expectedModel) {
+            // Tier config was updated since this session was last active (e.g. a model
+            // was renamed or removed). Force-activate so pi uses the current model ID
+            // rather than the stale one pi restored from session state.
+            await activateTier(family, index, ctx);
+          } else {
+            activeFamily = family;
+            tierIndex = index;
+            // Restore thinking level — pi doesn't persist it across sessions.
+            pi.setThinkingLevel(FAMILIES[family].tiers[index].thinking);
+            updateStatus(ctx);
+          }
           return;
         }
         break;

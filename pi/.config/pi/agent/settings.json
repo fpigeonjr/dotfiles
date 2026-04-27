@@ -1,14 +1,14 @@
 {
   "$comment": "Pi coding agent settings. Keep this file minimal per pi philosophy — add customization only when a real task demands it. See https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/settings.json",
   "defaultProvider": "amazon-bedrock",
-  "defaultModel": "us.anthropic.claude-opus-4-7",
-  "defaultThinkingLevel": "medium",
+  "defaultModel": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+  "defaultThinkingLevel": "off",
   "enabledModels": [
     "us.anthropic.claude-sonnet-4-6",
     "us.anthropic.claude-opus-4-7",
     "us.anthropic.claude-haiku-4-5-20251001-v1:0",
     "deepseek.v3.2",
-    "qwen.qwen3-coder-480b-a35b-v1:0",
+    "qwen.qwen3-next-80b-a3b",
     "moonshotai.kimi-k2.5"
   ],
   "enableInstallTelemetry": false,
@@ -20,5 +20,5 @@
       "timeoutMs": 3600000
     }
   },
-  "lastChangelogVersion": "0.70.2"
+  "lastChangelogVersion": "0.70.5"
 }

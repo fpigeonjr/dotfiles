@@ -7,9 +7,9 @@ The `model-tiers` extension is loaded. Use these commands to switch provider fam
 | command | instant | thinking | pro |
 |---|---|---|---|
 | `/a` | claude-haiku-4-5 (Bedrock) | claude-sonnet-4-6 | claude-opus-4-7 |
-| `/e` | qwen3-coder-30b (Bedrock) | qwen3-coder-480b | deepseek.v3.2 |
+| `/e` | qwen3-coder-30b (Bedrock) | qwen3-next-80b | deepseek.v3.2 |
 
-- `kimi-k2.5` (e·pro): stalls frequently on Bedrock — multiple 10m+ non-responses observed. Moonshot latency is unpredictable. Treat as experimental; fall back to `/a pro` when it stalls.
+- `kimi-k2.5` (Bedrock): stalls frequently — multiple 10m+ non-responses observed. Available via `/model` but don't put it in a tier.
 | `/g` | gemini-2.5-flash/off (Gemini CLI) | gemini-2.5-flash/medium | gemini-2.5-pro |
 | `/o` | gpt-5.4-mini (Codex) | gpt-5.4 | gpt-5.5 |
 
