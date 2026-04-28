@@ -8,10 +8,11 @@ The `model-tiers` extension is loaded. Use these commands to switch provider fam
 |---|---|---|---|
 | `/a` | claude-haiku-4-5 (Bedrock) | claude-sonnet-4-6 | claude-opus-4-7 |
 | `/e` | qwen3-coder-30b (Bedrock) | qwen3-next-80b | deepseek.v3.2 |
-
-- `kimi-k2.5` (Bedrock): stalls frequently — multiple 10m+ non-responses observed. Available via `/model` but don't put it in a tier.
+| `/n` | llama-3.3-70b (NIM) | kimi-k2-thinking (NIM) | qwen3-coder-480b (NIM) |
 | `/g` | gemini-2.5-flash/off (Gemini CLI) | gemini-2.5-flash/medium | gemini-2.5-pro |
 | `/o` | gpt-5.4-mini (Codex) | gpt-5.4 | gpt-5.5 |
+
+- `kimi-k2.5` (Bedrock): stalls frequently — multiple 10m+ non-responses observed. Available via `/model` but don't put it in a tier.
 
 - `/a thinking` jumps directly to a named tier; bare `/a` always starts at instant
 - `Ctrl+P` / `Shift+Ctrl+P` cycles tiers within the active family

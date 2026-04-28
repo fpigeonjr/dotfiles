@@ -7,6 +7,7 @@
  *   /a  Anthropic via Bedrock   haiku → sonnet → opus
  *   /e  Experiment via Bedrock  qwen3-coder-30b → qwen3-next-80b → deepseek-v3.2
  *   /g  Google via Gemini CLI   2.5-flash/off → 2.5-flash/medium → 2.5-pro
+ *   /n  NVIDIA NIM               llama-3.3-70b → kimi-k2-thinking → qwen3-coder-480b
  *   /o  OpenAI via Codex        gpt-5.4-mini → gpt-5.4 → gpt-5.5
  *
  * Usage:
@@ -55,6 +56,15 @@ interface PersistedState {
 const TIER_NAMES: TierName[] = ["instant", "thinking", "pro"];
 
 const FAMILIES: Record<string, Family> = {
+  n: {
+    label: "n",
+    provider: "nvidia-nim",
+    tiers: [
+      { name: "instant",  model: "meta/llama-3.3-70b-instruct",         thinking: "off",    short: "llama-70b"  },
+      { name: "thinking", model: "moonshotai/kimi-k2-thinking",          thinking: "medium", short: "kimi-k2"    },
+      { name: "pro",      model: "qwen/qwen3-coder-480b-a35b-instruct",  thinking: "off",    short: "qwen3-480b" },
+    ],
+  },
   a: {
     label: "a",
     provider: "amazon-bedrock",
@@ -228,7 +238,7 @@ export default function (pi: ExtensionAPI) {
     description: "Cycle to next model tier (model-tiers)",
     handler: async (ctx) => {
       if (!activeFamily) {
-        ctx.ui.notify("model-tiers: pick a provider first — /a  /e  /g  /o", "info");
+        ctx.ui.notify("model-tiers: pick a provider first — /a  /e  /g  /n  /o", "info");
         return;
       }
       await activateTier(activeFamily, (tierIndex + 1) % 3, ctx);
@@ -239,7 +249,7 @@ export default function (pi: ExtensionAPI) {
     description: "Cycle to previous model tier (model-tiers)",
     handler: async (ctx) => {
       if (!activeFamily) {
-        ctx.ui.notify("model-tiers: pick a provider first — /a  /e  /g  /o", "info");
+        ctx.ui.notify("model-tiers: pick a provider first — /a  /e  /g  /n  /o", "info");
         return;
       }
       await activateTier(activeFamily, (tierIndex + 2) % 3, ctx);
