@@ -81,9 +81,10 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 - **Adding new models**: Find the Bedrock model ID in the [AWS docs](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html) and add an entry under `provider.amazon-bedrock.models` in `opencode.json`
 
 ### Pi Agent `models.json`
-- **Do not create `~/.config/pi/agent/models.json` to override Bedrock model metadata.** The `pi-ai` package ships a bundled `models.generated.js` with correct `contextWindow`, `maxTokens`, and real per-token `cost` values for all Bedrock models.
+- **Do not use `models.json` to override Bedrock model metadata.** The `pi-ai` package ships a bundled `models.generated.js` with correct `contextWindow`, `maxTokens`, and real per-token `cost` values for all Bedrock models.
 - Overriding with a local `models.json` (even with zeros or conservative window sizes) silently replaces the bundled values — causing the context fill bar to saturate too early, premature compaction, and `$0.000` cost in the footer.
-- Only add `models.json` for genuinely custom providers (Ollama, vLLM, proxies) or models not yet in the bundled registry. Check `node_modules/@mariozechner/pi-ai/dist/models.generated.js` first before adding any entry.
+- Only add `models.json` for genuinely custom providers (Ollama, vLLM, proxies, NVIDIA NIM) or models not yet in the bundled registry. Check `node_modules/@mariozechner/pi-ai/dist/models.generated.js` first before adding any Bedrock entry.
+- `models.json` is **gitignored** — it's machine-local and may contain API key resolvers. Recreate it from scratch on new machines using `curl https://integrate.api.nvidia.com/v1/models` to discover current working NIM models.
 
 ### Pi Model Tiers
 
@@ -92,7 +93,8 @@ The `model-tiers` extension registers four provider families. Each family scopes
 | command | instant | thinking | pro |
 |---|---|---|---|
 | `/a` Anthropic·Bedrock | haiku-4-5 | sonnet-4-6 | opus-4-7 |
-| `/e` Experiment·Bedrock | qwen3-coder-30b | qwen3-coder-480b | deepseek.v3.2 |
+| `/e` Experiment·Bedrock | qwen3-coder-30b | qwen3-next-80b | deepseek.v3.2 |
+| `/n` NVIDIA NIM | llama-3.3-70b | kimi-k2-thinking | qwen3-coder-480b |
 | `/g` Google·Gemini CLI | gemini-2.5-flash (thinking off) | gemini-2.5-flash (thinking medium) | gemini-2.5-pro |
 | `/o` OpenAI·Codex | gpt-5.4-mini | gpt-5.4 | gpt-5.5 |
 
