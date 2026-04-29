@@ -4,11 +4,12 @@
  * Registers four provider family commands that each scope Ctrl+P to a
  * three-model instant → thinking → pro ladder.
  *
- *   /a  Anthropic via Bedrock   haiku → sonnet → opus
- *   /e  Experiment via Bedrock  qwen3-coder-30b → qwen3-235b-a22b-2507 → deepseek-v3.2
- *   /g  Google via Gemini CLI   2.5-flash/off → 2.5-flash/medium → 2.5-pro
- *   /n  NVIDIA NIM               llama-4-maverick → kimi-k2-thinking → qwen3.5-397b
- *   /o  OpenAI via Codex        gpt-5.4-mini → gpt-5.4 → gpt-5.5
+ *   /a   Anthropic via Bedrock   haiku → sonnet → opus
+ *   /e   Experiment via Bedrock  qwen3-coder-30b → qwen3-235b-a22b-2507 → deepseek-v3.2
+ *   /g   Google via Gemini CLI   2.5-flash/off → 2.5-flash/medium → 2.5-pro
+ *   /n   NVIDIA NIM               llama-4-maverick → kimi-k2-thinking → qwen3.5-397b
+ *   /o   OpenAI via Codex        gpt-5.4-mini → gpt-5.4 → gpt-5.5
+ *   /oc  OpenCode Go             deepseek-v4-flash → kimi-k2.6 → deepseek-v4-pro
  *
  * Usage:
  *   /a              → switches to instant tier for Anthropic, scopes Ctrl+P
@@ -56,6 +57,15 @@ interface PersistedState {
 const TIER_NAMES: TierName[] = ["instant", "thinking", "pro"];
 
 const FAMILIES: Record<string, Family> = {
+  oc: {
+    label: "oc",
+    provider: "opencode-go",
+    tiers: [
+      { name: "instant",  model: "deepseek-v4-flash", thinking: "off",    short: "ds-v4-flash" },
+      { name: "thinking", model: "kimi-k2.6",          thinking: "medium", short: "kimi-k2.6"   },
+      { name: "pro",      model: "deepseek-v4-pro",   thinking: "off",    short: "ds-v4-pro"  },
+    ],
+  },
   n: {
     label: "n",
     provider: "nvidia-nim",
