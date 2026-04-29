@@ -19,6 +19,10 @@ The `model-tiers` extension is loaded. Use these commands to switch provider fam
 - `/model` (Ctrl+L) escapes to free model selection and clears family tracking
 - Footer shows active family and tier, e.g. `a·thinking`
 
+## Dotfiles / Committing
+
+Pi rewrites `defaultModel` and `defaultThinkingLevel` in `settings.json` on every session. Always `git diff` before staging — only `lastChangelogVersion` (and intentional config changes) should be committed; revert the model fields to `haiku-4-5` / `off` (`a·instant`) if dirty.
+
 ## Clarifying Questions
 
 When you need to ask clarifying questions before proceeding, ask them **one at a time**.
