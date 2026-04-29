@@ -5,9 +5,9 @@
  * three-model instant → thinking → pro ladder.
  *
  *   /a  Anthropic via Bedrock   haiku → sonnet → opus
- *   /e  Experiment via Bedrock  qwen3-coder-30b → qwen3-next-80b → deepseek-v3.2
+ *   /e  Experiment via Bedrock  qwen3-coder-30b → qwen3-235b-a22b-2507 → deepseek-v3.2
  *   /g  Google via Gemini CLI   2.5-flash/off → 2.5-flash/medium → 2.5-pro
- *   /n  NVIDIA NIM               llama-3.3-70b → kimi-k2-thinking → qwen3-coder-480b
+ *   /n  NVIDIA NIM               llama-4-maverick → kimi-k2-thinking → qwen3.5-397b
  *   /o  OpenAI via Codex        gpt-5.4-mini → gpt-5.4 → gpt-5.5
  *
  * Usage:
@@ -60,9 +60,9 @@ const FAMILIES: Record<string, Family> = {
     label: "n",
     provider: "nvidia-nim",
     tiers: [
-      { name: "instant",  model: "meta/llama-3.3-70b-instruct",         thinking: "off",    short: "llama-70b"  },
-      { name: "thinking", model: "moonshotai/kimi-k2-thinking",          thinking: "medium", short: "kimi-k2"    },
-      { name: "pro",      model: "qwen/qwen3-coder-480b-a35b-instruct",  thinking: "off",    short: "qwen3-480b" },
+      { name: "instant",  model: "meta/llama-4-maverick-17b-128e-instruct", thinking: "off",    short: "llama4-mav" },
+      { name: "thinking", model: "moonshotai/kimi-k2-thinking",          thinking: "medium", short: "kimi-k2"      },
+      { name: "pro",      model: "qwen/qwen3.5-397b-a17b",              thinking: "off",    short: "qwen3.5-397b" },
     ],
   },
   a: {
@@ -81,8 +81,8 @@ const FAMILIES: Record<string, Family> = {
       // Amazon Nova models require inference profiles not in pi registry.
       // Using qwen3-coder-30b — smaller/faster coding model.
       { name: "instant",  model: "qwen.qwen3-coder-30b-a3b-v1:0",  thinking: "off",  short: "qwen-30b"  },
-      // qwen3-next-80b-a3b: reasoning:false, 262k context/output, streaming+tools verified.
-      { name: "thinking", model: "qwen.qwen3-next-80b-a3b",          thinking: "off",  short: "qwen-80b"  },
+      // qwen3-235b-a22b-2507: 3× bigger MoE than qwen3-next-80b, same thinking-capable family, Active on Bedrock.
+      { name: "thinking", model: "qwen.qwen3-235b-a22b-2507-v1:0",     thinking: "off",  short: "qwen-235b" },
       // deepseek.v3.2: proven reliable with tool streaming.
       { name: "pro",      model: "deepseek.v3.2",                     thinking: "off",  short: "deepseek" },
     ],

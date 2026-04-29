@@ -7,8 +7,8 @@ The `model-tiers` extension is loaded. Use these commands to switch provider fam
 | command | instant | thinking | pro |
 |---|---|---|---|
 | `/a` | claude-haiku-4-5 (Bedrock) | claude-sonnet-4-6 | claude-opus-4-7 |
-| `/e` | qwen3-coder-30b (Bedrock) | qwen3-next-80b | deepseek.v3.2 |
-| `/n` | llama-3.3-70b (NIM) | kimi-k2-thinking (NIM) | qwen3-coder-480b (NIM) |
+| `/e` | qwen3-coder-30b (Bedrock) | qwen3-235b-a22b-2507 | deepseek.v3.2 |
+| `/n` | llama-4-maverick (NIM) | kimi-k2-thinking (NIM) | qwen3.5-397b (NIM) |
 | `/g` | gemini-2.5-flash/off (Gemini CLI) | gemini-2.5-flash/medium | gemini-2.5-pro |
 | `/o` | gpt-5.4-mini (Codex) | gpt-5.4 | gpt-5.5 |
 
