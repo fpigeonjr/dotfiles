@@ -31,11 +31,18 @@ export default function (pi: ExtensionAPI) {
   // Tier label from model-tiers extension (injected via pi.events)
   let tierLabel: string | undefined;
 
-  // Cached model ID — updated via session_start and model_select so the
-  // footer render() closure never needs to touch the session-bound ctx.model.
-  // Guards against the v0.69.0 stale-ctx throw when a timer fires after quit.
+  // All render-time data is cached from event handlers so the render closure
+  // never touches session-bound ctx directly (avoids stale-ctx throws in
+  // --print mode when Pi invalidates the session ctx after the turn).
   let modelId = "no-model";
+  let cachedCwd = "";
+  let cachedCost = 0;
+  let cachedContextPct = 0;
   let isActive = false;
+  let sessionGen = 0;
+  // False in --print / non-interactive mode. Suppresses footer, notifications,
+  // and all async ctx access that would be stale after Pi disposes the session.
+  let interactive = false;
 
   // ─── Cross-extension: receive tier label from model-tiers ──────────────────
   pi.events.on("model-tiers:change", (data: { label: string | undefined }) => {
@@ -153,8 +160,10 @@ export default function (pi: ExtensionAPI) {
           if (!isActive) return ["", ""];
 
           // ── Model + directory + branch (line 1) ──
+          // All values are read from module-level cache — never from ctx —
+          // so this closure stays safe after Pi invalidates the session ctx.
           const model = friendlyModel(modelId);
-          const dirName = ctx.cwd.split("/").pop() || ctx.cwd;
+          const dirName = cachedCwd.split("/").pop() || cachedCwd;
           const branch = footerData.getGitBranch();
           const branchStr = branch ? theme.fg("dim", ` | 🌿 ${branch}`) : "";
           const tierStr = tierLabel ? " " + theme.fg("accent", tierLabel) : "";
@@ -164,18 +173,9 @@ export default function (pi: ExtensionAPI) {
             theme.fg("dim", ` 📁 ${dirName}`) +
             branchStr;
 
-          // ── Cost from all session entries (pre- and post-compaction) ──
-          let totalCost = 0;
-          for (const entry of ctx.sessionManager.getEntries()) {
-            if (entry.type === "message" && entry.message.role === "assistant") {
-              totalCost += (entry.message as any).usage?.cost?.total ?? 0;
-            }
-          }
-
-          // ── Context usage ──
-          // Use pre-computed percent (tokens can be null right after compaction)
-          const usage = ctx.getContextUsage();
-          const pct = usage?.percent != null ? Math.min(100, Math.round(usage.percent)) : 0;
+          // ── Cost + context pct — updated by agent_end, never via ctx ──
+          const totalCost = cachedCost;
+          const pct = cachedContextPct;
 
           // ── Session duration ──
           const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
@@ -224,9 +224,26 @@ export default function (pi: ExtensionAPI) {
 
   pi.on("session_start", async (event, ctx) => {
     isActive = true;
+    const myGen = ++sessionGen;
     modelId = ctx.model?.id ?? "no-model";
-    await refreshAws();
+    interactive = ctx.hasUI;
+
+    // Non-interactive (--print) mode: no TUI, no footer, no notifications.
+    // Skip all async ctx usage to avoid stale-ctx throws after Pi disposes.
+    if (!interactive) return;
+
+    cachedCwd = ctx.cwd;
+    cachedCost = 0;
+    cachedContextPct = 0;
+    // Set up footer synchronously before any await so ctx is never
+    // accessed after a potential session replacement during refreshAws().
     setupFooter(ctx);
+    await refreshAws();
+
+    // Guard: bail if a newer session has started while refreshAws() was awaiting.
+    // Using a generation counter rather than isActive because the new session
+    // resets isActive=true before this continuation resumes.
+    if (sessionGen !== myGen) return;
 
     // Warn if credentials are expired or expiring within 30 min
     if (awsExpiresAt) {
@@ -246,8 +263,27 @@ export default function (pi: ExtensionAPI) {
     }
   });
 
-  // Refresh AWS expiry, re-render footer, ring cmux pane, and play audio after each agent turn
-  pi.on("agent_end", async (_event) => {
+  // Refresh AWS expiry, update cached cost+context, re-render footer, and notify after each turn.
+  // Accumulate cost incrementally from message_end so agent_end never needs ctx.
+  pi.on("message_end", async (event) => {
+    if (event.message.role === "assistant") {
+      cachedCost += (event.message as any).usage?.cost?.total ?? 0;
+    }
+  });
+
+  // Cache context% after each turn while ctx is guaranteed live.
+  pi.on("turn_end", async (_event, ctx) => {
+    try {
+      const usage = ctx.getContextUsage();
+      if (usage?.percent != null) cachedContextPct = Math.min(100, Math.round(usage.percent));
+    } catch {
+      // ctx stale in --print mode — keep last cached value
+    }
+  });
+
+  // agent_end: no ctx needed — all data already cached above.
+  pi.on("agent_end", async () => {
+    if (!interactive) return;
     await refreshAws();
     footerTui?.requestRender();
     await cmuxNotify("Pi", "Waiting for input");
