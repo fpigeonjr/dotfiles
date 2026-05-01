@@ -13,7 +13,13 @@ The `model-tiers` extension is loaded. Use these commands to switch provider fam
 | `/o` | gpt-5.4-mini (Codex) | gpt-5.4 | gpt-5.5 |
 | `/oc` | deepseek-v4-flash (OpenCode Go) | kimi-k2.6 | deepseek-v4-pro |
 
-- `kimi-k2.5` (Bedrock): stalls frequently — multiple 10m+ non-responses observed. Available via `/model` but don't put it in a tier.
+- `kimi-k2.5` stalls frequently — multiple 10m+ non-responses observed on Bedrock and NIM. Available via `/model` but don't put it in a tier.
+
+- `/g` requires `GEMINI_API_KEY` (free tier, Google AI Studio) in `~/.config/zsh/local.zsh`. `gemini-2.5-pro` is not available on the free tier — all three `/g` tiers use `gemini-2.5-flash`.
+
+- `/n` requires `NVIDIA_NIM_API_KEY` in `~/.config/zsh/local.zsh`.
+
+- `/oc` requires `OPENCODE_API_KEY` (OpenCode Go subscription) in `~/.config/zsh/local.zsh` and `/connect` in OpenCode TUI.
 
 - `/a thinking` jumps directly to a named tier; bare `/a` always starts at instant
 - `Ctrl+P` / `Shift+Ctrl+P` cycles tiers within the active family

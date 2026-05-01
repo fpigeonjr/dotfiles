@@ -6,7 +6,7 @@
  *
  *   /a   Anthropic via Bedrock   haiku → sonnet → opus
  *   /e   Experiment via Bedrock  qwen3-coder-30b → qwen3-235b-a22b-2507 → deepseek-v3.2
- *   /g   Google Gemini           2.5-flash/off → 2.5-flash/medium → 2.5-pro
+ *   /g   Google Gemini           2.5-flash/off → 2.5-flash/medium → 2.5-flash/high
  *   /n   NVIDIA NIM               llama-4-maverick → kimi-k2-thinking → qwen3.5-397b
  *   /o   OpenAI via Codex        gpt-5.4-mini → gpt-5.4 → gpt-5.5
  *   /oc  OpenCode Go             deepseek-v4-flash → kimi-k2.6 → deepseek-v4-pro
