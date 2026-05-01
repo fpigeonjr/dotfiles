@@ -3,14 +3,6 @@
   "defaultProvider": "amazon-bedrock",
   "defaultModel": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
   "defaultThinkingLevel": "off",
-  "enabledModels": [
-    "us.anthropic.claude-sonnet-4-6",
-    "us.anthropic.claude-opus-4-7",
-    "us.anthropic.claude-haiku-4-5-20251001-v1:0",
-    "deepseek.v3.2",
-    "qwen.qwen3-next-80b-a3b",
-    "moonshotai.kimi-k2.5"
-  ],
   "enableInstallTelemetry": false,
   "terminal": {
     "showTerminalProgress": true
