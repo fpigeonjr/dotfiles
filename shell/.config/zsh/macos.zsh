@@ -41,8 +41,9 @@ fi
 # Redirect bare `pi` to the Flexion Bedrock wrapper so AWS SSO auth happens automatically.
 alias pi='flexion-pi'
 # Quick one-shot question — bypasses flexion-pi SSO wrapper, uses OpenCode Go (no AWS needed).
-# Usage: q "what does this regex do?"
-alias q='command pi --model opencode-go/deepseek-v4-flash -p'
+# Usage: q what is the meaning of life
+#        q "what does * mean in regex"  (quote special shell chars: * ? ! $ & | etc.)
+q() { command pi --model opencode-go/deepseek-v4-flash -p "$*"; }
 alias code='code-insiders'
 alias work='cd ~/Code/OPRE-OPS/frontend'
 alias graph="cd ~/Library/Mobile\ Documents/iCloud~com~logseq~logseq/Documents/Graph"
