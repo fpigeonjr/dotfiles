@@ -10,7 +10,9 @@
  *   - Fires cmux notify when Pi finishes a turn and is waiting for input,
  *     matching the same pane-ring behaviour as the opencode cmux-notify plugin.
  *
- * Placed in ~/.config/pi/agent/extensions/ (auto-discovered via PI_CODING_AGENT_DIR).
+ * Commands:
+ *   /reauth  — re-authenticate AWS SSO in-place (opens browser, updates process.env)
+ *   /exit    — alias for /quit
  */
 
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
@@ -212,6 +214,68 @@ export default function (pi: ExtensionAPI) {
   }
 
   // ─── Events ─────────────────────────────────────────────────────────────
+
+  // ─── /reauth — re-authenticate AWS SSO without leaving Pi ──────────────────
+  // Opens the browser SSO flow, then exports fresh credentials into process.env
+  // so the Bedrock SDK picks them up without restarting Pi.
+
+  pi.registerCommand("reauth", {
+    description: "Re-authenticate AWS SSO credentials without leaving Pi",
+    handler: async (_args, ctx) => {
+      ctx.ui.notify("🔐 Opening AWS SSO login in your browser...", "info");
+
+      // Step 1: SSO login — opens browser automatically on macOS, waits for completion.
+      const loginResult = await pi.exec(
+        "aws",
+        ["sso", "login", "--profile", PROFILE],
+        { timeout: 5 * 60 * 1000 }
+      );
+
+      if (loginResult.code !== 0 || loginResult.killed) {
+        ctx.ui.notify(
+          `❌ AWS SSO login failed: ${loginResult.stderr.trim() || "timed out"}`,
+          "error"
+        );
+        return;
+      }
+
+      // Step 2: Export fresh credentials as JSON (includes Expiration field).
+      const credsResult = await pi.exec(
+        "aws",
+        ["configure", "export-credentials", "--profile", PROFILE, "--format", "process"],
+        { timeout: 10000 }
+      );
+
+      if (credsResult.code !== 0 || !credsResult.stdout.trim()) {
+        ctx.ui.notify("❌ Failed to export credentials after login", "error");
+        return;
+      }
+
+      let creds: { AccessKeyId: string; SecretAccessKey: string; SessionToken?: string; Expiration?: string };
+      try {
+        creds = JSON.parse(credsResult.stdout);
+      } catch {
+        ctx.ui.notify("❌ Could not parse credential response", "error");
+        return;
+      }
+
+      // Step 3: Update process.env — AWS SDK reads these lazily so Bedrock
+      // picks up the new creds on the very next request.
+      process.env.AWS_ACCESS_KEY_ID = creds.AccessKeyId;
+      process.env.AWS_SECRET_ACCESS_KEY = creds.SecretAccessKey;
+      if (creds.SessionToken) process.env.AWS_SESSION_TOKEN = creds.SessionToken;
+
+      // Step 4: Update cached expiry and refresh footer.
+      awsExpiresAt = creds.Expiration ? new Date(creds.Expiration) : null;
+      awsLastCheck = Date.now();
+      footerTui?.requestRender();
+
+      const expiryStr = awsExpiresAt
+        ? awsExpiresAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", timeZoneName: "short" })
+        : "unknown";
+      ctx.ui.notify(`✅ AWS credentials refreshed — expires at ${expiryStr}`, "success");
+    },
+  });
 
   // ─── /exit alias for /quit ─────────────────────────────────────────────────
 
