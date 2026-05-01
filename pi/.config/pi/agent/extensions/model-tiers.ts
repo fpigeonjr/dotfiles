@@ -105,7 +105,7 @@ const FAMILIES: Record<string, Family> = {
       // 2.5-flash covers instant (off) and thinking (medium); 2.5-pro at pro.
       { name: "instant",  model: "gemini-2.5-flash", thinking: "off",    short: "flash·off" },
       { name: "thinking", model: "gemini-2.5-flash", thinking: "medium", short: "flash·med" },
-      { name: "pro",      model: "gemini-2.5-pro",   thinking: "high",   short: "pro"       },
+      { name: "pro",      model: "gemini-2.5-flash", thinking: "high",   short: "flash·high" },
     ],
   },
   o: {
