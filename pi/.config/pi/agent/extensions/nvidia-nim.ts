@@ -7,7 +7,7 @@
  * All models use openai-completions with standard NIM compat flags.
  */
 
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 const COMPAT = {
   supportsDeveloperRole: false,

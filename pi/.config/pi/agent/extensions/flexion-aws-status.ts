@@ -15,8 +15,8 @@
  *   /exit    — alias for /quit
  */
 
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
-import { truncateToWidth } from "@mariozechner/pi-tui";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { truncateToWidth } from "@earendil-works/pi-tui";
 
 const PROFILE = "ClaudeCodeAccess-FlexionLLM";
 const AWS_CACHE_MS = 5 * 60 * 1000; // refresh expiry every 5 minutes

@@ -31,7 +31,7 @@
  * Selecting a model via /model (Ctrl+L) clears family tracking.
  */
 
-import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 
 type ThinkingLevel = "off" | "minimal" | "low" | "medium" | "high" | "xhigh";
 type TierName = "instant" | "thinking" | "pro";
