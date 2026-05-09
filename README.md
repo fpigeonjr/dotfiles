@@ -83,7 +83,7 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 ### Pi Agent `models.json`
 - **Do not use `models.json` to override Bedrock model metadata.** The `pi-ai` package ships a bundled `models.generated.js` with correct `contextWindow`, `maxTokens`, and real per-token `cost` values for all Bedrock models.
 - Overriding with a local `models.json` (even with zeros or conservative window sizes) silently replaces the bundled values — causing the context fill bar to saturate too early, premature compaction, and `$0.000` cost in the footer.
-- Only add `models.json` for genuinely custom providers (Ollama, vLLM, proxies, NVIDIA NIM) or models not yet in the bundled registry. Check `node_modules/@mariozechner/pi-ai/dist/models.generated.js` first before adding any Bedrock entry.
+- Only add `models.json` for genuinely custom providers (Ollama, vLLM, proxies, NVIDIA NIM) or models not yet in the bundled registry. Check `node_modules/@earendil-works/pi-ai/dist/models.generated.js` first before adding any Bedrock entry.
 - `models.json` is **gitignored** — it's machine-local and may contain API key resolvers. Recreate it from scratch on new machines using `curl https://integrate.api.nvidia.com/v1/models` to discover current working NIM models.
 
 ### Pi Model Tiers
