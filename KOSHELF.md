@@ -30,7 +30,7 @@ This will:
 
 - **Domain access**: http://koshelf.books (requires nginx reverse proxy)
 - **Direct access**: http://localhost:8090
-- **Network access**: http://192.168.1.150:8090
+- **Network access**: http://macmini.local:8090
 
 ## Manual Commands
 

@@ -139,7 +139,7 @@ you. Do not auth it with a personal subscription.
 After setup, verify the right email is used before your first commit:
 
 ```bash
-# Should show your gov address, not frank.pigeonjr@gmail.com
+# Should show your gov address, not the default noreply address
 cd ~/Code/<any-repo>
 git config user.email
 ```
