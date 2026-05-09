@@ -10,6 +10,18 @@ shell/.config/zsh/local.zsh
 config/.config/nvim/lazyvim.json
 session-*.md
 
+# keys and certificates
+*.pem
+*.p12
+*.pfx
+*.key
+
+# credential files
+**/.netrc
+**/credentials
+**/.env
+!**/.env.example
+
 # pi coding agent runtime state — not dotfiles
 pi/.config/pi/agent/auth.json
 pi/.config/pi/agent/sessions/

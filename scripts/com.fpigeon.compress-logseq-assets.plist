@@ -8,7 +8,7 @@
   <key>ProgramArguments</key>
   <array>
     <string>/bin/bash</string>
-    <string>/Users/fpigeonjr/dotfiles/scripts/compress-logseq-assets.sh</string>
+    <string>__HOME__/dotfiles/scripts/compress-logseq-assets.sh</string>
     <string>--incremental</string>
     <string>--execute</string>
   </array>
@@ -24,7 +24,7 @@
   </dict>
 
   <key>WorkingDirectory</key>
-  <string>/Users/fpigeonjr/dotfiles</string>
+  <string>__HOME__/dotfiles</string>
 
   <key>EnvironmentVariables</key>
   <dict>
@@ -33,9 +33,9 @@
   </dict>
 
   <key>StandardOutPath</key>
-  <string>/Users/fpigeonjr/.local/share/logs/compress-logseq-assets.log</string>
+  <string>__HOME__/.local/share/logs/compress-logseq-assets.log</string>
 
   <key>StandardErrorPath</key>
-  <string>/Users/fpigeonjr/.local/share/logs/compress-logseq-assets.log</string>
+  <string>__HOME__/.local/share/logs/compress-logseq-assets.log</string>
 </dict>
 </plist>
