@@ -1,4 +1,4 @@
-Monitor CI for the OPRE-OPS project using the scripts in `.claude/actions/`. Work from the `~/Code/OPRE-OPS` directory. Argument handling:
+Monitor CI for the current project using the scripts in `.claude/actions/`. Work from the current directory. Argument handling:
 
 - If {{args}} is a numeric run ID → run `.claude/actions/monitor-ci.sh {{args}}` to poll until completion (60s interval by default). Report progress at each interval. When complete, summarize the conclusion, total elapsed time, and E2E test results.
 - If {{args}} is a branch name → run `.claude/actions/quick-ci-status.sh {{args}}` for an instant snapshot of the latest CI run on that branch.

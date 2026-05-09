@@ -45,5 +45,6 @@ alias pi='flexion-pi'
 #        q "what does * mean in regex"  (quote special shell chars: * ? ! $ & | etc.)
 q() { command pi --model opencode-go/deepseek-v4-flash -p "$*"; }
 alias code='code-insiders'
-alias work='cd ~/Code/OPRE-OPS/frontend'
+# work alias is project-specific — define in ~/.config/zsh/local.zsh
+# e.g. alias work='cd ~/Code/my-project'
 alias graph="cd ~/Library/Mobile\ Documents/iCloud~com~logseq~logseq/Documents/Graph"

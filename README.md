@@ -42,10 +42,10 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 - `scripts/install-lid-wakeup-fix.sh`: Installs a small systemd service that disables ACPI lid wakeup on boot for laptops that immediately wake from suspend with the lid open.
 - This is intentionally managed as an install script plus service template instead of a stowed `~/.config` file, because it writes to `/etc/systemd/system/` and is machine-specific.
 
-### Worktrunk for OPRE OPS
-- **Local override**: `~/.config/worktrunk/config.toml` includes a repo-specific override for `github.com/HHS/OPRE-OPS`
+### Worktrunk for repos with uppercase names
+- **Local override**: `~/.config/worktrunk/config.toml` includes a repo-specific override for projects where the repo name contains uppercase characters
 - **Why**: Worktrunk's default sibling worktree naming can preserve uppercase repo names, which breaks Podman/Lazydocker compose project naming
-- **Behavior**: New OPRE OPS worktrees are created under `.worktrees/{{ branch | sanitize_db }}` so paths stay lowercase-safe
+- **Behavior**: New worktrees are created under `.worktrees/{{ branch | sanitize_db }}` so paths stay lowercase-safe
 - **Shell integration**: Loaded in `shell/.config/zsh/common.zsh` — enables auto-cd after `wt switch` and tab completions (no-op if `wt` is not installed)
 
 ### OpenCode
