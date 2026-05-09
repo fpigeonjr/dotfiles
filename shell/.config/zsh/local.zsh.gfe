@@ -1,0 +1,25 @@
+# GFE — machine-local Zsh config template
+#
+# Copy this file to ~/.config/zsh/local.zsh on the GFE.
+# It is NEVER stowed or committed — it lives only on this machine.
+#
+#   cp ~/dotfiles/shell/.config/zsh/local.zsh.gfe ~/.config/zsh/local.zsh
+
+# ── Prompt: gov-mbp makes it immediately clear this is the government machine ─
+PROMPT="%(?:%{$fg_bold[green]%}➜ :%{$fg_bold[red]%}➜ ) %{$fg_bold[cyan]%}%n@gov-mbp%{$reset_color%} %{$fg[cyan]%}%c%{$reset_color%}"
+PROMPT+=' $(git_prompt_info)'
+
+# ── Navigation ────────────────────────────────────────────────────────────────
+# Update this path once gov repos are cloned.
+alias gov='cd ~/Code'
+
+# ── Node / framework version ──────────────────────────────────────────────────
+# fnm is initialised in common.zsh; pin a version here if the project requires it:
+# fnm use 20
+
+# ── Gov-specific tooling goes below this line ─────────────────────────────────
+# e.g. VPN aliases, internal proxy settings, PIV card helpers
+
+# NO personal API keys (NVIDIA_NIM_API_KEY, GEMINI_API_KEY, etc.)
+# NO contractor Bedrock profiles
+# NO pi agent config (contractor extensions)

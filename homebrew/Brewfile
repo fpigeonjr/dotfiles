@@ -1,100 +1,163 @@
+# Brewfile — Flexion MBP (personal daily driver)
+#
+# Install with:
+#   brew bundle install --file=~/dotfiles/homebrew/Brewfile
+
+# ── Taps ──────────────────────────────────────────────────────────────────────
 tap "homebrew/services"
+tap "manaflow-ai/cmux"
 tap "oven-sh/bun"
-brew "webp"
-brew "btop"
-brew "cmatrix"
-brew "eslint"
-brew "fastfetch"
-brew "fd"
+
+# ── Brews ─────────────────────────────────────────────────────────────────────
+
+# audio / video
 brew "ffmpeg"
-brew "fnm"
-brew "fzf"
-brew "gh"
+brew "mpv"
+
+# containers
+brew "hadolint"                # Dockerfile linter
+brew "lazydocker"              # container TUI
+brew "podman"
+
+# editors & AI
+brew "luarocks"                # Lua package manager (neovim plugins)
+brew "neovim"
+brew "opencode"                # AI coding agent
+brew "tree-sitter"             # parser generator (neovim)
+
+# files & search
+brew "fd"                      # fast find
+brew "fzf"                     # fuzzy finder
+brew "kondo"                   # project cleaner
+brew "ripgrep"                 # fast grep (rg)
+brew "tree"                    # directory listing
+brew "wget"
+
+# git
+brew "gh"                      # GitHub CLI
+brew "lazygit"                 # git TUI
+brew "mob"                     # mob programming
+brew "pre-commit"              # repo-level hooks
+brew "trufflehog"              # secrets scanner
+
+# image processing
 brew "ghostscript"
-brew "hadolint"
 brew "imagemagick"
 brew "jpegoptim"
-brew "kondo"
-brew "lazydocker"
-brew "lazygit"
-brew "python@3.13"
-brew "luarocks"
-brew "mob"
-brew "mpv"
-brew "tree-sitter"
-brew "neovim"
-brew "opencode"
+brew "pngquant"
+brew "webp"
+
+# node / js
+brew "eslint"
+brew "fnm"                     # Node version manager
+brew "oven-sh/bun/bun"
+
+# python
 brew "pipenv"
 brew "pipx"
-brew "pngquant"
-brew "podman"
-brew "pre-commit"
 brew "python@3.12"
-brew "ripgrep"
+brew "python@3.13"
+
+# ruby
 brew "ruby"
+
+# shell
+brew "btop"                    # resource monitor
+brew "cmatrix"
+brew "fastfetch"               # system info
 brew "simple-scan"
-brew "stow"
-brew "tree"
-brew "trufflehog"
-brew "wget"
-brew "zoxide"
+brew "stow"                    # dotfile management
+brew "zoxide"                  # smart cd
 brew "zsh-syntax-highlighting"
-# tap-specific
-brew "oven-sh/bun/bun"
-cask "audacity"
-cask "balenaetcher"
-cask "bitwarden"
+
+# ── Casks ─────────────────────────────────────────────────────────────────────
+
+# browsers
 cask "brave-browser"
-cask "figma"
 cask "firefox@developer-edition"
-cask "ghostty"
-cask "github"
-cask "hyperkey"
-cask "keycastr"
-cask "logseq"
-cask "monitorcontrol"
-cask "obsidian"
 cask "orion"
+
+# dev tools
+cask "github"                  # GitHub Desktop
 cask "podman-desktop"
-cask "raycast"
-cask "shottr"
-cask "slack"
-cask "tunnelblick"
+
+# editors & terminals
+cask "manaflow-ai/cmux/cmux"        # terminal (reads ghostty config; no separate config needed)
+cask "ghostty"
 cask "visual-studio-code"
 cask "visual-studio-code@insiders"
-cask "whatsapp"
 cask "zed"
-vscode "aaron-bond.better-comments"
-vscode "antfu.icons-carbon"
-vscode "arcticicestudio.nord-visual-studio-code"
-vscode "bierner.markdown-preview-github-styles"
+
+# notes & knowledge
+cask "logseq"
+cask "obsidian"
+
+# productivity
+cask "bitwarden"
+cask "figma"
+cask "raycast"
+
+# social
+cask "slack"
+cask "whatsapp"
+
+# system utilities
+cask "audacity"
+cask "balenaetcher"
+cask "hyperkey"
+cask "keycastr"
+cask "monitorcontrol"
+cask "shottr"
+cask "tunnelblick"
+
+# ── VS Code extensions ────────────────────────────────────────────────────────
+
+# AI
+vscode "danielsanmedium.dscodegpt"
+vscode "github.copilot"
+vscode "github.copilot-chat"
+
+# CSS & styling
 vscode "bradlc.vscode-tailwindcss"
-vscode "catppuccin.catppuccin-vsc"
-vscode "catppuccin.catppuccin-vsc-icons"
+vscode "cipchk.cssrem"
+vscode "kamikillerto.vscode-colorize"
+vscode "zignd.html-css-class-completion"
+
+# editor utilities
+vscode "patbenatar.advanced-new-file"
+vscode "richie5um2.vscode-sort-json"
+vscode "sleistner.vscode-fileutils"
+vscode "streetsidesoftware.code-spell-checker"
+
+# git
+vscode "github.vscode-pull-request-github"
+
+# HTML, markdown & markup
+vscode "bierner.markdown-preview-github-styles"
+vscode "formulahendry.auto-close-tag"
+vscode "formulahendry.auto-rename-tag"
+vscode "tobermory.es6-string-html"
+vscode "unifiedjs.vscode-mdx"
+
+# JavaScript / TypeScript
 vscode "christian-kohler.npm-intellisense"
 vscode "christian-kohler.path-intellisense"
-vscode "cipchk.cssrem"
-vscode "danielsanmedium.dscodegpt"
 vscode "dbaeumer.vscode-eslint"
 vscode "dsznajder.es7-react-js-snippets"
 vscode "esbenp.prettier-vscode"
-vscode "file-icons.file-icons"
-vscode "formulahendry.auto-close-tag"
-vscode "formulahendry.auto-rename-tag"
-vscode "github.copilot"
-vscode "github.copilot-chat"
-vscode "github.vscode-pull-request-github"
-vscode "kamikillerto.vscode-colorize"
 vscode "mattpocock.ts-error-translator"
-vscode "ms-azuretools.vscode-docker"
 vscode "orta.vscode-jest"
-vscode "patbenatar.advanced-new-file"
-vscode "richie5um2.vscode-sort-json"
+vscode "wix.vscode-import-cost"
+
+# themes & icons
+vscode "aaron-bond.better-comments"
+vscode "antfu.icons-carbon"
+vscode "arcticicestudio.nord-visual-studio-code"
+vscode "catppuccin.catppuccin-vsc"
+vscode "catppuccin.catppuccin-vsc-icons"
+vscode "file-icons.file-icons"
 vscode "sdras.inbedby7pm"
 vscode "sdras.night-owl"
-vscode "sleistner.vscode-fileutils"
-vscode "streetsidesoftware.code-spell-checker"
-vscode "tobermory.es6-string-html"
-vscode "unifiedjs.vscode-mdx"
-vscode "wix.vscode-import-cost"
-vscode "zignd.html-css-class-completion"
+
+# other
+vscode "ms-azuretools.vscode-docker"

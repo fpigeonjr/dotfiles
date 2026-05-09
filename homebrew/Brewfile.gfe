@@ -1,0 +1,51 @@
+# Brewfile.gfe — minimal Homebrew packages for a government-furnished Mac
+#
+# Install with:
+#   brew bundle install --file=~/dotfiles/homebrew/Brewfile.gfe
+#
+# Philosophy: only what is needed for client work.
+# No personal tools, no Flexion AI stack, no cloud credentials.
+
+# ── Taps ──────────────────────────────────────────────────────────────────────
+tap "manaflow-ai/cmux"
+tap "oven-sh/bun"
+
+# ── Brews ─────────────────────────────────────────────────────────────────────
+
+# editors & AI
+brew "neovim"                  # editor (matches $EDITOR in dotfiles)
+brew "opencode"                # AI coding agent (no Flexion config stowed — see GFE-SETUP.md)
+
+# files & search
+brew "fd"                      # fast find
+brew "fzf"                     # fuzzy finder
+brew "ripgrep"                 # fast grep (rg)
+brew "tree"                    # directory listing
+brew "wget"                    # downloads
+
+# git
+brew "gh"                      # GitHub CLI
+brew "git-lfs"                 # large file support
+brew "lazygit"                 # git TUI
+brew "pre-commit"              # repo-level hooks
+
+# node / js
+brew "fnm"                     # Node version manager
+brew "oven-sh/bun/bun"         # fast JS runtime / package manager
+
+# shell
+brew "fastfetch"               # system info
+brew "stow"                    # dotfile management
+brew "zoxide"                  # smart cd
+brew "zsh-syntax-highlighting" # shell nicety
+
+# ── Casks ─────────────────────────────────────────────────────────────────────
+cask "brave-browser"           # work browser profile lives here
+cask "ghostty"                 # terminal (fallback / direct use)
+cask "manaflow-ai/cmux/cmux"   # terminal (reads ghostty config; no separate config needed)
+cask "visual-studio-code"      # IDE
+cask "zed"                     # editor
+
+# ── Optional (uncomment if work project requires local containers) ─────────────
+# brew "podman"
+# cask "podman-desktop"

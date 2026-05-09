@@ -65,7 +65,7 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 - **Install**: `brew tap manaflow-ai/cmux && brew install --cask cmux`
 
 ### Amazon Bedrock Model Access
-- **Profile**: `ClaudeCodeAccess-FlexionLLM` in `us-east-2` (managed by Flexion org via AWS IAM Identity Center)
+- **Profile**: `employer-bedrock` (template only — real values in `~/.aws/config`, never committed; see `aws/.aws/config` for setup instructions)
 - **Permitted providers**: Anthropic (Claude), DeepSeek, Meta Llama, Amazon Nova, Mistral, Qwen, MiniMax, Moonshot AI (Kimi), Z.AI (GLM), NVIDIA Nemotron, Google Gemma, Writer Palmyra, OpenAI OSS, TwelveLabs Pegasus
 - **Auto-discovery**: `bedrock:ListFoundationModels` is now permitted — OpenCode will discover models available in `us-east-2`. However, discovered models may still fail if they require an inference profile or don't support tool call streaming
 - **Verified working** (tool calls + streaming): `qwen3-coder-480b`, `nova-pro`, `kimi-k2.5`, `minimax-m2.5`, `glm-5`, `gemma-3-27b`, `ministral-14b`, `gpt-oss-120b`, `gpt-oss-20b`
@@ -266,7 +266,7 @@ sudo pacman -S stow
    stow vim          # Vim configuration
    stow config       # App configs including Ghostty, Neovim, Zed, and Hyprland
    stow ssh          # SSH client config
-   stow aws          # AWS CLI config (SSO profile for Flexion Bedrock)
+   stow aws          # AWS CLI config — template only; real values go in ~/.aws/config (see aws/.aws/config)
    stow vscode       # VS Code settings and keybindings
    stow vscode-insiders # VS Code Insiders settings
    stow logseq       # Logseq configuration
@@ -716,7 +716,7 @@ cp -r ~/config-backup/YYYYMMDD/* ~/
 | `vim` | .vimrc | Traditional Vim settings |
 | `config` | .config/nvim/, .config/zed/, .config/hypr/, .config/waybar/, .config/ghostty/, .config/opencode/ | Modern app configurations (Neovim includes GitHub Copilot; OpenCode config, agents, and plugins) |
 | `ssh` | .ssh/config | SSH client settings (no keys) |
-| `aws` | .aws/config | AWS CLI SSO profile for Flexion Bedrock access |
+| `aws` | .aws/config | AWS CLI SSO profile template — stow then fill in real values, or skip stowing and create `~/.aws/config` manually |
 | `vscode` | settings.json, keybindings.json | VS Code configuration |
 | `vscode-insiders` | settings.json, keybindings.json | VS Code Insiders configuration |
 | `logseq` | .logseq/config/, .logseq/custom.css, .logseq/settings/, .logseq/preferences.json, Notes/logseq/custom.css | Logseq knowledge management settings, plugins, and graph-level CSS (graph CSS takes precedence over global) |

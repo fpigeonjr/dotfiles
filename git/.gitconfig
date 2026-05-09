@@ -10,6 +10,12 @@
 	signingkey = ~/.ssh/id_ed25519.pub
 	username = fpigeonjr
 
+# Machine-local overrides (email, signingkey, etc.)
+# Create ~/.gitconfig.local on any machine that needs different values.
+# Safe no-op if the file does not exist.
+[includeIf "gitdir:~/"]
+	path = ~/.gitconfig.local
+
 [init]
 	defaultBranch = main
 
