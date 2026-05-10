@@ -4,8 +4,8 @@
 #   flexion-opencode
 #   flexion-pi
 #
-# This file is a no-op on machines without the AWS CLI (e.g. GFE).
-command -v aws >/dev/null 2>&1 || return 0
+# This file is a no-op on machines without the Flexion AWS profile (e.g. GFE).
+[[ -f ~/.aws/config ]] && grep -q 'ClaudeCodeAccess-FlexionLLM' ~/.aws/config || return 0
 
 FLEXION_BEDROCK_PROFILE="ClaudeCodeAccess-FlexionLLM"
 FLEXION_BEDROCK_REGION="us-east-2"
