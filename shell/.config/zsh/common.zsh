@@ -59,8 +59,13 @@ library() {
 
 if command -v fnm >/dev/null 2>&1; then
   eval "$(fnm env --use-on-cd --shell zsh)"
-  # 'default' alias tracks lts-latest; run `fnm install --lts` to upgrade
-  fnm use default --silent-if-unchanged 2>/dev/null
+  # 'default' alias tracks lts-latest; run `fnm install --lts` to upgrade.
+  # Guard on the alias existing — avoids a multi-second hang on machines where
+  # fnm is installed but no Node versions are managed (e.g. fresh / restricted
+  # environments where `fnm use default` tries to resolve over the network).
+  if [[ -n "$FNM_DIR" && -e "$FNM_DIR/aliases/default" ]]; then
+    fnm use default --silent-if-unchanged 2>/dev/null
+  fi
 fi
 
 [[ -f ~/.env.local ]] && source ~/.env.local
