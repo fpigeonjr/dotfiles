@@ -16,7 +16,30 @@
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { truncateToWidth } from "@earendil-works/pi-tui";
+
+// Inline implementation — @earendil-works/pi-tui is not bundled with Pi.
+// Strips ANSI escape sequences when measuring width so colored strings
+// are truncated correctly (visible chars only, not escape bytes).
+function truncateToWidth(str: string, width: number): string {
+  let visible = 0;
+  let result = "";
+  let i = 0;
+  while (i < str.length) {
+    // Check for an ANSI escape sequence at position i
+    const rest = str.slice(i);
+    const m = rest.match(/^\x1b\[[0-9;]*m/);
+    if (m) {
+      result += m[0];
+      i += m[0].length;
+    } else {
+      if (visible >= width) break;
+      result += str[i];
+      visible++;
+      i++;
+    }
+  }
+  return result;
+}
 
 const PROFILE = "ClaudeCodeAccess-FlexionLLM";
 const AWS_CACHE_MS = 5 * 60 * 1000; // refresh expiry every 5 minutes
