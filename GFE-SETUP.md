@@ -15,21 +15,26 @@ git clone <your-dotfiles-repo> ~/dotfiles
 cd ~/dotfiles
 
 stow git          # .gitconfig with includeIf for local email override
+stow ssh          # SSH client config (includes ~/.ssh/config.local)
 stow shell        # Zsh entrypoint, common.zsh, macos.zsh
 stow vim          # .vimrc
-stow ssh          # SSH client config (includes ~/.ssh/config.local)
 stow vscode       # VS Code settings and keybindings
 stow homebrew     # gives you access to Brewfile.gfe
 
 # config: skip opencode (Flexion Bedrock) — stow everything else
 stow --ignore='opencode' config   # nvim, ghostty, zed
+
+# AI coding agents — Copilot-only variants (no Flexion credentials required)
+stow opencode-gfe   # OpenCode with GitHub Copilot config
+stow pi-gfe         # Pi coding agent with GitHub Copilot config
 ```
 
 ### Do NOT stow on the GFE
 
 | Package | Why |
 |---|---|
-| `pi` | Flexion Bedrock profiles, personal extensions, API keys |
+| `pi` | Flexion Bedrock profiles — use `pi-gfe` instead |
+| `config` opencode subtree | Flexion Bedrock config — use `opencode-gfe` instead |
 | `aws` | Flexion-only AWS SSO profile |
 | `claude` | Personal Claude Code / Bedrock auth |
 | `logseq` | Personal notes — iCloud paths |
@@ -79,7 +84,46 @@ Host github-gov
 
 ---
 
-## SSH keys — generate fresh on the GFE
+## AI coding agents (GitHub Copilot)
+
+Both `opencode-gfe` and `pi-gfe` use only GitHub Copilot models — no Flexion
+credentials, no personal API keys. Auth flows through your GSA GitHub account.
+
+### 1 — Copilot authentication
+
+OpenCode and Pi both use `gh` for Copilot token exchange. Run this once:
+
+```bash
+gh auth login
+# Choose: GitHub.com → HTTPS → Login with a web browser
+# Then in the browser, sign in with your GSA GitHub account
+```
+
+Your GSA org Copilot licence is already provisioned — no separate activation needed.
+
+### 2 — OpenCode notifier plugin
+
+```bash
+cd ~/.config/opencode && npm install
+```
+
+This installs `@opencode-ai/plugin` locally so the `@mohak34/opencode-notifier`
+plugin can load. Run once after stow, and again after any `opencode-gfe` package
+update that bumps `package.json`.
+
+### 3 — Pi coding agent
+
+```bash
+npm install -g @earendil-works/pi-coding-agent
+```
+
+Pi is distributed via npm (GSA Helix Artifactory mirror). After install, launch
+with `pi` and run `/login` → select **GitHub Copilot** on first use. Subsequent
+sessions authenticate automatically via the stored `gh` token.
+
+---
+
+
 
 **Do not copy keys from the Flexion laptop.** Generate a new key pair on the GFE:
 

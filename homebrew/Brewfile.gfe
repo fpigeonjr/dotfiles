@@ -14,7 +14,10 @@ tap "oven-sh/bun"
 
 # editors & AI
 brew "neovim"                  # editor (matches $EDITOR in dotfiles)
-brew "opencode"                # AI coding agent (no Flexion config stowed — see GFE-SETUP.md)
+brew "opencode"                # AI coding agent (stow opencode-gfe — see GFE-SETUP.md)
+# Pi coding agent — install via npm after brew sets up fnm + node:
+#   npm install -g @earendil-works/pi-coding-agent
+# Then: stow pi-gfe && pi → /login → GitHub Copilot
 
 # files & search
 brew "fd"                      # fast find
