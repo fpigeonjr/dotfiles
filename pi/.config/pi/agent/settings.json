@@ -12,5 +12,6 @@
       "timeoutMs": 3600000
     }
   },
-  "lastChangelogVersion": "0.74.0"
+  "lastChangelogVersion": "0.74.0",
+  "skills": ["~/Code/skills/skills"]
 }

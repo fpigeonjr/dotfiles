@@ -1,154 +1,147 @@
 {
-  "$schema": "https://opencode.ai/config.json",
-  "command": {
-    "address-review-comments": {
-      "description": "Address PR review comments end-to-end",
-      "template": "Address PR review comments for this pull request. Use {{args}} if a PR URL or identifier was provided. If no argument was provided, infer the PR from the current branch context, preferring the PR associated with the checked out branch. If the PR cannot be determined confidently, ask for the PR URL instead of guessing. Collect all open PR review comments and unresolved conversations first. Investigate each comment carefully before making changes. Only apply changes for feedback that is valid or materially improves the code. If a comment is not valid or should not be adopted, do not change the code for it; reply with a concise explanation. Make the minimal correct changes needed. Run relevant local tests, checks, or builds before pushing. Push the branch after fixes pass. After pushing, reply to each addressed review comment with a concise summary of what changed. Resolve each conversation only after the push succeeds. If any comment is blocked or cannot be resolved confidently, stop and report the blocker instead of guessing."
-    },
-    "review-for-frank": {
-      "description": "Review a PR and draft a review for Frank",
-      "template": "Review the pull request using the standard /review behavior and quality bar. Use {{args}} if a PR URL or identifier was provided. If no argument was provided, infer the PR from the current branch context, preferring the PR associated with the checked out branch. If the PR cannot be determined confidently, ask for the PR URL instead of guessing. If this PR was previously reviewed, treat this as a follow-up review. Check prior review comments, requested changes, and unresolved threads. Focus on what changed since the last review and verify whether earlier concerns were addressed before making a final recommendation. Draft the review for Frank to read first; do not submit or post anything yet. Prioritize concrete bugs, regressions, risks, and missing tests. Keep the review concise but specific. End with a clear final recommendation of either Approve or Request changes. Include a short final note stating that, if posted, the review would be submitted on Frank's behalf as his coding agent."
-    },
-    "submit-draft-pr": {
-      "description": "Create a draft PR using the repo template, link an issue, apply labels, and assign author",
-      "template": "Create a draft PR for the current branch. If $ARGUMENTS is provided, treat it as a GitHub issue number and append 'Closes #$ARGUMENTS' to the PR body — place it in the template's linked issues section if one exists, otherwise append it at the end. Fetch the PR template using the GitHub API: 'gh api repos/{owner}/{repo}/contents/.github/pull_request_template.md --jq .content | base64 -d' (the filename may be lowercase or uppercase — try both pull_request_template.md and PULL_REQUEST_TEMPLATE.md if the first fails). Populate the template fully — do not submit a blank or partially filled template. If no template exists after trying both casings, write a concise description covering what changed, why, and any relevant context. Create the PR as a draft using 'gh pr create --draft'. Detect and apply relevant labels from the repo's available labels based on the change type (e.g. bug, enhancement, documentation, chore) — skip labeling if labels cannot be determined with confidence. Assign the PR to the authenticated user via 'gh api user --jq .login'. If the PR already exists for this branch, report its URL and status instead of creating a duplicate. Report the PR URL and a summary of what was done when complete. Finally, print this exact note: 'ACTION REQUIRED: GitHub does not support requesting a Copilot review via the API. Please open the PR in your browser and add Copilot as a reviewer manually from the Reviewers panel.'"
-    },
-    "release-pr": {
-      "description": "Watch CI on a draft PR, wait for all checks to pass, then mark it ready for review",
-      "template": "Release the draft PR to ready-for-review. If $ARGUMENTS is provided, treat it as a PR URL or number; otherwise infer the PR from the current branch. Confirm the PR is in draft state before proceeding. Poll CI checks using 'gh pr checks' every 30 seconds, reporting progress at each interval, until all required checks pass or a failure is detected. If any check fails, stop immediately and report which check failed and why — do not convert to ready on failure. Once all checks are green, check for unresolved review threads — if any exist, report them and ask how to proceed rather than marking ready. If all checks pass and no unresolved threads exist, convert the draft to ready-for-review using 'gh pr ready'. If required checks are not configured on the repo, note this and ask the user to confirm before marking ready. Report the final PR URL and status when complete."
-    }
-  },
-  "enabled_providers": ["openai", "amazon-bedrock", "github-copilot", "opencode-go"],
-  "plugin": ["@mohak34/opencode-notifier@latest"],
-  "provider": {
-    "opencode-go": {
-      "models": {
-        "deepseek-v4-flash": {},
-        "deepseek-v4-pro": {},
-        "kimi-k2.5": {},
-        "kimi-k2.6": {},
-        "glm-5": {},
-        "glm-5.1": {},
-        "mimo-v2-omni": {},
-        "mimo-v2-pro": {},
-        "mimo-v2.5": {},
-        "mimo-v2.5-pro": {},
-        "minimax-m2.5": {},
-        "minimax-m2.7": {},
-        "qwen3.5-plus": {},
-        "qwen3.6-plus": {}
-      }
-    },
-
-    "amazon-bedrock": {
-      "options": {
-        "region": "us-east-2",
-        "profile": "ClaudeCodeAccess-FlexionLLM"
-      },
-      "models": {
-        "claude-sonnet-4-6": {
-          "id": "us.anthropic.claude-sonnet-4-6"
+    "$schema": "https://opencode.ai/config.json",
+    "enabled_providers": [
+        "openai",
+        "amazon-bedrock",
+        "github-copilot",
+        "opencode-go"
+    ],
+    "plugin": [
+        "@mohak34/opencode-notifier@latest"
+    ],
+    "provider": {
+        "opencode-go": {
+            "models": {
+                "deepseek-v4-flash": {},
+                "deepseek-v4-pro": {},
+                "kimi-k2.5": {},
+                "kimi-k2.6": {},
+                "glm-5": {},
+                "glm-5.1": {},
+                "mimo-v2-omni": {},
+                "mimo-v2-pro": {},
+                "mimo-v2.5": {},
+                "mimo-v2.5-pro": {},
+                "minimax-m2.5": {},
+                "minimax-m2.7": {},
+                "qwen3.5-plus": {},
+                "qwen3.6-plus": {}
+            }
         },
-        "claude-haiku-4-5": {
-          "id": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+        "amazon-bedrock": {
+            "options": {
+                "region": "us-east-2",
+                "profile": "ClaudeCodeAccess-FlexionLLM"
+            },
+            "models": {
+                "claude-sonnet-4-6": {
+                    "id": "us.anthropic.claude-sonnet-4-6"
+                },
+                "claude-haiku-4-5": {
+                    "id": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+                },
+                "claude-opus-4-6": {
+                    "id": "us.anthropic.claude-opus-4-6-v1"
+                },
+                "claude-opus-4-7": {
+                    "id": "us.anthropic.claude-opus-4-7"
+                },
+                "llama4-maverick": {
+                    "id": "us.meta.llama4-maverick-17b-instruct-v1:0",
+                    "tool_call": false,
+                    "limit": {
+                        "context": 1048576,
+                        "output": 8192
+                    }
+                },
+                "llama4-scout": {
+                    "id": "us.meta.llama4-scout-17b-instruct-v1:0",
+                    "tool_call": false,
+                    "limit": {
+                        "context": 10000000,
+                        "output": 8192
+                    }
+                },
+                "deepseek-r1": {
+                    "id": "us.deepseek.r1-v1:0",
+                    "tool_call": false,
+                    "limit": {
+                        "context": 64000,
+                        "output": 32768
+                    }
+                },
+                "mistral-large": {
+                    "id": "mistral.mistral-large-3-675b-instruct"
+                },
+                "devstral": {
+                    "id": "mistral.devstral-2-123b"
+                },
+                "ministral-14b": {
+                    "id": "mistral.ministral-3-14b-instruct"
+                },
+                "qwen3-coder-480b": {
+                    "id": "qwen.qwen3-coder-480b-a35b-v1:0"
+                },
+                "qwen3-coder-30b": {
+                    "id": "qwen.qwen3-coder-30b-a3b-v1:0"
+                },
+                "qwen3-next-80b": {
+                    "id": "qwen.qwen3-next-80b-a3b"
+                },
+                "nova-pro": {
+                    "id": "amazon.nova-pro-v1:0"
+                },
+                "nova-2-lite": {
+                    "id": "amazon.nova-2-lite-v1:0"
+                },
+                "kimi-k2.5": {
+                    "id": "moonshotai.kimi-k2.5"
+                },
+                "minimax-m2.5": {
+                    "id": "minimax.minimax-m2.5"
+                },
+                "glm-5": {
+                    "id": "zai.glm-5"
+                },
+                "gemma-3-27b": {
+                    "id": "google.gemma-3-27b-it"
+                },
+                "gpt-oss-120b": {
+                    "id": "openai.gpt-oss-120b-1:0"
+                },
+                "gpt-oss-20b": {
+                    "id": "openai.gpt-oss-20b-1:0"
+                }
+            }
         },
-        "claude-opus-4-6": {
-          "id": "us.anthropic.claude-opus-4-6-v1"
-        },
-        "claude-opus-4-7": {
-          "id": "us.anthropic.claude-opus-4-7"
-        },
-        "llama4-maverick": {
-          "id": "us.meta.llama4-maverick-17b-instruct-v1:0",
-          "tool_call": false,
-          "limit": {
-            "context": 1048576,
-            "output": 8192
-          }
-        },
-        "llama4-scout": {
-          "id": "us.meta.llama4-scout-17b-instruct-v1:0",
-          "tool_call": false,
-          "limit": {
-            "context": 10000000,
-            "output": 8192
-          }
-        },
-        "deepseek-r1": {
-          "id": "us.deepseek.r1-v1:0",
-          "tool_call": false,
-          "limit": {
-            "context": 64000,
-            "output": 32768
-          }
-        },
-        "mistral-large": {
-          "id": "mistral.mistral-large-3-675b-instruct"
-        },
-        "devstral": {
-          "id": "mistral.devstral-2-123b"
-        },
-        "ministral-14b": {
-          "id": "mistral.ministral-3-14b-instruct"
-        },
-        "qwen3-coder-480b": {
-          "id": "qwen.qwen3-coder-480b-a35b-v1:0"
-        },
-        "qwen3-coder-30b": {
-          "id": "qwen.qwen3-coder-30b-a3b-v1:0"
-        },
-        "qwen3-next-80b": {
-          "id": "qwen.qwen3-next-80b-a3b"
-        },
-        "nova-pro": {
-          "id": "amazon.nova-pro-v1:0"
-        },
-        "nova-2-lite": {
-          "id": "amazon.nova-2-lite-v1:0"
-        },
-        "kimi-k2.5": {
-          "id": "moonshotai.kimi-k2.5"
-        },
-        "minimax-m2.5": {
-          "id": "minimax.minimax-m2.5"
-        },
-        "glm-5": {
-          "id": "zai.glm-5"
-        },
-        "gemma-3-27b": {
-          "id": "google.gemma-3-27b-it"
-        },
-        "gpt-oss-120b": {
-          "id": "openai.gpt-oss-120b-1:0"
-        },
-        "gpt-oss-20b": {
-          "id": "openai.gpt-oss-20b-1:0"
+        "github-copilot": {
+            "models": {
+                "claude-sonnet-4": {},
+                "claude-sonnet-4.5": {},
+                "claude-sonnet-4.6": {},
+                "claude-haiku-4.5": {},
+                "claude-opus-4.5": {},
+                "claude-opus-4.6": {},
+                "claude-opus-4.7": {},
+                "gemini-2.5-pro": {},
+                "gemini-3.1-pro-preview": {},
+                "gemini-3-flash-preview": {},
+                "gpt-5.2-codex": {},
+                "gpt-5.3-codex": {},
+                "gpt-5.4": {},
+                "gpt-5.4-mini": {},
+                "gpt-5.4-nano": {},
+                "gpt-5-mini": {},
+                "gpt-5.1": {},
+                "gpt-5.2": {}
+            }
         }
-      }
     },
-    "github-copilot": {
-      "models": {
-        "claude-sonnet-4": {},
-        "claude-sonnet-4.5": {},
-        "claude-sonnet-4.6": {},
-        "claude-haiku-4.5": {},
-        "claude-opus-4.5": {},
-        "claude-opus-4.6": {},
-        "claude-opus-4.7": {},
-        "gemini-2.5-pro": {},
-        "gemini-3.1-pro-preview": {},
-        "gemini-3-flash-preview": {},
-        "gpt-5.2-codex": {},
-        "gpt-5.3-codex": {},
-        "gpt-5.4": {},
-        "gpt-5.4-mini": {},
-        "gpt-5.4-nano": {},
-        "gpt-5-mini": {},
-        "gpt-5.1": {},
-        "gpt-5.2": {}
-      }
+    "model": "amazon-bedrock/claude-sonnet-4-6",
+    "small_model": "amazon-bedrock/claude-haiku-4-5",
+    "skills": {
+        "paths": [
+            "~/Code/skills/skills"
+        ]
     }
-  },
-  "model": "amazon-bedrock/claude-sonnet-4-6",
-  "small_model": "amazon-bedrock/claude-haiku-4-5"
 }
