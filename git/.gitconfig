@@ -37,3 +37,12 @@
 	br = branch
 	ci = commit
 	st = status
+[credential "https://github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://github.helix.gsa.gov"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
