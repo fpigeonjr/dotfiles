@@ -1,9 +1,14 @@
 /**
- * copilot-status — Pi extension for GFE session status
+ * session-status — Pi extension for session status footer
  *
  * Renders a two-line custom footer:
  *   Line 1:  [model] provider tier 📁 dirname | 🌿 branch
- *   Line 2:  ████████░░ 80% | $0.000 | ⏱ 5m 23s
+ *   Line 2:  ████████░░ 80% | ↑23k ↓5k | $0.000 | ⏱ 5m 23s
+ *
+ * Token counts are color-coded:
+ *   < 80k tokens: dim (smart zone)
+ *   80k-100k: yellow (approaching dumb zone)
+ *   > 100k: red (dumb zone - compact recommended)
  *
  * Also:
  *   - Fires cmux notify when Pi finishes a turn and is waiting for input,
@@ -58,6 +63,8 @@ export default function (pi: ExtensionAPI) {
   let cachedCwd = "";
   let cachedCost = 0;
   let cachedContextPct = 0;
+  let cachedInputTokens = 0;
+  let cachedOutputTokens = 0;
   let isActive = false;
   let sessionGen = 0;
   // False in --print / non-interactive mode. Suppresses footer, notifications,
@@ -171,9 +178,25 @@ export default function (pi: ExtensionAPI) {
             theme.fg("dim", ` 📁 ${dirName}`) +
             branchStr;
 
-          // ── Cost + context pct — updated by agent_end, never via ctx ──
+          // ── Cost + context pct + tokens — updated by agent_end, never via ctx ──
           const totalCost = cachedCost;
           const pct = cachedContextPct;
+          const totalTokens = cachedInputTokens + cachedOutputTokens;
+
+          // ── Format token counts with k suffix ──
+          const fmt = (n: number) => (n < 1000 ? `${n}` : `${(n / 1000).toFixed(1)}k`);
+
+          // ── Color code tokens based on total ──
+          let tokenColor: "dim" | "warning" | "error";
+          if (totalTokens > 100_000) {
+            tokenColor = "error";
+          } else if (totalTokens >= 80_000) {
+            tokenColor = "warning";
+          } else {
+            tokenColor = "dim";
+          }
+
+          const tokenStats = theme.fg(tokenColor, `↑${fmt(cachedInputTokens)} ↓${fmt(cachedOutputTokens)}`);
 
           // ── Session duration ──
           const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
@@ -194,6 +217,7 @@ export default function (pi: ExtensionAPI) {
           const sep = theme.fg("dim", " | ");
           const parts: string[] = [
             `${barColored} ${pct}%`,
+            tokenStats,
             theme.fg("muted", `$${totalCost.toFixed(3)}`),
             theme.fg("dim", `⏱ ${hours > 0 ? `${hours}h ` : ""}${mins}m ${secs < 10 ? "0" : ""}${secs}s`),
           ];
@@ -228,14 +252,19 @@ export default function (pi: ExtensionAPI) {
     cachedCwd = ctx.cwd;
     cachedCost = 0;
     cachedContextPct = 0;
+    cachedInputTokens = 0;
+    cachedOutputTokens = 0;
     // Set up footer synchronously before any await so ctx is never stale.
     setupFooter(ctx);
   });
 
-  // Accumulate cost incrementally from message_end so agent_end never needs ctx.
+  // Accumulate cost and tokens incrementally from message_end so agent_end never needs ctx.
   pi.on("message_end", async (event) => {
     if (event.message.role === "assistant") {
-      cachedCost += (event.message as any).usage?.cost?.total ?? 0;
+      const usage = (event.message as any).usage;
+      cachedCost += usage?.cost?.total ?? 0;
+      cachedInputTokens += usage?.input ?? 0;
+      cachedOutputTokens += usage?.output ?? 0;
     }
   });
 
