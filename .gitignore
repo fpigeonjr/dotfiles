@@ -29,3 +29,9 @@ pi/.config/pi/agent/git/
 pi/.config/pi/agent/npm/
 pi/.config/pi/agent/models.json
 pi/.config/pi/agent/codex-home/
+
+# opencode runtime state
+config/.config/opencode/opencode-notifier-state.json
+
+# zed runtime databases
+config/.config/zed/prompts/

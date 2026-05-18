@@ -1,20 +1,21 @@
 /**
  * model-tiers — Pi extension for tiered model selection (GFE / GitHub Copilot)
  *
- * Registers three provider family commands that each scope Ctrl+P to a
- * three-model instant → thinking → pro ladder. All models are served via
- * GitHub Copilot — no Bedrock, NIM, or personal API keys required.
+ * Registers four provider family commands that each scope Ctrl+P to a
+ * three-model instant → thinking → pro ladder. /a, /g, and /o use GitHub
+ * Copilot; /u uses the custom GSA AI provider.
  *
  *   /a   Anthropic via Copilot   haiku-4.5 → sonnet-4.6 → opus-4.7
  *   /g   Google via Copilot      gemini-3-flash-preview → gemini-2.5-pro → gemini-3.1-pro-preview
  *   /o   OpenAI via Copilot      gpt-5.4-mini → gpt-5.4 → gpt-5.5
+ *   /u   GSA AI                  claude_3_haiku → claude_4_5_sonnet → gemini-2.5-pro
  *
  * Usage:
  *   /a              → switches to instant tier for Anthropic, scopes Ctrl+P
  *   /a thinking     → jumps directly to thinking tier
  *   Ctrl+P          → advance to next tier within active family
  *   Shift+Ctrl+P    → back to previous tier within active family
- *   /tiers          → toggle compact tier table (3 lines, never truncates)
+ *   /tiers          → toggle compact tier table (4 lines, never truncates)
  *
  * Cold-start default: if no persisted state and no model match, silently
  * activates a·instant (claude-haiku-4.5) so Ctrl+P always works without
@@ -29,6 +30,7 @@
  *   - claude-opus-4.7 supports xhigh thinking.
  *   - gpt-5.4 and gpt-5.5 support xhigh thinking.
  *   - Gemini models via Copilot do not expose reasoning effort — all off.
+ *   - GSA AI models do not expose reasoning effort — all off.
  *
  * State persists across session resume/fork via pi.appendEntry().
  * Selecting a model via /model (Ctrl+L) clears family tracking.
@@ -85,6 +87,15 @@ const FAMILIES: Record<string, Family> = {
       { name: "instant",  model: "gpt-5.4-mini", thinking: "off",   short: "5.4-mini" },
       { name: "thinking", model: "gpt-5.4",       thinking: "xhigh", short: "5.4"      },
       { name: "pro",      model: "gpt-5.5",       thinking: "xhigh", short: "5.5"      },
+    ],
+  },
+  u: {
+    label: "u",
+    provider: "gsai",
+    tiers: [
+      { name: "instant",  model: "claude_3_haiku",   thinking: "off", short: "haiku"       },
+      { name: "thinking", model: "claude_4_5_sonnet", thinking: "off", short: "sonnet"      },
+      { name: "pro",      model: "gemini-2.5-pro",   thinking: "off", short: "g2.5-pro"    },
     ],
   },
 };
@@ -170,7 +181,7 @@ export default function (pi: ExtensionAPI) {
     });
   }
 
-  // ─── /tiers — compact toggle widget (3 lines, never truncates) ─────────────
+  // ─── /tiers — compact toggle widget (4 lines, never truncates) ─────────────
 
   pi.registerCommand("tiers", {
     description: "Show all tier stacks (toggle)",
@@ -218,7 +229,7 @@ export default function (pi: ExtensionAPI) {
     description: "Cycle to next model tier (model-tiers)",
     handler: async (ctx) => {
       if (!activeFamily) {
-        ctx.ui.notify("model-tiers: pick a provider first — /a  /g  /o", "info");
+        ctx.ui.notify("model-tiers: pick a provider first — /a  /g  /o  /u", "info");
         return;
       }
       await activateTier(activeFamily, (tierIndex + 1) % 3, ctx);
@@ -229,7 +240,7 @@ export default function (pi: ExtensionAPI) {
     description: "Cycle to previous model tier (model-tiers)",
     handler: async (ctx) => {
       if (!activeFamily) {
-        ctx.ui.notify("model-tiers: pick a provider first — /a  /g  /o", "info");
+        ctx.ui.notify("model-tiers: pick a provider first — /a  /g  /o  /u", "info");
         return;
       }
       await activateTier(activeFamily, (tierIndex + 2) % 3, ctx);

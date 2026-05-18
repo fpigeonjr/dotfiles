@@ -42,3 +42,5 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # OpenClaw Completion (only source if file exists)
 [[ -r "$HOME/.openclaw/completions/openclaw.zsh" ]] && source "$HOME/.openclaw/completions/openclaw.zsh"
+
+if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi

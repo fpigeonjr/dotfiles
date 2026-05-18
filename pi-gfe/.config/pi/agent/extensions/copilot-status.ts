@@ -2,7 +2,7 @@
  * copilot-status — Pi extension for GFE session status
  *
  * Renders a two-line custom footer:
- *   Line 1:  [model] tier 📁 dirname | 🌿 branch
+ *   Line 1:  [model] provider tier 📁 dirname | 🌿 branch
  *   Line 2:  ████████░░ 80% | $0.000 | ⏱ 5m 23s
  *
  * Also:
@@ -54,6 +54,7 @@ export default function (pi: ExtensionAPI) {
   // never touches session-bound ctx directly (avoids stale-ctx throws in
   // --print mode when Pi invalidates the session ctx after the turn).
   let modelId = "no-model";
+  let providerId = "no-provider";
   let cachedCwd = "";
   let cachedCost = 0;
   let cachedContextPct = 0;
@@ -90,6 +91,21 @@ export default function (pi: ExtensionAPI) {
       return `${provider}-${model}`;
     }
     return model || id;
+  }
+
+  function friendlyProvider(id: string): string {
+    switch (id) {
+      case "github-copilot":
+        return "copilot";
+      case "amazon-bedrock":
+        return "bedrock";
+      case "openai-codex":
+        return "codex";
+      case "opencode-go":
+        return "oc-go";
+      default:
+        return id || "unknown";
+    }
   }
 
   // ─── cmux notifications ──────────────────────────────────────────────────
@@ -142,12 +158,15 @@ export default function (pi: ExtensionAPI) {
           // All values are read from module-level cache — never from ctx —
           // so this closure stays safe after Pi invalidates the session ctx.
           const model = friendlyModel(modelId);
+          const provider = friendlyProvider(providerId);
           const dirName = cachedCwd.split("/").pop() || cachedCwd;
           const branch = footerData.getGitBranch();
           const branchStr = branch ? theme.fg("dim", ` | 🌿 ${branch}`) : "";
+          const providerStr = theme.fg("muted", ` ${provider}`);
           const tierStr = tierLabel ? " " + theme.fg("accent", tierLabel) : "";
           const line1 =
             theme.fg("accent", `[${model}]`) +
+            providerStr +
             tierStr +
             theme.fg("dim", ` 📁 ${dirName}`) +
             branchStr;
@@ -199,6 +218,7 @@ export default function (pi: ExtensionAPI) {
     isActive = true;
     const myGen = ++sessionGen;
     modelId = ctx.model?.id ?? "no-model";
+    providerId = ctx.model?.provider ?? "no-provider";
     interactive = ctx.hasUI;
 
     // Non-interactive (--print) mode: no TUI, no footer, no notifications.
@@ -240,6 +260,7 @@ export default function (pi: ExtensionAPI) {
   // Update cached model ID and re-render footer when model changes
   pi.on("model_select", async (event) => {
     modelId = event.model.id;
+    providerId = event.model.provider;
     footerTui?.requestRender();
   });
 

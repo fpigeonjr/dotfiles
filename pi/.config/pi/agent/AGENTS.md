@@ -12,6 +12,7 @@ The `model-tiers` extension is loaded. Use these commands to switch provider fam
 | `/g` | gemini-2.5-flash/off (Gemini) | gemini-2.5-flash/medium | gemini-2.5-flash/high |
 | `/o` | gpt-5.4-mini (Codex) | gpt-5.4 | gpt-5.5 |
 | `/oc` | deepseek-v4-flash (OpenCode Go) | kimi-k2.6 | deepseek-v4-pro |
+| `/u` | claude_3_haiku (GSA AI) | claude_4_5_sonnet (GSA AI) | gemini-2.5-pro (GSA AI) |
 
 - `kimi-k2.5` stalls frequently — multiple 10m+ non-responses observed on Bedrock and NIM. Available via `/model` but don't put it in a tier.
 
@@ -20,6 +21,8 @@ The `model-tiers` extension is loaded. Use these commands to switch provider fam
 - `/n` requires `NVIDIA_NIM_API_KEY` in `~/.config/zsh/local.zsh`.
 
 - `/oc` requires `OPENCODE_API_KEY` (OpenCode Go subscription) in `~/.config/zsh/local.zsh` and `/connect` in OpenCode TUI.
+
+- `/u` requires `GSAI_API_KEY` (or `USAI_API_KEY`) in `~/.config/zsh/local.zsh`. GSA AI models are served via https://api.prod.gsai.mcaas.fcs.gsa.gov/api/v1. All `/u` tiers run at `thinking: off` — the ladder is purely by model capability.
 
 - `/a thinking` jumps directly to a named tier; bare `/a` always starts at instant
 - `Ctrl+P` / `Shift+Ctrl+P` cycles tiers within the active family

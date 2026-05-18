@@ -10,6 +10,7 @@
  *   /n   NVIDIA NIM               llama-4-maverick → kimi-k2-thinking → qwen3.5-397b
  *   /o   OpenAI via Codex        gpt-5.4-mini → gpt-5.4 → gpt-5.5
  *   /oc  OpenCode Go             deepseek-v4-flash → kimi-k2.6 → deepseek-v4-pro
+ *   /u   GSA AI                  claude_3_haiku → claude_4_5_sonnet → gemini-2.5-pro
  *
  * Usage:
  *   /a              → switches to instant tier for Anthropic, scopes Ctrl+P
@@ -57,6 +58,15 @@ interface PersistedState {
 const TIER_NAMES: TierName[] = ["instant", "thinking", "pro"];
 
 const FAMILIES: Record<string, Family> = {
+  u: {
+    label: "u",
+    provider: "gsai",
+    tiers: [
+      { name: "instant",  model: "claude_3_haiku",    thinking: "off",    short: "haiku" },
+      { name: "thinking", model: "claude_4_5_sonnet",  thinking: "off",    short: "sonnet" },
+      { name: "pro",      model: "gemini-2.5-pro",    thinking: "off",    short: "gem-2.5-pro" },
+    ],
+  },
   oc: {
     label: "oc",
     provider: "opencode-go",
