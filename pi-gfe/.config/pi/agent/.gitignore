@@ -1,3 +1,4 @@
 # Pi runtime files — machine-local, never commit
 auth.json
 sessions/
+node_modules/

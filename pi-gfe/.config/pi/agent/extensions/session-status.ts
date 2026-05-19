@@ -3,9 +3,10 @@
  *
  * Renders a two-line custom footer:
  *   Line 1:  [model] provider tier 📁 dirname | 🌿 branch
- *   Line 2:  ████████░░ 80% | ↑23k ↓5k | $0.000 | ⏱ 5m 23s
+ *   Line 2:  ████████░░ 80% | 45.2k tok | $0.000 | ⏱ 5m 23s
  *
- * Token counts are color-coded:
+ * Token count shows current context window size (from ctx.getContextUsage()).
+ * Color-coded based on smart zone / dumb zone thresholds:
  *   < 80k tokens: dim (smart zone)
  *   80k-100k: yellow (approaching dumb zone)
  *   > 100k: red (dumb zone - compact recommended)
@@ -63,8 +64,7 @@ export default function (pi: ExtensionAPI) {
   let cachedCwd = "";
   let cachedCost = 0;
   let cachedContextPct = 0;
-  let cachedInputTokens = 0;
-  let cachedOutputTokens = 0;
+  let cachedContextTokens = 0;
   let isActive = false;
   let sessionGen = 0;
   // False in --print / non-interactive mode. Suppresses footer, notifications,
@@ -178,12 +178,12 @@ export default function (pi: ExtensionAPI) {
             theme.fg("dim", ` 📁 ${dirName}`) +
             branchStr;
 
-          // ── Cost + context pct + tokens — updated by agent_end, never via ctx ──
+          // ── Cost + context pct + tokens — updated by turn_end, never via ctx ──
           const totalCost = cachedCost;
           const pct = cachedContextPct;
-          const totalTokens = cachedInputTokens + cachedOutputTokens;
+          const totalTokens = cachedContextTokens;
 
-          // ── Format token counts with k suffix ──
+          // ── Format token count with k suffix ──
           const fmt = (n: number) => (n < 1000 ? `${n}` : `${(n / 1000).toFixed(1)}k`);
 
           // ── Color code tokens based on total ──
@@ -196,7 +196,7 @@ export default function (pi: ExtensionAPI) {
             tokenColor = "dim";
           }
 
-          const tokenStats = theme.fg(tokenColor, `↑${fmt(cachedInputTokens)} ↓${fmt(cachedOutputTokens)}`);
+          const tokenStats = theme.fg(tokenColor, `${fmt(totalTokens)} tok`);
 
           // ── Session duration ──
           const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
@@ -252,27 +252,25 @@ export default function (pi: ExtensionAPI) {
     cachedCwd = ctx.cwd;
     cachedCost = 0;
     cachedContextPct = 0;
-    cachedInputTokens = 0;
-    cachedOutputTokens = 0;
+    cachedContextTokens = 0;
     // Set up footer synchronously before any await so ctx is never stale.
     setupFooter(ctx);
   });
 
-  // Accumulate cost and tokens incrementally from message_end so agent_end never needs ctx.
+  // Accumulate cost incrementally from message_end so agent_end never needs ctx.
   pi.on("message_end", async (event) => {
     if (event.message.role === "assistant") {
       const usage = (event.message as any).usage;
       cachedCost += usage?.cost?.total ?? 0;
-      cachedInputTokens += usage?.input ?? 0;
-      cachedOutputTokens += usage?.output ?? 0;
     }
   });
 
-  // Cache context% after each turn while ctx is guaranteed live.
+  // Cache context% and tokens after each turn while ctx is guaranteed live.
   pi.on("turn_end", async (_event, ctx) => {
     try {
       const usage = ctx.getContextUsage();
       if (usage?.percent != null) cachedContextPct = Math.min(100, Math.round(usage.percent));
+      if (usage?.tokens != null) cachedContextTokens = usage.tokens;
     } catch {
       // ctx stale in --print mode — keep last cached value
     }
