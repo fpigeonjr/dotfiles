@@ -87,11 +87,13 @@ if command -v wt >/dev/null 2>&1; then
 fi
 
 # Ghostty/cmux shell integration - ensures PWD reporting works in all shells
-# (not just directly-spawned ones), enabling window-inherit-working-directory
+# (not just directly-spawned ones), enabling window-inherit-working-directory.
+# Allow an explicit opt-out for machines where Ghostty shell integration breaks
+# prompt rendering.
 # Guard: only source manually if Ghostty has NOT already auto-injected integration.
-# Auto-injection sets $GHOSTTY_SHELL_INTEGRATION_FEATURES; if it's set, skip manual
-# source to avoid double-registering ZLE hooks which causes doubled keystrokes.
-if [[ -n $GHOSTTY_RESOURCES_DIR && -z $GHOSTTY_SHELL_INTEGRATION_FEATURES && -z $SSH_CONNECTION && $TERM_PROGRAM == "ghostty" ]]; then
+# Auto-injection sets $GHOSTTY_SHELL_FEATURES; if it's set, skip manual source to
+# avoid double-registering prompt/ZLE hooks, which can cause prompt redraw issues.
+if [[ -z $DOTFILES_DISABLE_GHOSTTY_SHELL_INTEGRATION && -n $GHOSTTY_RESOURCES_DIR && -z $GHOSTTY_SHELL_FEATURES && -z $SSH_CONNECTION && $TERM_PROGRAM == "ghostty" ]]; then
   # Upstream Ghostty path
   if [[ -f "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration" ]]; then
     source "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration"

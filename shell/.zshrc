@@ -14,10 +14,19 @@ esac
 
 export ZDOTFILES_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
 
+# Ghostty shell integration currently breaks prompt rendering on the Flexion MBP:
+# precmd still runs, but the prompt itself disappears after each command. Disable
+# both auto-injected and manually sourced integration for zsh until the upstream
+# issue is understood.
+plugins=(git zsh-syntax-highlighting)
+if [[ $TERM_PROGRAM == "ghostty" ]]; then
+  export DOTFILES_DISABLE_GHOSTTY_SHELL_INTEGRATION=1
+  unset GHOSTTY_SHELL_FEATURES GHOSTTY_SHELL_INTEGRATION_FEATURES
+fi
+
 # Oh My Zsh remains optional so shell startup stays healthy on fresh machines.
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="robbyrussell"
-plugins=(git zsh-syntax-highlighting)
 
 if [[ -r "$ZSH/oh-my-zsh.sh" ]]; then
   source "$ZSH/oh-my-zsh.sh"
@@ -33,14 +42,6 @@ fi
 # - ~/.config/zsh/common.zsh (shared across all platforms)
 # - ~/.config/zsh/macos.zsh or ~/.config/zsh/linux.zsh (platform-specific)
 # - ~/.config/zsh/local.zsh (optional, machine-specific, not tracked in git)
-
 [[ -r "$ZDOTFILES_CONFIG_DIR/common.zsh" ]] && source "$ZDOTFILES_CONFIG_DIR/common.zsh"
 [[ -r "$ZDOTFILES_CONFIG_DIR/$DOTFILES_OS.zsh" ]] && source "$ZDOTFILES_CONFIG_DIR/$DOTFILES_OS.zsh"
 [[ -r "$ZDOTFILES_CONFIG_DIR/local.zsh" ]] && source "$ZDOTFILES_CONFIG_DIR/local.zsh"
-
-export PATH="$HOME/.local/bin:$PATH"
-
-# OpenClaw Completion (only source if file exists)
-[[ -r "$HOME/.openclaw/completions/openclaw.zsh" ]] && source "$HOME/.openclaw/completions/openclaw.zsh"
-
-if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi

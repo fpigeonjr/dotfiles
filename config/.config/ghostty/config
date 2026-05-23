@@ -1,5 +1,4 @@
 # Ghostty Configuration
-# Global Terminal Setup with Quick Terminal Feature
 
 # =============================================================================
 # SHELL AND COMMAND
@@ -50,21 +49,6 @@ palette = 15=#ffffff
 background-opacity = 0.9
 background-blur = true
 macos-window-shadow = true
-
-# =============================================================================
-# QUICK TERMINAL CONFIGURATION (Global Terminal Access)
-# =============================================================================
-# Quick terminal positioning and behavior - FULLSCREEN ATTEMPT 2
-quick-terminal-size = 100%
-quick-terminal-autohide = false
-quick-terminal-animation-duration = 0.1
-
-# Global keybind for system-wide quick terminal access (~ key / grave accent)
-# ✅ WORKING: Cmd+~ from any application on any desktop
-keybind = global:super+grave_accent=toggle_quick_terminal
-
-# Local fallback keybind REMOVED - it was overriding the global keybind
-# keybind = super+grave_accent=toggle_quick_terminal
 
 # =============================================================================
 # WINDOW MANAGEMENT
