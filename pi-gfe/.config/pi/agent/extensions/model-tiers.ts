@@ -1,13 +1,14 @@
 /**
  * model-tiers — Pi extension for tiered model selection (GFE / GitHub Copilot)
  *
- * Registers four provider family commands that each scope Ctrl+P to a
- * three-model instant → thinking → pro ladder. /a, /g, and /o use GitHub
+ * Registers five provider family commands that each scope Ctrl+P to a
+ * three-model instant → thinking → pro ladder. /a, /g, /o, and /c use GitHub
  * Copilot; /u uses the custom GSA AI provider.
  *
  *   /a   Anthropic via Copilot   haiku-4.5 → sonnet-4.6 → opus-4.7
  *   /g   Google via Copilot      gemini-3-flash-preview → gemini-2.5-pro → gemini-3.1-pro-preview
  *   /o   OpenAI via Copilot      gpt-5.4-mini → gpt-5.4 → gpt-5.5
+ *   /c   GFE Copilot (mixed)     gpt-5-mini → gpt-5.3-codex → claude-opus-4.5
  *   /u   GSA AI                  claude_3_haiku → claude_4_5_sonnet → gemini-2.5-pro
  *
  * Usage:
@@ -87,6 +88,15 @@ const FAMILIES: Record<string, Family> = {
       { name: "instant",  model: "gpt-5.4-mini", thinking: "off",   short: "5.4-mini" },
       { name: "thinking", model: "gpt-5.4",       thinking: "xhigh", short: "5.4"      },
       { name: "pro",      model: "gpt-5.5",       thinking: "xhigh", short: "5.5"      },
+    ],
+  },
+  c: {
+    label: "c",
+    provider: "github-copilot",
+    tiers: [
+      { name: "instant",  model: "gpt-5-mini",         thinking: "off", short: "5-mini"     },
+      { name: "thinking", model: "gpt-5.3-codex",      thinking: "off", short: "5.3-codex"  },
+      { name: "pro",      model: "claude-opus-4.5",    thinking: "off", short: "opus-4.5"   },
     ],
   },
   u: {
@@ -229,7 +239,7 @@ export default function (pi: ExtensionAPI) {
     description: "Cycle to next model tier (model-tiers)",
     handler: async (ctx) => {
       if (!activeFamily) {
-        ctx.ui.notify("model-tiers: pick a provider first — /a  /g  /o  /u", "info");
+        ctx.ui.notify("model-tiers: pick a provider first — /a  /g  /o  /c  /u", "info");
         return;
       }
       await activateTier(activeFamily, (tierIndex + 1) % 3, ctx);
@@ -240,7 +250,7 @@ export default function (pi: ExtensionAPI) {
     description: "Cycle to previous model tier (model-tiers)",
     handler: async (ctx) => {
       if (!activeFamily) {
-        ctx.ui.notify("model-tiers: pick a provider first — /a  /g  /o  /u", "info");
+        ctx.ui.notify("model-tiers: pick a provider first — /a  /g  /o  /c  /u", "info");
         return;
       }
       await activateTier(activeFamily, (tierIndex + 2) % 3, ctx);
