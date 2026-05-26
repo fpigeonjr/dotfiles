@@ -96,13 +96,17 @@ function dedupeModels(models: RemoteModel[]): RemoteModel[] {
 function inferInput(id: string): Array<"text" | "image"> {
   const lower = id.toLowerCase();
 
-  if (lower.includes("haiku") || lower.includes("llama")) {
+  if (lower.includes("llama")) {
+    return ["text"];
+  }
+
+  // GSA AI Sonnet doesn't support vision; Haiku untested but likely also text-only
+  if (lower.includes("sonnet") || lower.includes("haiku")) {
     return ["text"];
   }
 
   if (
     lower.includes("gemini") ||
-    lower.includes("sonnet") ||
     lower.includes("opus") ||
     lower.includes("gpt") ||
     lower.includes("grok")

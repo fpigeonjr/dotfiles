@@ -1,7 +1,7 @@
 -- ~/.config/nvim/lua/plugins/mdx.lua
 return {
   -- Reuses markdown + tsx, ships the queries & filetype
-  { "davidmh/mdx.nvim", config = true, dependencies = { "nvim-treesitter/nvim-treesitter" } },
+  { "davidmh/mdx.nvim", dependencies = { "nvim-treesitter/nvim-treesitter" } },
 
   -- Make sure the underlying parsers are present
   {
