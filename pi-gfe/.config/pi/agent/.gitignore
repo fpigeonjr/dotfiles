@@ -1,4 +1,9 @@
 # Pi runtime files — machine-local, never commit
 auth.json
+trust.json
+models.json
 sessions/
+git/
+npm/
+codex-home/
 node_modules/

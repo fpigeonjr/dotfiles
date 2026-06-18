@@ -34,7 +34,7 @@ type ModelsResponse = {
 
 const PROVIDER = "gsai";
 const PROVIDER_NAME = "GSA AI";
-const BASE_URL = "https://api.prod.gsai.mcaas.fcs.gsa.gov/api/v1";
+const BASE_URL = "https://api.gsa.usai.gov/api/v1";
 const PRIMARY_API_KEY_ENV = "GSAI_API_KEY";
 const API_KEY_ALIASES = [PRIMARY_API_KEY_ENV, "USAI_API_KEY"] as const;
 
@@ -52,13 +52,19 @@ const COMPAT = {
 // Conservative fallback for this environment until /models can be queried.
 // Trust live /models over docs: availability is tenant/key specific.
 const FALLBACK_MODELS: RemoteModel[] = [
+  { id: "claude_4_8_opus", owned_by: "Anthropic" },
+  { id: "claude_4_7_opus", owned_by: "Anthropic" },
+  { id: "claude_4_6_sonnet", owned_by: "Anthropic" },
   { id: "claude_4_5_sonnet", owned_by: "Anthropic" },
-  { id: "claude_3_haiku", owned_by: "Anthropic" },
-  { id: "llama3211b", owned_by: "Meta" },
+  { id: "claude_4_5_haiku", owned_by: "Anthropic" },
+  { id: "claude_3_5_haiku", owned_by: "Anthropic" },
+  { id: "llama_4_maverick", owned_by: "Meta" },
   { id: "gemini-2.5-flash", owned_by: "Google" },
-  { id: "gemini-2.0-flash", owned_by: "Google" },
-  { id: "gemini-2.0-flash-lite", owned_by: "Google" },
+  { id: "gemini-2.5-flash-lite", owned_by: "Google" },
   { id: "gemini-2.5-pro", owned_by: "Google" },
+  { id: "gpt-5.5-latest-guardrails-defaultv2", owned_by: "Open AI" },
+  { id: "gpt-5.4-latest-guardrails-defaultv2", owned_by: "Open AI" },
+  { id: "gpt-5.2-latest-guardrails-defaultv2", owned_by: "Open AI" },
 ];
 
 function resolveApiKey(): string | undefined {
@@ -122,8 +128,12 @@ function inferContextWindow(id: string, owner: string | undefined): number {
   const vendor = owner?.toLowerCase() ?? "";
 
   if (lower.includes("gemini") || vendor.includes("google")) return 1_048_576;
+  // Claude 4.6+ has 1M context; earlier versions 200K
+  if (lower.includes("claude_4_6") || lower.includes("claude_4_7") || lower.includes("claude_4_8")) return 1_000_000;
   if (lower.includes("claude") || vendor.includes("anthropic")) return 200_000;
-  if (lower.includes("gpt") || lower.includes("grok") || lower.includes("llama")) return 128_000;
+  if (lower.includes("gpt-5")) return 1_050_000; // GPT-5.x have 1M+ context
+  if (lower.includes("grok")) return 256_000; // Grok 4
+  if (lower.includes("gpt") || lower.includes("llama")) return 128_000;
   return 128_000;
 }
 
@@ -131,23 +141,37 @@ function inferMaxTokens(id: string, owner: string | undefined): number {
   const lower = id.toLowerCase();
   const vendor = owner?.toLowerCase() ?? "";
 
-  if (lower.includes("gemini") || vendor.includes("google")) return 8_192;
+  if (lower.includes("gemini") || vendor.includes("google")) return 65_536;
+  // Claude 4.6+ has 64K-128K output; Opus models support 128K
+  if (lower.includes("claude_4_7") || lower.includes("claude_4_8")) return 128_000;
+  if (lower.includes("claude_4_6")) return 64_000;
+  if (lower.includes("claude_4_5")) return 64_000;
   if (lower.includes("claude") || vendor.includes("anthropic")) return 16_384;
-  if (lower.includes("gpt") || lower.includes("grok")) return 16_384;
-  if (lower.includes("llama")) return 8_192;
+  if (lower.includes("gpt-5")) return 128_000; // GPT-5.x support 128K output
+  if (lower.includes("grok")) return 32_768; // Grok 4
+  if (lower.includes("gpt")) return 16_384;
+  if (lower.includes("llama")) return 16_384;
   return 16_384;
 }
 
 function prettyName(id: string, owner: string | undefined): string {
   const lower = id.toLowerCase();
 
-  if (lower === "gemini-2.5-flash") return "Gemini 2.5 Flash (GSA AI)";
-  if (lower === "gemini-2.0-flash") return "Gemini 2.0 Flash (GSA AI)";
-  if (lower === "gemini-2.0-flash-lite") return "Gemini 2.0 Flash Lite (GSA AI)";
-  if (lower === "gemini-2.5-pro") return "Gemini 2.5 Pro (GSA AI)";
-  if (lower === "claude_3_haiku") return "Claude Haiku 3 (GSA AI)";
+  if (lower === "claude_4_8_opus") return "Claude Opus 4.8 (GSA AI)";
+  if (lower === "claude_4_7_opus") return "Claude Opus 4.7 (GSA AI)";
+  if (lower === "claude_4_5_opus") return "Claude Opus 4.5 (GSA AI)";
+  if (lower === "claude_4_6_sonnet") return "Claude Sonnet 4.6 (GSA AI)";
   if (lower === "claude_4_5_sonnet") return "Claude Sonnet 4.5 (GSA AI)";
-  if (lower === "llama3211b") return "Llama 3.2 11B (GSA AI)";
+  if (lower === "claude_4_5_haiku") return "Claude Haiku 4.5 (GSA AI)";
+  if (lower === "claude_3_5_haiku") return "Claude Haiku 3.5 (GSA AI)";
+  if (lower === "gemini-2.5-flash") return "Gemini 2.5 Flash (GSA AI)";
+  if (lower === "gemini-2.5-flash-lite") return "Gemini 2.5 Flash Lite (GSA AI)";
+  if (lower === "gemini-2.5-pro") return "Gemini 2.5 Pro (GSA AI)";
+  if (lower === "llama_4_maverick") return "Llama 4 Maverick (GSA AI)";
+  if (lower === "gpt-5.5-latest-guardrails-defaultv2") return "GPT 5.5 (GSA AI)";
+  if (lower === "gpt-5.4-latest-guardrails-defaultv2") return "GPT 5.4 (GSA AI)";
+  if (lower === "gpt-5.2-latest-guardrails-defaultv2") return "GPT 5.2 (GSA AI)";
+  if (lower === "grok-4") return "Grok 4 (GSA AI)";
 
   const label = id
     .replace(/[_-]+/g, " ")

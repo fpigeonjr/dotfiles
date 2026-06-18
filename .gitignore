@@ -2,7 +2,8 @@
 .ssh/known_hosts
 **/*secret*
 **/*.local
-**/local.***/*token*
+**/local.*
+**/*token*
 shell/.profile
 aws/.aws/cli/
 aws/.aws/sso/
@@ -22,13 +23,14 @@ session-*.md
 **/.env
 !**/.env.example
 
-# pi coding agent runtime state — not dotfiles
-pi/.config/pi/agent/auth.json
-pi/.config/pi/agent/sessions/
-pi/.config/pi/agent/git/
-pi/.config/pi/agent/npm/
-pi/.config/pi/agent/models.json
-pi/.config/pi/agent/codex-home/
+# pi coding agent runtime state — not dotfiles (covers pi/, pi-gfe/, any future pi-* packages)
+pi*/.config/pi/agent/auth.json
+pi*/.config/pi/agent/trust.json
+pi*/.config/pi/agent/sessions/
+pi*/.config/pi/agent/git/
+pi*/.config/pi/agent/npm/
+pi*/.config/pi/agent/models.json
+pi*/.config/pi/agent/codex-home/
 
 # opencode runtime state
 config/.config/opencode/opencode-notifier-state.json

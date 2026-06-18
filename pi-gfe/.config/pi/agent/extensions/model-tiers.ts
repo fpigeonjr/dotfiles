@@ -9,7 +9,7 @@
  *   /g   Google via Copilot      gemini-3-flash-preview → gemini-2.5-pro → gemini-3.1-pro-preview
  *   /o   OpenAI via Copilot      gpt-5.4-mini → gpt-5.4 → gpt-5.5
  *   /c   GFE Copilot (mixed)     gpt-5-mini → gpt-5.3-codex → claude-opus-4.5
- *   /u   GSA AI                  claude_3_haiku → claude_4_5_sonnet → gemini-2.5-pro
+ *   /u   GSA AI                  claude_4_5_haiku → claude_4_6_sonnet → claude_4_8_opus
  *
  * Usage:
  *   /a              → switches to instant tier for Anthropic, scopes Ctrl+P
@@ -103,9 +103,9 @@ const FAMILIES: Record<string, Family> = {
     label: "u",
     provider: "gsai",
     tiers: [
-      { name: "instant",  model: "claude_3_haiku",   thinking: "off", short: "haiku"       },
-      { name: "thinking", model: "claude_4_5_sonnet", thinking: "off", short: "sonnet"      },
-      { name: "pro",      model: "gemini-2.5-pro",   thinking: "off", short: "g2.5-pro"    },
+      { name: "instant",  model: "claude_4_5_haiku",  thinking: "off", short: "haiku"       },
+      { name: "thinking", model: "claude_4_6_sonnet", thinking: "off", short: "sonnet"      },
+      { name: "pro",      model: "claude_4_8_opus",   thinking: "off", short: "opus-4.8"   },
     ],
   },
 };

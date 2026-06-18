@@ -23,3 +23,38 @@ alias gov='cd ~/Code'
 # NO personal API keys (NVIDIA_NIM_API_KEY, GEMINI_API_KEY, etc.)
 # NO contractor Bedrock profiles
 # NO pi agent config (contractor extensions)
+
+# ── q — quick ephemeral Pi with gpt-5-mini (GFE GitHub Copilot) ──────────────
+# Usage: q what is the meaning of life
+#        q @screenshot.png what do you see?
+#        q  (interactive mode)
+#
+# Supports text questions, file attachments (@file.txt), and images (@image.png).
+q() {
+  if [[ $# -eq 0 ]]; then
+    # No args: drop into interactive Pi prompt
+    pi --provider github-copilot --model gpt-5-mini --thinking off --no-session
+  else
+    # Args: treat as question, print mode (non-interactive)
+    # Explicitly set --thinking off to avoid settings.json defaultThinkingLevel conflicts
+    pi --provider github-copilot --model gpt-5-mini --thinking off --no-session --print "$@"
+  fi
+}
+
+# ── ql — ephemeral Pi for large files with gpt-5.4-mini ──────────────────────
+# Usage: ql @large-log.txt what caused the error?
+#        ql @big-file.json summarize this
+#        ql  (interactive mode)
+#
+# Uses gpt-5.4-mini for larger context window (~200K+ tokens) and better reasoning
+# for complex log analysis. Tested: handles 179K token files successfully.
+ql() {
+  if [[ $# -eq 0 ]]; then
+    # No args: drop into interactive Pi prompt
+    pi --provider github-copilot --model gpt-5.4-mini --thinking low --no-session
+  else
+    # Args: treat as question, print mode (non-interactive)
+    # Use --thinking low for better analysis (gpt-5.4-mini doesn't support 'off')
+    pi --provider github-copilot --model gpt-5.4-mini --thinking low --no-session --print "$@"
+  fi
+}

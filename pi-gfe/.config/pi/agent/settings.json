@@ -1,7 +1,7 @@
 {
   "$comment": "Pi coding agent settings for GFE — GitHub Copilot only. Keep this file minimal per pi philosophy. See https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/settings.json",
   "defaultProvider": "gsai",
-  "defaultModel": "claude_4_5_sonnet",
+  "defaultModel": "claude_4_8_opus",
   "defaultThinkingLevel": "off",
   "enableInstallTelemetry": false,
   "terminal": {
@@ -12,8 +12,9 @@
       "timeoutMs": 3600000
     }
   },
-  "lastChangelogVersion": "0.74.0",
+  "lastChangelogVersion": "0.79.7",
   "skills": [
     "~/Code/skills/skills"
-  ]
+  ],
+  "theme": "dark"
 }
