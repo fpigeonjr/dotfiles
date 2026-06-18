@@ -110,6 +110,8 @@ export default function (pi: ExtensionAPI) {
         return "codex";
       case "opencode-go":
         return "oc-go";
+      case "gsai":
+        return "usai";
       default:
         return id || "unknown";
     }

@@ -33,7 +33,7 @@ type ModelsResponse = {
 };
 
 const PROVIDER = "gsai";
-const PROVIDER_NAME = "GSA AI";
+const PROVIDER_NAME = "USAi";
 const BASE_URL = "https://api.gsa.usai.gov/api/v1";
 const PRIMARY_API_KEY_ENV = "GSAI_API_KEY";
 const API_KEY_ALIASES = [PRIMARY_API_KEY_ENV, "USAI_API_KEY"] as const;
@@ -157,21 +157,21 @@ function inferMaxTokens(id: string, owner: string | undefined): number {
 function prettyName(id: string, owner: string | undefined): string {
   const lower = id.toLowerCase();
 
-  if (lower === "claude_4_8_opus") return "Claude Opus 4.8 (GSA AI)";
-  if (lower === "claude_4_7_opus") return "Claude Opus 4.7 (GSA AI)";
-  if (lower === "claude_4_5_opus") return "Claude Opus 4.5 (GSA AI)";
-  if (lower === "claude_4_6_sonnet") return "Claude Sonnet 4.6 (GSA AI)";
-  if (lower === "claude_4_5_sonnet") return "Claude Sonnet 4.5 (GSA AI)";
-  if (lower === "claude_4_5_haiku") return "Claude Haiku 4.5 (GSA AI)";
-  if (lower === "claude_3_5_haiku") return "Claude Haiku 3.5 (GSA AI)";
-  if (lower === "gemini-2.5-flash") return "Gemini 2.5 Flash (GSA AI)";
-  if (lower === "gemini-2.5-flash-lite") return "Gemini 2.5 Flash Lite (GSA AI)";
-  if (lower === "gemini-2.5-pro") return "Gemini 2.5 Pro (GSA AI)";
-  if (lower === "llama_4_maverick") return "Llama 4 Maverick (GSA AI)";
-  if (lower === "gpt-5.5-latest-guardrails-defaultv2") return "GPT 5.5 (GSA AI)";
-  if (lower === "gpt-5.4-latest-guardrails-defaultv2") return "GPT 5.4 (GSA AI)";
-  if (lower === "gpt-5.2-latest-guardrails-defaultv2") return "GPT 5.2 (GSA AI)";
-  if (lower === "grok-4") return "Grok 4 (GSA AI)";
+  if (lower === "claude_4_8_opus") return "Claude Opus 4.8 (USAi)";
+  if (lower === "claude_4_7_opus") return "Claude Opus 4.7 (USAi)";
+  if (lower === "claude_4_5_opus") return "Claude Opus 4.5 (USAi)";
+  if (lower === "claude_4_6_sonnet") return "Claude Sonnet 4.6 (USAi)";
+  if (lower === "claude_4_5_sonnet") return "Claude Sonnet 4.5 (USAi)";
+  if (lower === "claude_4_5_haiku") return "Claude Haiku 4.5 (USAi)";
+  if (lower === "claude_3_5_haiku") return "Claude Haiku 3.5 (USAi)";
+  if (lower === "gemini-2.5-flash") return "Gemini 2.5 Flash (USAi)";
+  if (lower === "gemini-2.5-flash-lite") return "Gemini 2.5 Flash Lite (USAi)";
+  if (lower === "gemini-2.5-pro") return "Gemini 2.5 Pro (USAi)";
+  if (lower === "llama_4_maverick") return "Llama 4 Maverick (USAi)";
+  if (lower === "gpt-5.5-latest-guardrails-defaultv2") return "GPT 5.5 (USAi)";
+  if (lower === "gpt-5.4-latest-guardrails-defaultv2") return "GPT 5.4 (USAi)";
+  if (lower === "gpt-5.2-latest-guardrails-defaultv2") return "GPT 5.2 (USAi)";
+  if (lower === "grok-4") return "Grok 4 (USAi)";
 
   const label = id
     .replace(/[_-]+/g, " ")
@@ -181,7 +181,7 @@ function prettyName(id: string, owner: string | undefined): string {
     .replace(/\bXaI\b/g, "xAI");
 
   const suffix = owner ? ` (${owner})` : "";
-  return `${label}${suffix} [GSA AI]`;
+  return `${label}${suffix} [USAi]`;
 }
 
 function toPiModel(model: RemoteModel) {
