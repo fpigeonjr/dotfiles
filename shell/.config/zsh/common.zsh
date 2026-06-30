@@ -20,6 +20,7 @@ alias dc-up-prod="podman compose -f docker-compose.static.yml up --build"
 alias pod-down='podman compose down -v'
 alias dc-up="pod-up"
 alias dc-down="pod-down"
+alias wt-clean="$HOME/dotfiles/scripts/wt-clean.sh"
 alias graph="cd ~/Documents/Graph"
 alias journal='graph'
 alias matrix='cmatrix'

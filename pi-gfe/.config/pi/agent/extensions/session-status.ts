@@ -20,7 +20,7 @@
  *   /exit  — alias for /quit
  */
 
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { createBashTool, type ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 // Inline implementation — @earendil-works/pi-tui is not bundled with Pi.
 // Strips ANSI escape sequences when measuring width so colored strings
@@ -48,6 +48,11 @@ function truncateToWidth(str: string, width: number): string {
 
 const NOTIFICATION_SOUND = "/System/Library/Sounds/Submarine.aiff"; // swap to taste
 
+// Sentinel appended to every bash command so we can detect the working directory
+// after the command runs (e.g. after `wt switch` changes the worktree).
+// Must be stripped from the result before the LLM sees it.
+const CWD_MARKER = "###PI_CWD###:";
+
 export default function (pi: ExtensionAPI) {
   const sessionStart = Date.now();
 
@@ -62,11 +67,13 @@ export default function (pi: ExtensionAPI) {
   let modelId = "no-model";
   let providerId = "no-provider";
   let cachedCwd = "";
+  // Our own branch cache — updated whenever the cwd changes via bash tool
+  // (e.g. `wt switch`).  Overrides footerData.getGitBranch() in render().
+  let cachedBranch: string | null | undefined = undefined; // undefined = not yet read
   let cachedCost = 0;
   let cachedContextPct = 0;
   let cachedContextTokens = 0;
   let isActive = false;
-  let sessionGen = 0;
   // False in --print / non-interactive mode. Suppresses footer, notifications,
   // and all async ctx access that would be stale after Pi disposes the session.
   let interactive = false;
@@ -145,6 +152,69 @@ export default function (pi: ExtensionAPI) {
     return "█".repeat(filled) + "░".repeat(10 - filled);
   }
 
+  // ─── Branch helper ───────────────────────────────────────────────────────
+  // Read current git branch for a given directory, updating the module-level
+  // cache. Silently falls back to null (not in a repo / git not available).
+
+  async function refreshBranch(cwd: string): Promise<void> {
+    try {
+      const result = await pi.exec("git", ["rev-parse", "--abbrev-ref", "HEAD"], { cwd, timeout: 3000 });
+      cachedBranch = result.code === 0 ? result.stdout.trim() : null;
+    } catch {
+      cachedBranch = null;
+    }
+    footerTui?.requestRender();
+  }
+
+  // ─── Bash tool override ───────────────────────────────────────────────────
+  // Replaces the built-in bash tool with a spawnHook-wrapped version that
+  // appends a cwd marker after each command. The marker is stripped before the
+  // result reaches the LLM. When the marker shows a new directory (e.g. after
+  // `wt switch`), we update cachedCwd and re-read the git branch.
+
+  function registerBashTool(sessionCwd: string): void {
+    const bashTool = createBashTool(sessionCwd, {
+      spawnHook: ({ command, cwd: spawnCwd, env }) => ({
+        // Wrap in a subshell so `exit` inside the original command is still
+        // captured correctly. The marker is printed after the command finishes,
+        // regardless of exit code, and the original exit code is forwarded.
+        command: `{ ${command}\n}; __pi_exit=$?; echo "${CWD_MARKER}$(pwd)"; exit $__pi_exit`,
+        cwd: spawnCwd,
+        env,
+      }),
+    });
+
+    pi.registerTool({
+      ...bashTool,
+      execute: async (toolCallId, params, signal, onUpdate, _ctx) => {
+        const result = await bashTool.execute(toolCallId, params, signal, onUpdate);
+
+        // Strip the cwd marker from the result content so the LLM never sees it.
+        let detectedCwd: string | undefined;
+        const cleanedContent = result.content.map((block) => {
+          if (block.type !== "text") return block;
+          const markerIdx = block.text.lastIndexOf(CWD_MARKER);
+          if (markerIdx === -1) return block;
+          const afterMarker = block.text.slice(markerIdx + CWD_MARKER.length);
+          const newline = afterMarker.indexOf("\n");
+          detectedCwd = (newline === -1 ? afterMarker : afterMarker.slice(0, newline)).trim();
+          // Remove the marker line entirely (including leading newline).
+          const cleaned = block.text.slice(0, markerIdx).replace(/\n$/, "");
+          return { ...block, text: cleaned };
+        });
+
+        // If the directory changed, update caches and re-render the footer.
+        if (detectedCwd && detectedCwd !== cachedCwd) {
+          cachedCwd = detectedCwd;
+          // Fire-and-forget: read the new branch asynchronously.
+          void refreshBranch(detectedCwd);
+        }
+
+        return { ...result, content: cleanedContent };
+      },
+    });
+  }
+
   // ─── Footer setup ────────────────────────────────────────────────────────
 
   function setupFooter(ctx: Parameters<Parameters<ExtensionAPI["on"]>[1]>[1]): void {
@@ -152,10 +222,15 @@ export default function (pi: ExtensionAPI) {
       footerTui = tui;
       const unsubBranch = footerData.onBranchChange(() => tui.requestRender());
 
+      // Tick every second so the elapsed timer stays live and branch/cwd stay
+      // fresh even when pi is idle (no turns, no git watcher events).
+      const tickInterval = setInterval(() => tui.requestRender(), 1000);
+
       return {
         dispose: () => {
           footerTui = null;
           unsubBranch();
+          clearInterval(tickInterval);
         },
         invalidate() {},
         render(width: number): string[] {
@@ -169,7 +244,10 @@ export default function (pi: ExtensionAPI) {
           const model = friendlyModel(modelId);
           const provider = friendlyProvider(providerId);
           const dirName = cachedCwd.split("/").pop() || cachedCwd;
-          const branch = footerData.getGitBranch();
+          // Prefer our own cachedBranch (kept up-to-date after wt/cd/git calls)
+          // over footerData.getGitBranch() which is fixed to the session's
+          // original cwd and won't update when the worktree changes mid-session.
+          const branch = cachedBranch !== undefined ? cachedBranch : footerData.getGitBranch();
           const branchStr = branch ? theme.fg("dim", ` | 🌿 ${branch}`) : "";
           const providerStr = theme.fg("muted", ` ${provider}`);
           const tierStr = tierLabel ? " " + theme.fg("accent", tierLabel) : "";
@@ -242,7 +320,6 @@ export default function (pi: ExtensionAPI) {
 
   pi.on("session_start", async (event, ctx) => {
     isActive = true;
-    const myGen = ++sessionGen;
     modelId = ctx.model?.id ?? "no-model";
     providerId = ctx.model?.provider ?? "no-provider";
     interactive = ctx.hasUI;
@@ -251,10 +328,24 @@ export default function (pi: ExtensionAPI) {
     // Skip all async ctx usage to avoid stale-ctx throws after Pi disposes.
     if (!interactive) return;
 
+    // Update cached values for the new/resumed session.
+    // cachedCwd must be refreshed here because the footer render closure reads it
+    // as a module-level variable (footerData does not expose getCwd).
     cachedCwd = ctx.cwd;
-    cachedCost = 0;
-    cachedContextPct = 0;
-    cachedContextTokens = 0;
+    // Reset per-session stats only for fresh starts (not reload, which keeps history).
+    if (event.reason !== "reload") {
+      cachedCost = 0;
+      cachedContextPct = 0;
+      cachedContextTokens = 0;
+    }
+    // Reset branch cache so the next render reads the live value.
+    cachedBranch = undefined;
+    // Register the bash tool override BEFORE setting up the footer so that the
+    // tool is ready as soon as the session becomes interactive.
+    registerBashTool(ctx.cwd);
+    // Seed the branch cache asynchronously — don't await so we don't delay
+    // the synchronous footer setup below.
+    void refreshBranch(ctx.cwd);
     // Set up footer synchronously before any await so ctx is never stale.
     setupFooter(ctx);
   });
