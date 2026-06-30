@@ -139,64 +139,110 @@
         },
         "gsai": {
             "npm": "@ai-sdk/openai-compatible",
-            "name": "GSA AI",
+            "name": "USAi",
             "options": {
-                "baseURL": "https://api.prod.gsai.mcaas.fcs.gsa.gov/api/v1"
+                "baseURL": "https://api.gsa.usai.gov/api/v1"
             },
             "models": {
-                "claude_4_5_sonnet": {
-                    "name": "Claude Sonnet 4.5 (GSA AI)",
+                "claude_4_8_opus": {
+                    "name": "Claude Opus 4.8 (USAi)",
                     "attachment": true,
+                    "limit": {
+                        "context": 1000000,
+                        "output": 128000
+                    }
+                },
+                "claude_4_7_opus": {
+                    "name": "Claude Opus 4.7 (USAi)",
+                    "attachment": true,
+                    "limit": {
+                        "context": 1000000,
+                        "output": 128000
+                    }
+                },
+                "claude_4_5_opus": {
+                    "name": "Claude Opus 4.5 (USAi)",
+                    "attachment": true,
+                    "limit": {
+                        "context": 1000000,
+                        "output": 128000
+                    }
+                },
+                "claude_4_6_sonnet": {
+                    "name": "Claude Sonnet 4.6 (USAi)",
+                    "limit": {
+                        "context": 1000000,
+                        "output": 64000
+                    }
+                },
+                "claude_4_5_sonnet": {
+                    "name": "Claude Sonnet 4.5 (USAi)",
+                    "limit": {
+                        "context": 200000,
+                        "output": 64000
+                    }
+                },
+                "claude_4_5_haiku": {
+                    "name": "Claude Haiku 4.5 (USAi)",
                     "limit": {
                         "context": 200000,
                         "output": 16384
                     }
                 },
-                "claude_3_haiku": {
-                    "name": "Claude Haiku 3 (GSA AI)",
-                    "limit": {
-                        "context": 200000,
-                        "output": 8192
-                    }
-                },
-                "llama3211b": {
-                    "name": "Llama 3.2 11B (GSA AI)",
+                "llama_4_maverick": {
+                    "name": "Llama 4 Maverick (USAi)",
                     "tool_call": false,
                     "limit": {
                         "context": 128000,
-                        "output": 8192
+                        "output": 16384
                     }
                 },
                 "gemini-2.5-flash": {
-                    "name": "Gemini 2.5 Flash (GSA AI)",
+                    "name": "Gemini 2.5 Flash (USAi)",
                     "attachment": true,
                     "limit": {
                         "context": 1048576,
-                        "output": 8192
+                        "output": 65536
                     }
                 },
-                "gemini-2.0-flash": {
-                    "name": "Gemini 2.0 Flash (GSA AI)",
+                "gemini-2.5-flash-lite": {
+                    "name": "Gemini 2.5 Flash Lite (USAi)",
                     "attachment": true,
                     "limit": {
                         "context": 1048576,
-                        "output": 8192
-                    }
-                },
-                "gemini-2.0-flash-lite": {
-                    "name": "Gemini 2.0 Flash Lite (GSA AI)",
-                    "attachment": true,
-                    "limit": {
-                        "context": 1048576,
-                        "output": 8192
+                        "output": 65536
                     }
                 },
                 "gemini-2.5-pro": {
-                    "name": "Gemini 2.5 Pro (GSA AI)",
+                    "name": "Gemini 2.5 Pro (USAi)",
                     "attachment": true,
                     "limit": {
                         "context": 1048576,
-                        "output": 8192
+                        "output": 65536
+                    }
+                },
+                "gpt-5.5-latest-guardrails-defaultv2": {
+                    "name": "GPT 5.5 (USAi)",
+                    "attachment": true,
+                    "limit": {
+                        "context": 1050000,
+                        "output": 128000
+                    }
+                },
+                "gpt-5.4-latest-guardrails-defaultv2": {
+                    "name": "GPT 5.4 (USAi)",
+                    "attachment": true,
+                    "limit": {
+                        "context": 1050000,
+                        "output": 128000
+                    }
+                },
+                "gpt-5.2-latest-guardrails-defaultv2": {
+                    "name": "GPT 5.2 (USAi)",
+                    "attachment": true,
+                    "limit": {
+                        "context": 1050000,
+                        "output": 128000
                     }
                 }
             }
