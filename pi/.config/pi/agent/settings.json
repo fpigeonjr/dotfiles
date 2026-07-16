@@ -12,8 +12,9 @@
       "timeoutMs": 3600000
     }
   },
-  "lastChangelogVersion": "0.75.3",
+  "lastChangelogVersion": "0.80.7",
   "skills": [
     "~/Code/skills/skills"
-  ]
+  ],
+  "theme": "dark"
 }
