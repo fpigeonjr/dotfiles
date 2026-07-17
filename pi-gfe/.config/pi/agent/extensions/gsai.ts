@@ -54,10 +54,10 @@ const COMPAT = {
 const FALLBACK_MODELS: RemoteModel[] = [
   { id: "claude_4_8_opus", owned_by: "Anthropic" },
   { id: "claude_4_7_opus", owned_by: "Anthropic" },
+  { id: "claude_4_5_opus", owned_by: "Anthropic" },
   { id: "claude_4_6_sonnet", owned_by: "Anthropic" },
   { id: "claude_4_5_sonnet", owned_by: "Anthropic" },
   { id: "claude_4_5_haiku", owned_by: "Anthropic" },
-  { id: "claude_3_5_haiku", owned_by: "Anthropic" },
   { id: "llama_4_maverick", owned_by: "Meta" },
   { id: "gemini-2.5-flash", owned_by: "Google" },
   { id: "gemini-2.5-flash-lite", owned_by: "Google" },
@@ -163,7 +163,6 @@ function prettyName(id: string, owner: string | undefined): string {
   if (lower === "claude_4_6_sonnet") return "Claude Sonnet 4.6 (USAi)";
   if (lower === "claude_4_5_sonnet") return "Claude Sonnet 4.5 (USAi)";
   if (lower === "claude_4_5_haiku") return "Claude Haiku 4.5 (USAi)";
-  if (lower === "claude_3_5_haiku") return "Claude Haiku 3.5 (USAi)";
   if (lower === "gemini-2.5-flash") return "Gemini 2.5 Flash (USAi)";
   if (lower === "gemini-2.5-flash-lite") return "Gemini 2.5 Flash Lite (USAi)";
   if (lower === "gemini-2.5-pro") return "Gemini 2.5 Pro (USAi)";

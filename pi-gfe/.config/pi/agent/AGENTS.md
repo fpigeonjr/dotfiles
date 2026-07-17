@@ -12,7 +12,7 @@ Use these commands to switch provider families and scope `Ctrl+P` cycling:
 | `/g` | gemini-3-flash-preview (Copilot) | gemini-2.5-pro | gemini-3.1-pro-preview |
 | `/o` | gpt-5.4-mini (Copilot) | gpt-5.4 | gpt-5.5 |
 | `/c` | gpt-5-mini (Copilot) | gpt-5.3-codex | claude-opus-4.5 |
-| `/u` | claude_3_haiku (GSA AI) | claude_4_5_sonnet | gemini-2.5-pro |
+| `/u` | claude_4_5_haiku (GSA AI) | claude_4_6_sonnet | gemini-2.5-pro |
 
 - `/a thinking` jumps directly to a named tier; bare `/a` always starts at instant
 - `Ctrl+P` / `Shift+Ctrl+P` cycles tiers within the active family
