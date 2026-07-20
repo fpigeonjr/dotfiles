@@ -14,7 +14,8 @@
  * Also:
  *   - Fires cmux notify when Pi finishes a turn and is waiting for input,
  *     matching the same pane-ring behaviour as the opencode cmux-notify plugin.
- *   - Plays a macOS notification sound after each turn (when afplay is available).
+ *   - Sound notifications are handled by herdr's [ui.sound] completion chime; the
+ *     built-in afplay call is disabled to avoid playing two sounds.
  *
  * Commands:
  *   /exit  — alias for /quit
@@ -138,12 +139,10 @@ export default function (pi: ExtensionAPI) {
   }
 
   // ─── audio notifications ─────────────────────────────────────────────────
-  // Fire-and-forget afplay call — never awaited so it never blocks the extension.
-  // No-op on non-macOS or if afplay is unavailable.
-
-  function audioNotify(): void {
-    pi.exec("/usr/bin/afplay", [NOTIFICATION_SOUND], { timeout: 5000 }).catch(() => {});
-  }
+  // Disabled: herdr plays its own completion chime via [ui.sound] — no need to
+  // double up with a second afplay call.
+  function audioNotify(): void {}
+  void NOTIFICATION_SOUND; // suppress unused-variable warning
 
   // ─── Progress bar ────────────────────────────────────────────────────────
 
