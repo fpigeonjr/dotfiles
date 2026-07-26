@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.fpigeonjr.ssh-agent</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/ssh-agent</string>
+    <string>-D</string>
+    <string>-a</string>
+    <string>__HOME__/.ssh/ssh-agent.sock</string>
+    <string>-t</string>
+    <string>86400</string>
+  </array>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>__HOME__/.local/share/logs/launchd-ssh-agent.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>__HOME__/.local/share/logs/launchd-ssh-agent.log</string>
+</dict>
+</plist>

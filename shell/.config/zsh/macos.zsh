@@ -21,3 +21,16 @@ fi
 if command -v fnm >/dev/null 2>&1; then
   eval "$(fnm env --use-on-cd --shell zsh)"
 fi
+
+# Persistent ssh-agent via LaunchAgent (scripts/com.fpigeonjr.ssh-agent.plist).
+# launchd keeps a long-lived agent on a fixed socket so git SSH commit signing
+# (gpg.format=ssh) and SSH auth work across shells without re-entering passphrases.
+# Install the agent with: ~/dotfiles/scripts/install-launchagents.sh
+if [[ -S "$HOME/.ssh/ssh-agent.sock" ]]; then
+  export SSH_AUTH_SOCK="$HOME/.ssh/ssh-agent.sock"
+  # Load the default key lazily in interactive shells only. Non-interactive
+  # shells (scripts, agents) skip this so they don't block on a passphrase prompt.
+  if [[ -o interactive ]] && ! ssh-add -l >/dev/null 2>&1; then
+    ssh-add "$HOME/.ssh/id_ed25519" 2>/dev/null || true
+  fi
+fi

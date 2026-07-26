@@ -17,6 +17,7 @@ LOG_DIR="$HOME/.local/share/logs"
 AGENTS=(
   "com.fpigeon.compress-logseq-assets"
   "com.fpigeon.sync-notes-to-icloud"
+  "com.fpigeonjr.ssh-agent"
 )
 
 mkdir -p "$LAUNCH_AGENTS_DIR" "$LOG_DIR"
@@ -50,3 +51,5 @@ echo ""
 echo "Verify with:"
 echo "  launchctl print gui/\$(id -u)/com.fpigeon.compress-logseq-assets"
 echo "  launchctl print gui/\$(id -u)/com.fpigeon.sync-notes-to-icloud"
+echo "  launchctl print gui/\$(id -u)/com.fpigeonjr.ssh-agent"
+echo "  ssh-add -l  # should list ~/.ssh/id_ed25519 after opening a new shell"
