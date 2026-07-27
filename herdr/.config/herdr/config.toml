@@ -1,0 +1,24 @@
+onboarding = false
+# Herdr config — ~/.config/herdr/config.toml
+# Ghostty-friendly, prefix-free-first keymap. Mac-native feel (single chord, no
+# tmux prefix), using ctrl+alt so keys survive Ghostty + macOS and reach Herdr.
+# Everything not listed here stays at Herdr defaults (herdr --default-config).
+
+[keys]
+prefix = "ctrl+b"                          # escape hatch; prefix bindings still work
+
+# Splits — your cmd+d / shift+cmd+d, remapped to chords Ghostty won't eat
+split_vertical   = ["ctrl+alt+d", "prefix+v"]        # split right
+split_horizontal = ["ctrl+alt+shift+d", "prefix+minus"]  # split down
+
+# Panes
+close_pane       = ["ctrl+alt+w", "prefix+x"]
+zoom             = ["ctrl+alt+z", "prefix+z"]
+focus_pane_left  = ["ctrl+alt+h", "prefix+h"]
+focus_pane_down  = ["ctrl+alt+j", "prefix+j"]
+focus_pane_up    = ["ctrl+alt+k", "prefix+k"]
+focus_pane_right = ["ctrl+alt+l", "prefix+l"]
+
+# Tabs & sidebar
+new_tab          = ["ctrl+alt+c", "prefix+c"]
+toggle_sidebar   = ["ctrl+alt+b", "prefix+b"]

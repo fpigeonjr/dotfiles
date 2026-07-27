@@ -64,6 +64,14 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 - **Notification ring**: `cmux-notify.js` plugin bridges OpenCode session events to cmux's visual pane ring
 - **Install**: `brew tap manaflow-ai/cmux && brew install --cask cmux`
 
+### Herdr
+- **Config**: `herdr/.config/herdr/config.toml` stows to `~/.config/herdr/config.toml`
+- **Keymap style**: Prefix-free first, with `ctrl+alt` chords that survive Ghostty/macOS; `ctrl+b` remains the prefix escape hatch
+- **Core pane shortcuts**: `ctrl+alt+d` splits right, `ctrl+alt+shift+d` splits down, `ctrl+alt+w` closes the pane
+- **Navigation**: `ctrl+alt+h/j/k/l` focuses panes left/down/up/right; `ctrl+alt+z` zooms
+- **Tabs/sidebar**: `ctrl+alt+c` creates a tab; `ctrl+alt+b` toggles the sidebar
+- **Install/apply**: Run `stow herdr` on a new system, or `stow -R herdr` after updates; if an existing `~/.config/herdr/config.toml` is present, back it up or move it before stowing
+
 ### Amazon Bedrock Model Access
 - **Profile**: `employer-bedrock` (template only — real values in `~/.aws/config`, never committed; see `aws/.aws/config` for setup instructions)
 - **Permitted providers**: Anthropic (Claude), DeepSeek, Meta Llama, Amazon Nova, Mistral, Qwen, MiniMax, Moonshot AI (Kimi), Z.AI (GLM), NVIDIA Nemotron, Google Gemma, Writer Palmyra, OpenAI OSS, TwelveLabs Pegasus
@@ -165,6 +173,9 @@ dotfiles/
 │   └── .gitignore_global
 ├── homebrew/        # Homebrew package management
 │   └── Brewfile     # List of installed packages
+├── herdr/           # Herdr terminal multiplexer configuration
+│   └── .config/herdr/
+│       └── config.toml # Prefix-free pane/tab keybindings
 ├── pi/              # Pi coding agent configuration
 │   └── .config/pi/agent/
 │       ├── AGENTS.md        # Global system prompt additions
@@ -271,6 +282,7 @@ sudo pacman -S stow
    stow vscode-insiders # VS Code Insiders settings
    stow logseq       # Logseq configuration
    stow homebrew     # Homebrew Brewfile
+   stow herdr        # Herdr keybindings
    stow claude       # Claude Code settings and statusline
    stow pi           # Pi coding agent config, extensions, and prompts
    ```
@@ -721,6 +733,7 @@ cp -r ~/config-backup/YYYYMMDD/* ~/
 | `vscode-insiders` | settings.json, keybindings.json | VS Code Insiders configuration |
 | `logseq` | .logseq/config/, .logseq/custom.css, .logseq/settings/, .logseq/preferences.json, Notes/logseq/custom.css | Logseq knowledge management settings, plugins, and graph-level CSS (graph CSS takes precedence over global) |
 | `homebrew` | Brewfile | Homebrew package list for easy setup |
+| `herdr` | .config/herdr/config.toml | Herdr keybindings for splits, pane close/focus/zoom, tabs, and sidebar |
 | `claude` | .claude/settings.json, .claude/statusline.sh | Claude Code Bedrock/SSO config and status bar renderer |
 | `pi` | .config/pi/agent/ | Pi coding agent settings, extensions, and prompt templates |
 
