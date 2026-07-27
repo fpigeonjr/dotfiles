@@ -373,8 +373,10 @@ export default function (pi: ExtensionAPI) {
     if (!interactive) return;
     await refreshAws();
     footerTui?.requestRender();
-    await cmuxNotify("Pi", "Waiting for input");
-    audioNotify();
+    // Notifications are handled by Herder now — disable Pi's cmux/audio
+    // double-notify to avoid ringing twice on each turn end.
+    // await cmuxNotify("Pi", "Waiting for input");
+    // audioNotify();
   });
 
   // Update cached model ID and re-render footer when model changes
