@@ -90,8 +90,8 @@ const FAMILIES: Record<string, Family> = {
     provider: "amazon-bedrock",
     tiers: [
       { name: "instant",  model: "us.anthropic.claude-haiku-4-5-20251001-v1:0", thinking: "off",    short: "haiku"   },
-      { name: "thinking", model: "us.anthropic.claude-sonnet-4-6",              thinking: "medium", short: "sonnet"  },
-      { name: "pro",      model: "us.anthropic.claude-opus-4-7",                thinking: "high",   short: "opus"    },
+      { name: "thinking", model: "us.anthropic.claude-sonnet-5",                 thinking: "medium", short: "sonnet"  },
+      { name: "pro",      model: "us.anthropic.claude-opus-5",                   thinking: "high",   short: "opus"    },
     ],
   },
   e: {

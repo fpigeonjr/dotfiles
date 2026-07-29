@@ -6,7 +6,7 @@ The `model-tiers` extension is loaded. Use these commands to switch provider fam
 
 | command | instant | thinking | pro |
 |---|---|---|---|
-| `/a` | claude-haiku-4-5 (Bedrock) | claude-sonnet-4-6 | claude-opus-4-7 |
+| `/a` | claude-haiku-4-5 (Bedrock) | claude-sonnet-5 | claude-opus-5 |
 | `/e` | qwen3-coder-30b (Bedrock) | qwen3-235b-a22b-2507 (Bedrock) | qwen3-coder-480b (Bedrock) |
 | `/n` | llama-4-maverick (NIM) | kimi-k2-thinking (NIM) | qwen3.5-397b (NIM) |
 | `/g` | gemini-2.5-flash/off (Gemini) | gemini-2.5-flash/medium | gemini-2.5-flash/high |
