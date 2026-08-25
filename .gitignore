@@ -44,5 +44,10 @@ herdr/.config/herdr/*.sock
 herdr/.config/herdr/session.json
 herdr/.config/herdr/release-notes.json
 
+# herdr-managed opencode integration files — overwritten by herdr on update/reinstall
+config/.config/opencode/tui.jsonc
+config/.config/opencode/herdr-tui-session.js
+config/.config/opencode/plugins/herdr-agent-state.js
+
 # zed runtime databases
 config/.config/zed/prompts/

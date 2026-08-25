@@ -3,12 +3,12 @@
  *
  * Auth: set GSAI_API_KEY in ~/.config/zsh/local.zsh
  * Alias: USAI_API_KEY also works
- * Base URL: https://api.prod.gsai.mcaas.fcs.gsa.gov/api/v1
+ * Base URL: https://api.gsa.usai.gov/api/v1
  *
  * The API is OpenAI Chat Completions-compatible but uses /api/v1 paths.
  * On startup, if a key is present and Pi is online, the extension fetches
  * /models and registers the current chat-capable model list. If discovery
- * fails, it falls back to the documented public model lineup.
+ * fails, it falls back to the last verified live USAi lineup.
  */
 
 import {
@@ -50,21 +50,25 @@ const COMPAT = {
 };
 
 // Conservative fallback for this environment until /models can be queried.
-// Trust live /models over docs: availability is tenant/key specific.
+// Trust live /models over fallback: availability is tenant/key specific.
 const FALLBACK_MODELS: RemoteModel[] = [
-  { id: "claude_4_8_opus", owned_by: "Anthropic" },
-  { id: "claude_4_7_opus", owned_by: "Anthropic" },
-  { id: "claude_4_5_opus", owned_by: "Anthropic" },
-  { id: "claude_4_6_sonnet", owned_by: "Anthropic" },
-  { id: "claude_4_5_sonnet", owned_by: "Anthropic" },
-  { id: "claude_4_5_haiku", owned_by: "Anthropic" },
-  { id: "llama_4_maverick", owned_by: "Meta" },
+  { id: "claude-haiku-4.5", owned_by: "Anthropic" },
+  { id: "claude-opus-4.5", owned_by: "Anthropic" },
+  { id: "claude-opus-4.7", owned_by: "Anthropic" },
+  { id: "claude-opus-4.8", owned_by: "Anthropic" },
+  { id: "claude-opus-5", owned_by: "Anthropic" },
+  { id: "claude-sonnet-4.5", owned_by: "Anthropic" },
+  { id: "claude-sonnet-4.6", owned_by: "Anthropic" },
+  { id: "claude-sonnet-5", owned_by: "Anthropic" },
   { id: "gemini-2.5-flash", owned_by: "Google" },
   { id: "gemini-2.5-flash-lite", owned_by: "Google" },
   { id: "gemini-2.5-pro", owned_by: "Google" },
-  { id: "gpt-5.5-latest-guardrails-defaultv2", owned_by: "Open AI" },
-  { id: "gpt-5.4-latest-guardrails-defaultv2", owned_by: "Open AI" },
-  { id: "gpt-5.2-latest-guardrails-defaultv2", owned_by: "Open AI" },
+  { id: "gemini-3-7-flash", owned_by: "Google" },
+  { id: "gemini-3.5-flash", owned_by: "Google" },
+  { id: "gpt_5_2_default_v2", owned_by: "OpenAI" },
+  { id: "gpt_5_4_default_v2", owned_by: "OpenAI" },
+  { id: "gpt_5_5_default_v2", owned_by: "OpenAI" },
+  { id: "llama_4_maverick", owned_by: "Meta" },
 ];
 
 function resolveApiKey(): string | undefined {
@@ -127,12 +131,25 @@ function inferContextWindow(id: string, owner: string | undefined): number {
   const lower = id.toLowerCase();
   const vendor = owner?.toLowerCase() ?? "";
 
+  if (lower === "gemini-3.5-flash") return 200_000;
   if (lower.includes("gemini") || vendor.includes("google")) return 1_048_576;
-  // Claude 4.6+ has 1M context; earlier versions 200K
-  if (lower.includes("claude_4_6") || lower.includes("claude_4_7") || lower.includes("claude_4_8")) return 1_000_000;
+  // Claude 4.6+ and Claude 5 have 1M context; earlier Claude models are 200K.
+  if (
+    lower.includes("claude-sonnet-5") ||
+    lower.includes("claude-opus-5") ||
+    lower.includes("claude-opus-4.8") ||
+    lower.includes("claude-opus-4.7") ||
+    lower.includes("claude-sonnet-4.6") ||
+    lower.includes("claude_4_8") ||
+    lower.includes("claude_4_7") ||
+    lower.includes("claude_4_6")
+  ) {
+    return 1_000_000;
+  }
   if (lower.includes("claude") || vendor.includes("anthropic")) return 200_000;
-  if (lower.includes("gpt-5")) return 1_050_000; // GPT-5.x have 1M+ context
-  if (lower.includes("grok")) return 256_000; // Grok 4
+  if (lower.includes("gpt_5_2") || lower.includes("gpt-5.2")) return 400_000;
+  if (lower.includes("gpt_5_4") || lower.includes("gpt_5_5") || lower.includes("gpt-5")) return 1_050_000;
+  if (lower.includes("grok")) return 256_000;
   if (lower.includes("gpt") || lower.includes("llama")) return 128_000;
   return 128_000;
 }
@@ -141,42 +158,80 @@ function inferMaxTokens(id: string, owner: string | undefined): number {
   const lower = id.toLowerCase();
   const vendor = owner?.toLowerCase() ?? "";
 
-  if (lower.includes("gemini") || vendor.includes("google")) return 65_536;
-  // Claude 4.6+ has 64K-128K output; Opus models support 128K
-  if (lower.includes("claude_4_7") || lower.includes("claude_4_8")) return 128_000;
-  if (lower.includes("claude_4_6")) return 64_000;
-  if (lower.includes("claude_4_5")) return 64_000;
+  if (lower.includes("gemini") || vendor.includes("google")) return 64_000;
+  if (lower.includes("claude-sonnet-5")) return 128_000;
+  if (
+    lower.includes("claude-opus-5") ||
+    lower.includes("claude-opus-4.8") ||
+    lower.includes("claude-haiku-4.5") ||
+    lower === "claude_4_8_opus" ||
+    lower === "claude_4_5_haiku"
+  ) {
+    return 64_000;
+  }
+  if (
+    lower.includes("claude-opus-4.7") ||
+    lower.includes("claude-opus-4.5") ||
+    lower.includes("claude-sonnet-4.6") ||
+    lower.includes("claude-sonnet-4.5") ||
+    lower === "claude_4_7_opus" ||
+    lower === "claude_4_5_opus" ||
+    lower === "claude_4_6_sonnet" ||
+    lower === "claude_4_5_sonnet"
+  ) {
+    return 32_000;
+  }
   if (lower.includes("claude") || vendor.includes("anthropic")) return 16_384;
-  if (lower.includes("gpt-5")) return 128_000; // GPT-5.x support 128K output
-  if (lower.includes("grok")) return 32_768; // Grok 4
+  if (lower.includes("gpt_5") || lower.includes("gpt-5")) return 128_000;
+  if (lower.includes("grok")) return 32_768;
   if (lower.includes("gpt")) return 16_384;
   if (lower.includes("llama")) return 16_384;
   return 16_384;
 }
 
+const KNOWN_MODEL_NAMES: Record<string, string> = {
+  "claude-haiku-4.5": "Claude Haiku 4.5 (USAi)",
+  "claude-opus-4.5": "Claude Opus 4.5 (USAi)",
+  "claude-opus-4.7": "Claude Opus 4.7 (USAi)",
+  "claude-opus-4.8": "Claude Opus 4.8 (USAi)",
+  "claude-opus-5": "Claude Opus 5 (USAi)",
+  "claude-sonnet-4.5": "Claude Sonnet 4.5 (USAi)",
+  "claude-sonnet-4.6": "Claude Sonnet 4.6 (USAi)",
+  "claude-sonnet-5": "Claude Sonnet 5 (USAi)",
+  "gemini-2.5-flash": "Gemini 2.5 Flash (USAi)",
+  "gemini-2.5-flash-lite": "Gemini 2.5 Flash Lite (USAi)",
+  "gemini-2.5-pro": "Gemini 2.5 Pro (USAi)",
+  "gemini-3-7-flash": "Gemini 3.7 Flash (USAi)",
+  "gemini-3.5-flash": "Gemini 3.5 Flash (USAi)",
+  "gpt_5_2_default_v2": "GPT 5.2 (USAi)",
+  "gpt_5_4_default_v2": "GPT 5.4 (USAi)",
+  "gpt_5_5_default_v2": "GPT 5.5 (USAi)",
+  "llama_4_maverick": "Llama 4 Maverick (USAi)",
+
+  // Legacy aliases retained for old sessions and offline fallbacks.
+  "claude_4_8_opus": "Claude Opus 4.8 (USAi)",
+  "claude_4_7_opus": "Claude Opus 4.7 (USAi)",
+  "claude_4_5_opus": "Claude Opus 4.5 (USAi)",
+  "claude_4_6_sonnet": "Claude Sonnet 4.6 (USAi)",
+  "claude_4_5_sonnet": "Claude Sonnet 4.5 (USAi)",
+  "claude_4_5_haiku": "Claude Haiku 4.5 (USAi)",
+  "gpt-5.5-latest-guardrails-defaultv2": "GPT 5.5 (USAi)",
+  "gpt-5.4-latest-guardrails-defaultv2": "GPT 5.4 (USAi)",
+  "gpt-5.2-latest-guardrails-defaultv2": "GPT 5.2 (USAi)",
+  "grok-4": "Grok 4 (USAi)",
+};
+
 function prettyName(id: string, owner: string | undefined): string {
   const lower = id.toLowerCase();
-
-  if (lower === "claude_4_8_opus") return "Claude Opus 4.8 (USAi)";
-  if (lower === "claude_4_7_opus") return "Claude Opus 4.7 (USAi)";
-  if (lower === "claude_4_5_opus") return "Claude Opus 4.5 (USAi)";
-  if (lower === "claude_4_6_sonnet") return "Claude Sonnet 4.6 (USAi)";
-  if (lower === "claude_4_5_sonnet") return "Claude Sonnet 4.5 (USAi)";
-  if (lower === "claude_4_5_haiku") return "Claude Haiku 4.5 (USAi)";
-  if (lower === "gemini-2.5-flash") return "Gemini 2.5 Flash (USAi)";
-  if (lower === "gemini-2.5-flash-lite") return "Gemini 2.5 Flash Lite (USAi)";
-  if (lower === "gemini-2.5-pro") return "Gemini 2.5 Pro (USAi)";
-  if (lower === "llama_4_maverick") return "Llama 4 Maverick (USAi)";
-  if (lower === "gpt-5.5-latest-guardrails-defaultv2") return "GPT 5.5 (USAi)";
-  if (lower === "gpt-5.4-latest-guardrails-defaultv2") return "GPT 5.4 (USAi)";
-  if (lower === "gpt-5.2-latest-guardrails-defaultv2") return "GPT 5.2 (USAi)";
-  if (lower === "grok-4") return "Grok 4 (USAi)";
+  const knownName = KNOWN_MODEL_NAMES[lower];
+  if (knownName) return knownName;
 
   const label = id
     .replace(/[_-]+/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase())
     .replace(/\bGpt\b/g, "GPT")
     .replace(/\bLlama(\d)/g, "Llama $1")
+    .replace(/\bOpenai\b/g, "OpenAI")
     .replace(/\bXaI\b/g, "xAI");
 
   const suffix = owner ? ` (${owner})` : "";
@@ -197,7 +252,8 @@ function toPiModel(model: RemoteModel) {
 }
 
 function isOpenAIModelId(id: string): boolean {
-  return id.toLowerCase().startsWith("gpt-");
+  const lower = id.toLowerCase();
+  return lower.startsWith("gpt-") || lower.startsWith("gpt_");
 }
 
 function normalizeGsaiPayload(payload: unknown, model: Model<Api>): unknown {

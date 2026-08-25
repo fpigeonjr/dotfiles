@@ -12,8 +12,11 @@
 
 # Machine-local overrides (email, signingkey, etc.)
 # Create ~/.gitconfig.local on any machine that needs different values.
+# Only applies to repos with a github.helix.gsa.gov remote (SSH or HTTPS).
 # Safe no-op if the file does not exist.
-[includeIf "gitdir:~/"]
+[includeIf "hasconfig:remote.*.url:https://github.helix.gsa.gov/**"]
+	path = ~/.gitconfig.local
+[includeIf "hasconfig:remote.*.url:git@github.helix.gsa.gov:*/**"]
 	path = ~/.gitconfig.local
 
 [init]

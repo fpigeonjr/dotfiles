@@ -2,7 +2,7 @@
 
 ## Model Tiers
 
-The `model-tiers` extension is loaded. `/a`, `/g`, `/o`, and `/c` are served via **GitHub Copilot** — no API keys required beyond the GSA org Copilot licence. `/u` uses the custom **GSA AI / USAi** provider.
+The `model-tiers` extension is loaded. `/a`, `/g`, `/o`, and `/c` are served via **GitHub Copilot** — no API keys required beyond the GSA org Copilot licence. `/u` uses the custom **GSA AI / USAi** provider. `/f` and `/x` are served via **Flexion's AWS Bedrock** (region `us-east-2`) and require the `ClaudeCodeAccess-FlexionLLM` SSO profile to be active.
 
 Use these commands to switch provider families and scope `Ctrl+P` cycling:
 
@@ -12,7 +12,9 @@ Use these commands to switch provider families and scope `Ctrl+P` cycling:
 | `/g` | gemini-3-flash-preview (Copilot) | gemini-2.5-pro | gemini-3.1-pro-preview |
 | `/o` | gpt-5.4-mini (Copilot) | gpt-5.4 | gpt-5.5 |
 | `/c` | gpt-5-mini (Copilot) | gpt-5.3-codex | claude-opus-4.5 |
-| `/u` | claude_4_5_haiku (GSA AI) | claude_4_6_sonnet | gemini-2.5-pro |
+| `/u` | claude-haiku-4.5 (GSA AI) | claude-sonnet-5 | claude-opus-5 |
+| `/f` | claude-haiku-4.5 (Flexion Bedrock) | claude-sonnet-5 | claude-opus-5 |
+| `/x` | gpt-5.6-luna (Flexion Bedrock) | gpt-5.6-terra | gpt-5.6-sol |
 
 - `/a thinking` jumps directly to a named tier; bare `/a` always starts at instant
 - `Ctrl+P` / `Shift+Ctrl+P` cycles tiers within the active family
@@ -26,6 +28,14 @@ Use these commands to switch provider families and scope `Ctrl+P` cycling:
 - `/g` tiers — Gemini via Copilot does not support reasoning effort; all three tiers run at `off`. The ladder is purely by model capability.
 - `/c` tiers — GFE Copilot mixed stack; models do not support reasoning effort; all three tiers run at `off`. The ladder is purely by model capability.
 - `/u` tiers — GSA AI / USAi does not expose reasoning effort; all three tiers run at `off`. The ladder is purely by model capability.
+- `/f` tiers — **Flexion Bedrock (Claude), `us-east-2`**, via the `us.anthropic.*` inference-profile IDs (raw model IDs are not on-demand callable). `/f instant` (Claude Haiku 4.5) has no extended thinking, so it runs `off`. `/f thinking` (Claude Sonnet 5) and `/f pro` (Claude Opus 5) support genuine `xhigh` extended thinking.
+- `/x` tiers — **Flexion Bedrock (GPT), `us-east-2`**, via the `us.openai.*` inference-profile IDs. GPT-5.6 supports reasoning effort on Bedrock (`low`/`medium`/`high`/`xhigh`/`none`), but the store map exposes `xhigh` only: `/x instant` (GPT-5.6 Luna) runs `off`, while `/x thinking` (GPT-5.6 Terra) and `/x pro` (GPT-5.6 Sol) run `xhigh`. Ordering is Luna < Terra < Sol.
+
+## Flexion Bedrock (`/f`, `/x`)
+
+- Requires an active `ClaudeCodeAccess-FlexionLLM` SSO session (`aws sso login --profile ClaudeCodeAccess-FlexionLLM`) with `AWS_PROFILE`/`AWS_REGION` pointing at `us-east-2`.
+- Models are added to the (git-ignored) `models-store.json` under `amazon-bedrock` with `baseUrl` set to `us-east-2`; the provider signs against `AWS_REGION`.
+- `fable-5` is intentionally excluded — it routes to `us-east-1` where this role lacks `bedrock:InvokeModel` (AccessDenied).
 
 ## Custom Providers
 

@@ -1,15 +1,17 @@
 /**
  * model-tiers — Pi extension for tiered model selection (GFE / GitHub Copilot)
  *
- * Registers five provider family commands that each scope Ctrl+P to a
+ * Registers provider family commands that each scope Ctrl+P to a
  * three-model instant → thinking → pro ladder. /a, /g, /o, and /c use GitHub
- * Copilot; /u uses the custom GSA AI provider.
+ * Copilot; /u uses the custom GSA AI provider; /f and /x use Flexion Bedrock.
  *
  *   /a   Anthropic via Copilot   haiku-4.5 → sonnet-4.6 → opus-4.7
  *   /g   Google via Copilot      gemini-3-flash-preview → gemini-2.5-pro → gemini-3.1-pro-preview
  *   /o   OpenAI via Copilot      gpt-5.4-mini → gpt-5.4 → gpt-5.5
  *   /c   GFE Copilot (mixed)     gpt-5-mini → gpt-5.3-codex → claude-opus-4.5
- *   /u   GSA AI                  claude_4_5_haiku → claude_4_6_sonnet → claude_4_8_opus
+ *   /u   GSA AI                  claude-haiku-4.5 → claude-sonnet-5 → claude-opus-5
+ *   /f   Flexion Bedrock (Claude, us-east-2)  haiku-4.5 → sonnet-5 → opus-5
+ *   /x   Flexion Bedrock (GPT, us-east-2)     gpt-5.6-luna → gpt-5.6-terra → gpt-5.6-sol
  *
  * Usage:
  *   /a              → switches to instant tier for Anthropic, scopes Ctrl+P
@@ -32,6 +34,13 @@
  *   - gpt-5.4 and gpt-5.5 support xhigh thinking.
  *   - Gemini models via Copilot do not expose reasoning effort — all off.
  *   - GSA AI models do not expose reasoning effort — all off.
+ *   - /f (Flexion Bedrock Claude): Sonnet 5 and Opus 5 support genuine xhigh
+ *     extended thinking; Haiku 4.5 has no extended thinking (off). Runs against
+ *     Flexion's AWS Bedrock in us-east-2 via the us.anthropic.* inference profiles.
+ *   - /x (Flexion Bedrock GPT): GPT-5.6 supports reasoning effort on Bedrock;
+ *     the store map exposes xhigh only, so instant is off and thinking/pro use
+ *     xhigh. Runs against us-east-2 via the us.openai.* inference profiles.
+ *     Requires the ClaudeCodeAccess-FlexionLLM AWS profile / SSO to be active.
  *
  * State persists across session resume/fork via pi.appendEntry().
  * Selecting a model via /model (Ctrl+L) clears family tracking.
@@ -103,9 +112,29 @@ const FAMILIES: Record<string, Family> = {
     label: "u",
     provider: "gsai",
     tiers: [
-      { name: "instant",  model: "claude_4_5_haiku",  thinking: "off", short: "haiku"       },
-      { name: "thinking", model: "claude_4_6_sonnet", thinking: "off", short: "sonnet"      },
-      { name: "pro",      model: "claude_4_8_opus",   thinking: "off", short: "opus-4.8"   },
+      { name: "instant",  model: "claude-haiku-4.5", thinking: "off", short: "haiku-4.5" },
+      { name: "thinking", model: "claude-sonnet-5",  thinking: "off", short: "sonnet-5"  },
+      { name: "pro",      model: "claude-opus-5",    thinking: "off", short: "opus-5"    },
+    ],
+  },
+  // Flexion Bedrock (us-east-2) via ClaudeCodeAccess-FlexionLLM SSO profile.
+  // Uses us.* inference-profile IDs (raw model IDs are not on-demand callable).
+  f: {
+    label: "f",
+    provider: "amazon-bedrock",
+    tiers: [
+      { name: "instant",  model: "us.anthropic.claude-haiku-4-5-20251001-v1:0", thinking: "off",   short: "fx-haiku-4.5" },
+      { name: "thinking", model: "us.anthropic.claude-sonnet-5",                thinking: "xhigh", short: "fx-sonnet-5"  },
+      { name: "pro",      model: "us.anthropic.claude-opus-5",                  thinking: "xhigh", short: "fx-opus-5"    },
+    ],
+  },
+  x: {
+    label: "x",
+    provider: "amazon-bedrock",
+    tiers: [
+      { name: "instant",  model: "us.openai.gpt-5.6-luna",  thinking: "off",   short: "fx-5.6-luna"  },
+      { name: "thinking", model: "us.openai.gpt-5.6-terra", thinking: "xhigh", short: "fx-5.6-terra" },
+      { name: "pro",      model: "us.openai.gpt-5.6-sol",   thinking: "xhigh", short: "fx-5.6-sol"   },
     ],
   },
 };
@@ -239,7 +268,7 @@ export default function (pi: ExtensionAPI) {
     description: "Cycle to next model tier (model-tiers)",
     handler: async (ctx) => {
       if (!activeFamily) {
-        ctx.ui.notify("model-tiers: pick a provider first — /a  /g  /o  /c  /u", "info");
+        ctx.ui.notify("model-tiers: pick a provider first — /a  /g  /o  /c  /u  /f  /x", "info");
         return;
       }
       await activateTier(activeFamily, (tierIndex + 1) % 3, ctx);
@@ -250,7 +279,7 @@ export default function (pi: ExtensionAPI) {
     description: "Cycle to previous model tier (model-tiers)",
     handler: async (ctx) => {
       if (!activeFamily) {
-        ctx.ui.notify("model-tiers: pick a provider first — /a  /g  /o  /c  /u", "info");
+        ctx.ui.notify("model-tiers: pick a provider first — /a  /g  /o  /c  /u  /f  /x", "info");
         return;
       }
       await activateTier(activeFamily, (tierIndex + 2) % 3, ctx);
