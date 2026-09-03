@@ -112,9 +112,9 @@ const FAMILIES: Record<string, Family> = {
     label: "u",
     provider: "gsai",
     tiers: [
-      { name: "instant",  model: "claude-haiku-4.5", thinking: "off", short: "haiku-4.5" },
-      { name: "thinking", model: "claude-sonnet-5",  thinking: "off", short: "sonnet-5"  },
-      { name: "pro",      model: "claude-opus-5",    thinking: "off", short: "opus-5"    },
+      { name: "instant",  model: "claude_4_5_haiku", thinking: "off", short: "haiku-4.5" },
+      { name: "thinking", model: "claude-sonnet-5",   thinking: "off", short: "sonnet-5"  },
+      { name: "pro",      model: "claude-opus-5",     thinking: "off", short: "opus-5"    },
     ],
   },
   // Flexion Bedrock (us-east-2) via ClaudeCodeAccess-FlexionLLM SSO profile.
