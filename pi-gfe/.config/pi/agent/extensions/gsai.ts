@@ -106,17 +106,16 @@ function dedupeModels(models: RemoteModel[]): RemoteModel[] {
 function inferInput(id: string): Array<"text" | "image"> {
   const lower = id.toLowerCase();
 
-  if (lower.includes("llama")) {
-    return ["text"];
-  }
-
-  // GSA AI Sonnet doesn't support vision; Haiku untested but likely also text-only
-  if (lower.includes("sonnet") || lower.includes("haiku")) {
-    return ["text"];
-  }
-
+  // Verified against the live USAi gateway (64x64 PNG): Claude Sonnet 5/4.6/4.5,
+  // Haiku 4.5, Opus 5/4.8/4.7, Llama 4 Maverick, GPT 5.x and Gemini all answer
+  // image prompts correctly. The earlier text-only flags were a false negative:
+  // USAi rejects very small images (1x1) for *every* model with
+  // "Could not process image", which is a gateway size check, not a capability.
   if (
     lower.includes("gemini") ||
+    lower.includes("sonnet") ||
+    lower.includes("haiku") ||
+    lower.includes("llama") ||
     lower.includes("opus") ||
     lower.includes("gpt") ||
     lower.includes("grok")
