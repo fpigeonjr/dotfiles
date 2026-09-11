@@ -10,6 +10,7 @@
  *   /o   OpenAI via Copilot      gpt-5.4-mini → gpt-5.4 → gpt-5.5
  *   /c   GFE Copilot (mixed)     gpt-5-mini → gpt-5.3-codex → claude-opus-4.5
  *   /u   GSA AI                  claude-haiku-4.5 → claude-sonnet-5 → claude-opus-5
+ *   /n   GSA AI (GPT)            gpt-5.6-luna → gpt-5.6-terra → gpt-5.6-sol
  *   /f   Flexion Bedrock (Claude, us-east-2)  haiku-4.5 → sonnet-5 → opus-5
  *   /x   Flexion Bedrock (GPT, us-east-2)     gpt-5.6-luna → gpt-5.6-terra → gpt-5.6-sol
  *
@@ -33,7 +34,7 @@
  *   - claude-opus-4.7 supports xhigh thinking.
  *   - gpt-5.4 and gpt-5.5 support xhigh thinking.
  *   - Gemini models via Copilot do not expose reasoning effort — all off.
- *   - GSA AI models do not expose reasoning effort — all off.
+ *   - GSA AI models do not expose reasoning effort — all off (both /u and /n).
  *   - /f (Flexion Bedrock Claude): Sonnet 5 and Opus 5 support genuine xhigh
  *     extended thinking; Haiku 4.5 has no extended thinking (off). Runs against
  *     Flexion's AWS Bedrock in us-east-2 via the us.anthropic.* inference profiles.
@@ -115,6 +116,17 @@ const FAMILIES: Record<string, Family> = {
       { name: "instant",  model: "claude_4_5_haiku", thinking: "off", short: "haiku-4.5" },
       { name: "thinking", model: "claude-sonnet-5",   thinking: "off", short: "sonnet-5"  },
       { name: "pro",      model: "claude-opus-5",     thinking: "off", short: "opus-5"    },
+    ],
+  },
+  // GSA AI / USAi GPT-5.6 stack. USAi does not expose reasoning effort, so all
+  // tiers run off; the ladder is purely by model capability (luna < terra < sol).
+  n: {
+    label: "n",
+    provider: "gsai",
+    tiers: [
+      { name: "instant",  model: "gpt-5.6-luna",                            thinking: "off", short: "5.6-luna"  },
+      { name: "thinking", model: "gpt-5.6-terra",                           thinking: "off", short: "5.6-terra" },
+      { name: "pro",      model: "gpt-5.6-sol-latest-guardrails-defaultv2", thinking: "off", short: "5.6-sol"   },
     ],
   },
   // Flexion Bedrock (us-east-2) via ClaudeCodeAccess-FlexionLLM SSO profile.
@@ -268,7 +280,7 @@ export default function (pi: ExtensionAPI) {
     description: "Cycle to next model tier (model-tiers)",
     handler: async (ctx) => {
       if (!activeFamily) {
-        ctx.ui.notify("model-tiers: pick a provider first — /a  /g  /o  /c  /u  /f  /x", "info");
+        ctx.ui.notify("model-tiers: pick a provider first — /a  /g  /o  /c  /u  /n  /f  /x", "info");
         return;
       }
       await activateTier(activeFamily, (tierIndex + 1) % 3, ctx);
@@ -279,7 +291,7 @@ export default function (pi: ExtensionAPI) {
     description: "Cycle to previous model tier (model-tiers)",
     handler: async (ctx) => {
       if (!activeFamily) {
-        ctx.ui.notify("model-tiers: pick a provider first — /a  /g  /o  /c  /u  /f  /x", "info");
+        ctx.ui.notify("model-tiers: pick a provider first — /a  /g  /o  /c  /u  /n  /f  /x", "info");
         return;
       }
       await activateTier(activeFamily, (tierIndex + 2) % 3, ctx);
