@@ -45,9 +45,14 @@ herdr/.config/herdr/session.json
 herdr/.config/herdr/release-notes.json
 
 # herdr-managed opencode integration files — overwritten by herdr on update/reinstall
-config/.config/opencode/tui.jsonc
-config/.config/opencode/herdr-tui-session.js
-config/.config/opencode/plugins/herdr-agent-state.js
+**/.config/opencode/cli.json
+**/.config/opencode/tui.jsonc
+**/.config/opencode/herdr-tui-session.js
+**/.config/opencode/herdr-opencode/
+**/.config/opencode/plugins/herdr-agent-state.js
+
+# local test caches
+node_modules/
 
 # zed runtime databases
 config/.config/zed/prompts/

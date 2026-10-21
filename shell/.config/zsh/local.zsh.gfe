@@ -17,6 +17,11 @@ alias gov='cd ~/Code'
 # fnm is initialised in common.zsh; pin a version here if the project requires it:
 # fnm use 20
 
+# ── SSL / Corporate Proxy (Zscaler) ──────────────────────────────────────────
+# Exported from macOS System Keychain so Node.js trusts corporate proxy certificates:
+# security find-certificate -a -c "Zscaler" -p /Library/Keychains/System.keychain > ~/.config/ssl/zscaler-ca.pem
+[[ -f "$HOME/.config/ssl/zscaler-ca.pem" ]] && export NODE_EXTRA_CA_CERTS="$HOME/.config/ssl/zscaler-ca.pem"
+
 # ── Gov-specific tooling goes below this line ─────────────────────────────────
 # e.g. VPN aliases, internal proxy settings, PIV card helpers
 

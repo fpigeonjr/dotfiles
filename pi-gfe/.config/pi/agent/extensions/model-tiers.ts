@@ -3,51 +3,42 @@
  *
  * Registers provider family commands that each scope Ctrl+P to a
  * three-model instant → thinking → pro ladder. /a, /g, /o, and /c use GitHub
- * Copilot; /u uses the custom GSA AI provider; /f and /x use Flexion Bedrock.
+ * Copilot; /u and /n use USAi.
  *
- *   /a   Anthropic via Copilot   haiku-4.5 → sonnet-4.6 → opus-4.7
- *   /g   Google via Copilot      gemini-3-flash-preview → gemini-2.5-pro → gemini-3.1-pro-preview
- *   /o   OpenAI via Copilot      gpt-5.4-mini → gpt-5.4 → gpt-5.5
- *   /c   GFE Copilot (mixed)     gpt-5-mini → gpt-5.3-codex → claude-opus-4.5
- *   /u   GSA AI                  claude-haiku-4.5 → claude-sonnet-5 → claude-opus-5
- *   /n   GSA AI (GPT)            gpt-5.6-luna → gpt-5.6-terra → gpt-5.6-sol
- *   /f   Flexion Bedrock (Claude, us-east-2)  haiku-4.5 → sonnet-5 → opus-5
- *   /x   Flexion Bedrock (GPT, us-east-2)     gpt-5.6-luna → gpt-5.6-terra → gpt-5.6-sol
+ *   /a   Anthropic via Copilot   haiku-4.5 → sonnet-5.5 → opus-5.5
+ *   /g   Google via Copilot      gemini-3.6-flash → gemini-3.7-flash → gemini-3.7-flash
+ *   /o   OpenAI via Copilot      gpt-6-luna → gpt-6-sol → gpt-6.1-sol
+ *   /c   GFE Copilot (mixed)     gpt-5-mini → gpt-5.3-codex → claude-opus-4.8
+ *   /u   USAi (Claude)           claude-haiku-4.5 → claude-sonnet-5.5 → claude-opus-5
+ *   /n   USAi (GPT)              gpt-5.6-luna → gpt-5.6-sol → gpt-6-astra
  *
  * Usage:
- *   /a              → switches to instant tier for Anthropic, scopes Ctrl+P
- *   /a thinking     → jumps directly to thinking tier
+ *   /u              → switches to instant tier for USAi Claude, scopes Ctrl+P
+ *   /u thinking     → jumps directly to thinking tier
  *   Ctrl+P          → advance to next tier within active family
  *   Shift+Ctrl+P    → back to previous tier within active family
- *   /tiers          → toggle compact tier table (4 lines, never truncates)
+ *   /tiers          → toggle compact tier table (never truncates)
  *
- * Cold-start default: if no persisted state and no model match, silently
- * activates a·instant (claude-haiku-4.5) so Ctrl+P always works without
- * typing a command.
+ * Cold-start default: activates n·instant (gpt-5.6-luna via USAi) so
+ * Ctrl+P always works without typing a command first.
  *
- * Footer shows active family and tier, e.g. "a·thinking" (via pi.events
+ * Footer shows active family and tier, e.g. "n·instant" (via pi.events
  * cross-extension comms with copilot-status).
  *
  * Note on thinking levels:
- *   - claude-sonnet-4.6 has no thinkingLevelMap via Copilot — it is a
- *     capability step, not a true thinking tier. thinking: "off" is correct.
- *   - claude-opus-4.7 supports xhigh thinking.
- *   - gpt-5.4 and gpt-5.5 support xhigh thinking.
+ *   - claude-sonnet-5.5 and claude-opus-5.5 support xhigh thinking.
+ *   - gpt-6-sol and gpt-6.1-sol support xhigh thinking.
  *   - Gemini models via Copilot do not expose reasoning effort — all off.
- *   - GSA AI models do not expose reasoning effort — all off (both /u and /n).
- *   - /f (Flexion Bedrock Claude): Sonnet 5 and Opus 5 support genuine xhigh
- *     extended thinking; Haiku 4.5 has no extended thinking (off). Runs against
- *     Flexion's AWS Bedrock in us-east-2 via the us.anthropic.* inference profiles.
- *   - /x (Flexion Bedrock GPT): GPT-5.6 supports reasoning effort on Bedrock;
- *     the store map exposes xhigh only, so instant is off and thinking/pro use
- *     xhigh. Runs against us-east-2 via the us.openai.* inference profiles.
- *     Requires the ClaudeCodeAccess-FlexionLLM AWS profile / SSO to be active.
+ *   - USAi models do not expose reasoning effort — all off (/u and /n).
  *
  * State persists across session resume/fork via pi.appendEntry().
  * Selecting a model via /model (Ctrl+L) clears family tracking.
  */
 
-import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
+import type {
+  ExtensionAPI,
+  ExtensionContext,
+} from "@earendil-works/pi-coding-agent";
 
 type ThinkingLevel = "off" | "minimal" | "low" | "medium" | "high" | "xhigh";
 type TierName = "instant" | "thinking" | "pro";
@@ -62,6 +53,7 @@ interface Tier {
 interface Family {
   label: string;
   provider: string;
+  providerName?: string;
   tiers: [Tier, Tier, Tier];
 }
 
@@ -77,76 +69,143 @@ const FAMILIES: Record<string, Family> = {
     label: "a",
     provider: "github-copilot",
     tiers: [
-      { name: "instant",  model: "claude-haiku-4.5",  thinking: "off",   short: "haiku-4.5"  },
-      { name: "thinking", model: "claude-sonnet-4.6", thinking: "off",   short: "sonnet-4.6" },
-      { name: "pro",      model: "claude-opus-4.7",   thinking: "xhigh", short: "opus-4.7"   },
+      {
+        name: "instant",
+        model: "claude-haiku-4.5",
+        thinking: "off",
+        short: "haiku-4.5",
+      },
+      {
+        name: "thinking",
+        model: "claude-sonnet-5.5",
+        thinking: "xhigh",
+        short: "sonnet-5.5",
+      },
+      {
+        name: "pro",
+        model: "claude-opus-5.5",
+        thinking: "xhigh",
+        short: "opus-5.5",
+      },
     ],
   },
   g: {
     label: "g",
     provider: "github-copilot",
     tiers: [
-      { name: "instant",  model: "gemini-3-flash-preview",  thinking: "off", short: "g3-flash"    },
-      { name: "thinking", model: "gemini-2.5-pro",          thinking: "off", short: "g2.5-pro"    },
-      { name: "pro",      model: "gemini-3.1-pro-preview",  thinking: "off", short: "g3.1-pro"    },
+      {
+        name: "instant",
+        model: "gemini-3.6-flash",
+        thinking: "off",
+        short: "g3.6-flash",
+      },
+      {
+        name: "thinking",
+        model: "gemini-3.7-flash",
+        thinking: "off",
+        short: "g3.7-flash",
+      },
+      {
+        name: "pro",
+        model: "gemini-3.7-flash",
+        thinking: "off",
+        short: "g3.7-flash",
+      },
     ],
   },
   o: {
     label: "o",
     provider: "github-copilot",
     tiers: [
-      { name: "instant",  model: "gpt-5.4-mini", thinking: "off",   short: "5.4-mini" },
-      { name: "thinking", model: "gpt-5.4",       thinking: "xhigh", short: "5.4"      },
-      { name: "pro",      model: "gpt-5.5",       thinking: "xhigh", short: "5.5"      },
+      {
+        name: "instant",
+        model: "gpt-6-luna",
+        thinking: "off",
+        short: "6-luna",
+      },
+      {
+        name: "thinking",
+        model: "gpt-6-sol",
+        thinking: "xhigh",
+        short: "6-sol",
+      },
+      {
+        name: "pro",
+        model: "gpt-6.1-sol",
+        thinking: "xhigh",
+        short: "6.1-sol",
+      },
     ],
   },
   c: {
     label: "c",
     provider: "github-copilot",
     tiers: [
-      { name: "instant",  model: "gpt-5-mini",         thinking: "off", short: "5-mini"     },
-      { name: "thinking", model: "gpt-5.3-codex",      thinking: "off", short: "5.3-codex"  },
-      { name: "pro",      model: "claude-opus-4.5",    thinking: "off", short: "opus-4.5"   },
+      {
+        name: "instant",
+        model: "gpt-5-mini",
+        thinking: "off",
+        short: "5-mini",
+      },
+      {
+        name: "thinking",
+        model: "gpt-5.3-codex",
+        thinking: "off",
+        short: "5.3-codex",
+      },
+      {
+        name: "pro",
+        model: "claude-opus-4.8",
+        thinking: "off",
+        short: "opus-4.8",
+      },
     ],
   },
   u: {
     label: "u",
-    provider: "gsai",
+    provider: "usai",
+    providerName: "USAi",
     tiers: [
-      { name: "instant",  model: "claude_4_5_haiku", thinking: "off", short: "haiku-4.5" },
-      { name: "thinking", model: "claude-sonnet-5",   thinking: "off", short: "sonnet-5"  },
-      { name: "pro",      model: "claude-opus-5",     thinking: "off", short: "opus-5"    },
+      {
+        name: "instant",
+        model: "claude_4_5_haiku",
+        thinking: "off",
+        short: "haiku-4.5",
+      },
+      {
+        name: "thinking",
+        model: "claude-sonnet-5.5",
+        thinking: "off",
+        short: "sonnet-5.5",
+      },
+      { name: "pro", model: "claude-opus-5", thinking: "off", short: "opus-5" },
     ],
   },
-  // GSA AI / USAi GPT-5.6 stack. USAi does not expose reasoning effort, so all
-  // tiers run off; the ladder is purely by model capability (luna < terra < sol).
+  // USAi OpenAI stack. USAi does not expose reasoning effort, so all tiers
+  // run off; GPT-6 Astra is the currently callable GPT-6 deployment.
   n: {
     label: "n",
-    provider: "gsai",
+    provider: "usai",
+    providerName: "USAi",
     tiers: [
-      { name: "instant",  model: "gpt-5.6-luna",                            thinking: "off", short: "5.6-luna"  },
-      { name: "thinking", model: "gpt-5.6-terra",                           thinking: "off", short: "5.6-terra" },
-      { name: "pro",      model: "gpt-5.6-sol-latest-guardrails-defaultv2", thinking: "off", short: "5.6-sol"   },
-    ],
-  },
-  // Flexion Bedrock (us-east-2) via ClaudeCodeAccess-FlexionLLM SSO profile.
-  // Uses us.* inference-profile IDs (raw model IDs are not on-demand callable).
-  f: {
-    label: "f",
-    provider: "amazon-bedrock",
-    tiers: [
-      { name: "instant",  model: "us.anthropic.claude-haiku-4-5-20251001-v1:0", thinking: "off",   short: "fx-haiku-4.5" },
-      { name: "thinking", model: "us.anthropic.claude-sonnet-5",                thinking: "xhigh", short: "fx-sonnet-5"  },
-      { name: "pro",      model: "us.anthropic.claude-opus-5",                  thinking: "xhigh", short: "fx-opus-5"    },
-    ],
-  },
-  x: {
-    label: "x",
-    provider: "amazon-bedrock",
-    tiers: [
-      { name: "instant",  model: "us.openai.gpt-5.6-luna",  thinking: "off",   short: "fx-5.6-luna"  },
-      { name: "thinking", model: "us.openai.gpt-5.6-terra", thinking: "xhigh", short: "fx-5.6-terra" },
-      { name: "pro",      model: "us.openai.gpt-5.6-sol",   thinking: "xhigh", short: "fx-5.6-sol"   },
+      {
+        name: "instant",
+        model: "gpt-5.6-luna",
+        thinking: "off",
+        short: "5.6-luna",
+      },
+      {
+        name: "thinking",
+        model: "gpt-5.6-sol-latest-guardrails-defaultv2",
+        thinking: "off",
+        short: "5.6-sol",
+      },
+      {
+        name: "pro",
+        model: "gpt-6-astra",
+        thinking: "off",
+        short: "6-astra",
+      },
     ],
   },
 };
@@ -186,7 +245,10 @@ export default function (pi: ExtensionAPI) {
 
     const model = ctx.modelRegistry.find(family.provider, tier.model);
     if (!model) {
-      ctx.ui.notify(`model-tiers: not found — ${family.provider}/${tier.model}`, "error");
+      ctx.ui.notify(
+        `model-tiers: not found — ${family.provider}/${tier.model}`,
+        "error",
+      );
       return;
     }
 
@@ -194,7 +256,10 @@ export default function (pi: ExtensionAPI) {
     try {
       const ok = await pi.setModel(model);
       if (!ok) {
-        ctx.ui.notify(`model-tiers: no auth for ${family.provider}/${tier.model}`, "error");
+        ctx.ui.notify(
+          `model-tiers: no auth for ${family.provider}/${tier.model}`,
+          "error",
+        );
         return;
       }
       // setThinkingLevel drives the editor border color natively.
@@ -212,9 +277,12 @@ export default function (pi: ExtensionAPI) {
 
   for (const key of Object.keys(FAMILIES)) {
     const family = FAMILIES[key];
+    const displayProvider =
+      family.providerName ??
+      (family.provider === "usai" ? "USAi" : family.provider);
 
     pi.registerCommand(key, {
-      description: `${family.provider} tier stack — instant / thinking / pro`,
+      description: `${displayProvider} tier stack — instant / thinking / pro`,
       getArgumentCompletions: () =>
         TIER_NAMES.map((t) => ({ value: t, label: t })),
       handler: async (args, ctx) => {
@@ -257,7 +325,11 @@ export default function (pi: ExtensionAPI) {
               : theme.fg("dim", t.short),
           )
           .join(theme.fg("dim", " / "));
-        const provider = theme.fg("dim", family.provider);
+        const provider = theme.fg(
+          "dim",
+          family.providerName ??
+            (family.provider === "usai" ? "usai" : family.provider),
+        );
         return `${prefix} ${slash}  ${tierLabels}  ${provider}`;
       });
 
@@ -280,7 +352,10 @@ export default function (pi: ExtensionAPI) {
     description: "Cycle to next model tier (model-tiers)",
     handler: async (ctx) => {
       if (!activeFamily) {
-        ctx.ui.notify("model-tiers: pick a provider first — /a  /g  /o  /c  /u  /n  /f  /x", "info");
+        ctx.ui.notify(
+          "model-tiers: pick a provider first — /a  /g  /o  /c  /u  /n",
+          "info",
+        );
         return;
       }
       await activateTier(activeFamily, (tierIndex + 1) % 3, ctx);
@@ -291,7 +366,10 @@ export default function (pi: ExtensionAPI) {
     description: "Cycle to previous model tier (model-tiers)",
     handler: async (ctx) => {
       if (!activeFamily) {
-        ctx.ui.notify("model-tiers: pick a provider first — /a  /g  /o  /c  /u  /n  /f  /x", "info");
+        ctx.ui.notify(
+          "model-tiers: pick a provider first — /a  /g  /o  /c  /u  /n",
+          "info",
+        );
         return;
       }
       await activateTier(activeFamily, (tierIndex + 2) % 3, ctx);
@@ -352,10 +430,10 @@ export default function (pi: ExtensionAPI) {
       }
     }
 
-    // 3. Cold-start default: nothing matched — silently activate a·instant
+    // 3. Cold-start default: nothing matched — activate n·instant (GPT-5.6 Luna via USAi)
     //    so Ctrl+P always works without typing a command first.
     if (!activeFamily) {
-      await activateTier("a", 0, ctx);
+      await activateTier("n", 0, ctx);
       return;
     }
 

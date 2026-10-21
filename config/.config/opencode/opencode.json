@@ -5,7 +5,7 @@
         "amazon-bedrock",
         "github-copilot",
         "opencode-go",
-        "gsai"
+        "usai"
     ],
     "plugin": [
         "@mohak34/opencode-notifier@latest"
@@ -137,7 +137,7 @@
                 "gpt-5.2": {}
             }
         },
-        "gsai": {
+        "usai": {
             "npm": "@ai-sdk/openai-compatible",
             "name": "USAi",
             "options": {

@@ -21,7 +21,10 @@
  *   /exit  — alias for /quit
  */
 
-import { createBashTool, type ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import {
+  createBashTool,
+  type ExtensionAPI,
+} from "@earendil-works/pi-coding-agent";
 
 // Inline implementation — @earendil-works/pi-tui is not bundled with Pi.
 // Strips ANSI escape sequences when measuring width so colored strings
@@ -86,8 +89,7 @@ export default function (pi: ExtensionAPI) {
   });
 
   // ─── Model display name ────────────────────────────────────────────────────
-  // Strips provider prefix from Bedrock ARNs (no-op for Copilot model IDs,
-  // but kept for safety if model IDs ever include a dot-namespace prefix).
+  // Strips leading provider namespace prefixes if model IDs include dot-namespace prefixes.
 
   function friendlyModel(id: string): string {
     // Strip leading pure-alpha dot-namespaced provider segments
@@ -112,13 +114,11 @@ export default function (pi: ExtensionAPI) {
     switch (id) {
       case "github-copilot":
         return "copilot";
-      case "amazon-bedrock":
-        return "bedrock";
       case "openai-codex":
         return "codex";
       case "opencode-go":
         return "oc-go";
-      case "gsai":
+      case "usai":
         return "usai";
       default:
         return id || "unknown";
@@ -132,7 +132,9 @@ export default function (pi: ExtensionAPI) {
   async function cmuxNotify(title: string, body: string): Promise<void> {
     if (!process.env.CMUX_SOCKET_PATH) return;
     try {
-      await pi.exec("cmux", ["notify", "--title", title, "--body", body], { timeout: 2000 });
+      await pi.exec("cmux", ["notify", "--title", title, "--body", body], {
+        timeout: 2000,
+      });
     } catch {
       // cmux not reachable — silently ignore
     }
@@ -157,7 +159,11 @@ export default function (pi: ExtensionAPI) {
 
   async function refreshBranch(cwd: string): Promise<void> {
     try {
-      const result = await pi.exec("git", ["rev-parse", "--abbrev-ref", "HEAD"], { cwd, timeout: 3000 });
+      const result = await pi.exec(
+        "git",
+        ["rev-parse", "--abbrev-ref", "HEAD"],
+        { cwd, timeout: 3000 },
+      );
       cachedBranch = result.code === 0 ? result.stdout.trim() : null;
     } catch {
       cachedBranch = null;
@@ -186,7 +192,12 @@ export default function (pi: ExtensionAPI) {
     pi.registerTool({
       ...bashTool,
       execute: async (toolCallId, params, signal, onUpdate, _ctx) => {
-        const result = await bashTool.execute(toolCallId, params, signal, onUpdate);
+        const result = await bashTool.execute(
+          toolCallId,
+          params,
+          signal,
+          onUpdate,
+        );
 
         // Strip the cwd marker from the result content so the LLM never sees it.
         let detectedCwd: string | undefined;
@@ -196,7 +207,9 @@ export default function (pi: ExtensionAPI) {
           if (markerIdx === -1) return block;
           const afterMarker = block.text.slice(markerIdx + CWD_MARKER.length);
           const newline = afterMarker.indexOf("\n");
-          detectedCwd = (newline === -1 ? afterMarker : afterMarker.slice(0, newline)).trim();
+          detectedCwd = (
+            newline === -1 ? afterMarker : afterMarker.slice(0, newline)
+          ).trim();
           // Remove the marker line entirely (including leading newline).
           const cleaned = block.text.slice(0, markerIdx).replace(/\n$/, "");
           return { ...block, text: cleaned };
@@ -216,7 +229,9 @@ export default function (pi: ExtensionAPI) {
 
   // ─── Footer setup ────────────────────────────────────────────────────────
 
-  function setupFooter(ctx: Parameters<Parameters<ExtensionAPI["on"]>[1]>[1]): void {
+  function setupFooter(
+    ctx: Parameters<Parameters<ExtensionAPI["on"]>[1]>[1],
+  ): void {
     ctx.ui.setFooter((tui, theme, footerData) => {
       footerTui = tui;
       const unsubBranch = footerData.onBranchChange(() => tui.requestRender());
@@ -246,7 +261,10 @@ export default function (pi: ExtensionAPI) {
           // Prefer our own cachedBranch (kept up-to-date after wt/cd/git calls)
           // over footerData.getGitBranch() which is fixed to the session's
           // original cwd and won't update when the worktree changes mid-session.
-          const branch = cachedBranch !== undefined ? cachedBranch : footerData.getGitBranch();
+          const branch =
+            cachedBranch !== undefined
+              ? cachedBranch
+              : footerData.getGitBranch();
           const branchStr = branch ? theme.fg("dim", ` | 🌿 ${branch}`) : "";
           const providerStr = theme.fg("muted", ` ${provider}`);
           const tierStr = tierLabel ? " " + theme.fg("accent", tierLabel) : "";
@@ -263,7 +281,8 @@ export default function (pi: ExtensionAPI) {
           const totalTokens = cachedContextTokens;
 
           // ── Format token count with k suffix ──
-          const fmt = (n: number) => (n < 1000 ? `${n}` : `${(n / 1000).toFixed(1)}k`);
+          const fmt = (n: number) =>
+            n < 1000 ? `${n}` : `${(n / 1000).toFixed(1)}k`;
 
           // ── Color code tokens based on total ──
           let tokenColor: "dim" | "warning" | "error";
@@ -298,7 +317,10 @@ export default function (pi: ExtensionAPI) {
             `${barColored} ${pct}%`,
             tokenStats,
             theme.fg("muted", `$${totalCost.toFixed(3)}`),
-            theme.fg("dim", `⏱ ${hours > 0 ? `${hours}h ` : ""}${mins}m ${secs < 10 ? "0" : ""}${secs}s`),
+            theme.fg(
+              "dim",
+              `⏱ ${hours > 0 ? `${hours}h ` : ""}${mins}m ${secs < 10 ? "0" : ""}${secs}s`,
+            ),
           ];
           const line2 = parts.join(sep);
 
@@ -361,7 +383,8 @@ export default function (pi: ExtensionAPI) {
   pi.on("turn_end", async (_event, ctx) => {
     try {
       const usage = ctx.getContextUsage();
-      if (usage?.percent != null) cachedContextPct = Math.min(100, Math.round(usage.percent));
+      if (usage?.percent != null)
+        cachedContextPct = Math.min(100, Math.round(usage.percent));
       if (usage?.tokens != null) cachedContextTokens = usage.tokens;
     } catch {
       // ctx stale in --print mode — keep last cached value
