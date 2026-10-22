@@ -9,7 +9,7 @@ Use these commands to switch provider families and scope `Ctrl+P` cycling:
 | command | instant | thinking | pro |
 |---|---|---|---|
 | `/u` | claude-haiku-4.5 (USAi) | claude-sonnet-5.5 | claude-opus-5 |
-| `/n` | gpt-5.6-luna (USAi) | gpt-5.6-sol | gpt-6-astra |
+| `/n` | gpt-5.6-luna (USAi) | gpt-6-sol | gpt-6-astra |
 | `/a` | claude-haiku-4.5 (Copilot) | claude-sonnet-5.5 | claude-opus-5.5 |
 | `/g` | gemini-3.6-flash (Copilot) | gemini-3.7-flash | gemini-3.7-flash |
 | `/o` | gpt-6-luna (Copilot) | gpt-6-sol | gpt-6.1-sol |
@@ -26,7 +26,79 @@ Use these commands to switch provider families and scope `Ctrl+P` cycling:
 - `/g` tiers — Gemini via Copilot (3.6-flash < 3.7-flash) runs at `off`. The ladder is by capability.
 - `/c` tiers — GFE Copilot mixed stack; models do not support reasoning effort; all three tiers run at `off`. The ladder is purely by model capability.
 - `/u` tiers — **USAi Claude stack**. USAi does not expose reasoning effort; all three tiers run at `off`; Sonnet 5.5 is the new thinking tier.
-- `/n` tiers — **USAi OpenAI stack**. USAi does not expose reasoning effort; all three tiers run at `off`. The ladder is GPT-5.6 Luna → GPT-5.6 Sol → GPT-6 Astra; Astra was verified with text, streaming, and tool calls. Other GPT-6 IDs are advertised but currently return deployment `404`s, so they are not tiered.
+- `/n` tiers — **USAi OpenAI stack**. USAi does not expose reasoning effort; all three tiers run at `off`. The ladder is GPT-5.6 Luna → GPT-6 Sol → GPT-6 Astra. GPT-6 Luna, Sol, 6.1 Sol and Astra are callable (checked with chat, streaming and tool use); keep the steadier 5.6 Luna for instant, and Astra for pro. Recheck availability before changing tiers again.
+
+## Subagent Model Routing
+
+When spawning subagents, the `thinking` argument is validated against the model's
+`supportedThinkingLevels` **before launch**, and a mismatch is a hard failure, not a clamp.
+Omitting `thinking` clamps silently, but orchestration rules require it to be explicit.
+
+**Rule: every `usai/*` child must be spawned with `thinking: "off"`.**
+
+`extensions/usai.ts` declares all USAi models `reasoning: false`, so their only supported
+level is `off`. That declaration is correct, not a workaround — the USAi gateway accepts
+`reasoning_effort` (even invalid values like `"BANANAS"` return HTTP 200) and an Anthropic
+`thinking` block, but returns no reasoning tokens and no thinking content. The knob is
+dropped upstream. Do not "fix" this by setting `reasoning: true` or adding a
+`thinkingLevelMap`; that would fake a control that does not exist.
+
+Consequence for delegation: with USAi, **model capability is the only lever**. Pick the tier
+by model, not by thinking level:
+
+| work | USAi model |
+|---|---|
+| recon, mechanical, bounded | `usai/claude_4_5_haiku`, `usai/gpt-5.6-luna` |
+| implementation, ordinary review, test runs | `usai/claude-sonnet-5.5`, `usai/gpt-6-sol-latest-guardrails-defaultv2` |
+| architecture, security, hard diagnosis, adversarial review | `usai/claude-opus-5`, `usai/gpt-6-astra` |
+
+Subagent `model` needs the **exact** live ID, which is not always the pretty tier name above
+(`claude_4_5_haiku`, not `claude-haiku-4.5`; `gpt-6-sol-latest-guardrails-defaultv2`, not
+`gpt-6-sol`). Confirm with:
+`curl -s -H "Authorization: Bearer $USAI_API_KEY" "$USAI_BASE_URL/models"`
+
+When a child genuinely needs reasoning effort, route it to a `github-copilot/*` model
+instead — `claude-opus-5.5`, `gpt-6-sol`, and `gpt-6.1-sol` support `xhigh`. Mixing
+providers across children is fine and buys cross-family independence for reviews.
+
+## Bounded Delegation Preference
+
+Prefer explicit authenticated GPT model IDs for bounded recon and implementation,
+with capability matched to the task and `thinking: "off"` for USAi. Do not silently
+substitute models; report actual routing. This preference does not establish
+cross-family review independence or override a task's explicit review requirement.
+
+Uncertain integration failures begin with diagnosis-only work: at most roughly ten
+tool calls, one reproducible failure, and a concrete hypothesis or blocker. A partial
+answer with evidence beats speculation. Authorize implementation after diagnosis;
+do not launch another broad repair investigation without new evidence.
+
+Timeboxes and prompt tool-call caps are advisory unless enforced by a verified,
+supported mechanism. Never promise automatic cancellation from a warning threshold.
+When an over-budget advisory arrives, the parent must decide promptly whether to
+cancel or explicitly extend the investigation, reporting that decision to the user.
+
+## Subagent Timeboxing
+
+`~/.config/pi/agent/herdr-agents/config.json` sets `supervision.hangWarningMinutes: 8`
+(down from the default 15). Advisories are **warning-only** — they never interrupt, kill,
+retry, or restart a child; they just wake the parent with the session path and recovery
+options. The cancel decision stays with the parent via `subagent_cancel`.
+
+The config is a backstop, not a budget. Every open-ended analysis child also needs a
+prompt-level timebox, because long read-only investigations sprawl — the model keeps
+gathering corroboration instead of concluding. Include in such prompts:
+
+- a tool-call cap: *"Use at most ~25 tool calls. If you hit that, stop and report what you
+  established plus what remains open."*
+- a partial-result contract: *"A partial answer with evidence beats a complete answer you
+  had to guess at. Never speculate to fill a gap — label it UNVERIFIED."*
+- an ordered stop condition rather than a flat list of questions: *"answer Q1–Q3 first,
+  then stop if the verdict is already determined."* A prompt with six independent numbered
+  sub-questions invites six independent investigations.
+
+Children that run a command loop (build, test, mutation runs) self-limit and need this
+less than pure-read reviewers do.
 
 ## Custom Providers
 

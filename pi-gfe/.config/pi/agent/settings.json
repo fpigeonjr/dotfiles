@@ -12,9 +12,10 @@
       "timeoutMs": 3600000
     }
   },
-  "lastChangelogVersion": "1.3.0",
+  "lastChangelogVersion": "1.4.0",
   "skills": [
-    "~/Code/skills/skills"
+    "~/Code/skills/skills",
+    "~/.local/share/pi-skills-gfe"
   ],
   "theme": "dark",
   "packages": [

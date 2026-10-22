@@ -3,12 +3,18 @@
  *
  * Auth: set USAI_API_KEY in ~/.config/zsh/local.zsh
  * Alias: GSAI_API_KEY also works
- * Base URL: https://api.gsa.usai.gov/api/v1
+ * Base URL: set USAI_BASE_URL in ~/.config/zsh/local.zsh
+ *
+ * The API endpoint is not published in GSA's public documentation — it is
+ * provided to API users after authentication — so it is read from the
+ * environment rather than committed here. Without USAI_BASE_URL the provider
+ * does not register, and Pi simply starts without USAi.
  *
  * The API is OpenAI Chat Completions-compatible but uses /api/v1 paths.
- * On startup, if a key is present and Pi is online, the extension fetches
- * /models and registers the current chat-capable model list. If discovery
- * fails, it falls back to the last verified live USAi lineup.
+ * On startup, if a key and base URL are present and Pi is online, the
+ * extension fetches /models and registers the current chat-capable model
+ * list. If discovery fails, it falls back to the last verified live USAi
+ * lineup.
  */
 
 import {
@@ -35,7 +41,7 @@ type ModelsResponse = {
 
 const PROVIDER = "usai";
 const PROVIDER_NAME = "USAi";
-const BASE_URL = "https://api.gsa.usai.gov/api/v1";
+const BASE_URL_ENV = "USAI_BASE_URL";
 const PRIMARY_API_KEY_ENV = "USAI_API_KEY";
 const API_KEY_ALIASES = [PRIMARY_API_KEY_ENV, "GSAI_API_KEY"] as const;
 
@@ -208,6 +214,28 @@ function resolveApiKey(): string | undefined {
     if (value) return value;
   }
   return undefined;
+}
+
+/**
+ * Resolve the USAi API root from the environment.
+ *
+ * GSA documents the paths (/api/v1/models, /api/v1/chat/completions) publicly
+ * but withholds the host, so it is configured per machine instead of being
+ * committed. Accepts a value with or without a trailing /api/v1 and with or
+ * without a trailing slash.
+ */
+export function resolveBaseUrl(
+  raw: string | undefined = process.env[BASE_URL_ENV],
+): string | undefined {
+  const value = raw?.trim();
+  if (!value) return undefined;
+
+  const withoutTrailingSlash = value.replace(/\/+$/, "");
+  if (!withoutTrailingSlash) return undefined;
+
+  return /\/api\/v\d+$/.test(withoutTrailingSlash)
+    ? withoutTrailingSlash
+    : `${withoutTrailingSlash}/api/v1`;
 }
 
 function isOffline(): boolean {
@@ -498,8 +526,11 @@ function streamUsai(
   );
 }
 
-async function fetchRemoteModels(apiKey: string): Promise<RemoteModel[]> {
-  const response = await fetch(`${BASE_URL}/models`, {
+async function fetchRemoteModels(
+  apiKey: string,
+  baseUrl: string,
+): Promise<RemoteModel[]> {
+  const response = await fetch(`${baseUrl}/models`, {
     headers: {
       accept: "application/json",
       Authorization: `Bearer ${apiKey}`,
@@ -515,16 +546,23 @@ async function fetchRemoteModels(apiKey: string): Promise<RemoteModel[]> {
 }
 
 export default async function (pi: ExtensionAPI) {
+  const baseUrl = resolveBaseUrl();
+  if (!baseUrl) {
+    // No endpoint configured: stay silent and leave USAi unregistered rather
+    // than registering a provider that cannot reach anything.
+    return;
+  }
+
   const resolvedApiKey = resolveApiKey();
   let discoveredModels: RemoteModel[] = [];
 
   if (resolvedApiKey && !isOffline()) {
     try {
-      discoveredModels = await fetchRemoteModels(resolvedApiKey);
+      discoveredModels = await fetchRemoteModels(resolvedApiKey, baseUrl);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.warn(
-        `[${PROVIDER}] failed to fetch ${BASE_URL}/models: ${message}; using fallback models`,
+        `[${PROVIDER}] failed to fetch ${baseUrl}/models: ${message}; using fallback models`,
       );
     }
   }
@@ -539,7 +577,7 @@ export default async function (pi: ExtensionAPI) {
 
   pi.registerProvider(PROVIDER, {
     name: PROVIDER_NAME,
-    baseUrl: BASE_URL,
+    baseUrl,
     apiKey: resolvedApiKey ?? PRIMARY_API_KEY_ENV,
     api: "openai-completions",
     authHeader: true,

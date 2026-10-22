@@ -22,7 +22,7 @@ The `model-tiers` extension is loaded. Use these commands to switch provider fam
 
 - `/oc` requires `OPENCODE_API_KEY` (OpenCode Go subscription) in `~/.config/zsh/local.zsh` and `/connect` in OpenCode TUI.
 
-- `/u` requires `USAI_API_KEY` (or `GSAI_API_KEY`) in `~/.config/zsh/local.zsh`. USAi models are served via https://api.gsa.usai.gov/api/v1. All `/u` tiers run at `thinking: off` — the ladder is purely by model capability. **Claude 4.8 Opus** (the newest USAi model) is available at the `pro` tier.
+- `/u` requires `USAI_API_KEY` (or `GSAI_API_KEY`) and `USAI_BASE_URL` in `~/.config/zsh/local.zsh`. All `/u` tiers run at `thinking: off` — the ladder is purely by model capability. **Claude 4.8 Opus** (the newest USAi model) is available at the `pro` tier.
 
 - `/a thinking` jumps directly to a named tier; bare `/a` always starts at instant
 - `Ctrl+P` / `Shift+Ctrl+P` cycles tiers within the active family

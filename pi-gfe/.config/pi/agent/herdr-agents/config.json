@@ -1,0 +1,21 @@
+{
+  "$comment": "Durable pi-herdr-agents config. Mirrors the package config.json.example, except supervision.hangWarningMinutes is lowered from 15 to 8 so no-progress advisories arrive early enough to act on. Advisories are warning-only: they never interrupt, kill, or restart a child. Creating this file means status/role/pane/persistent settings now come from here instead of the example, so those blocks are kept explicitly. Run /reload after editing.",
+  "status": {
+    "enabled": true
+  },
+  "models": {
+    "agents": {}
+  },
+  "persistent": {
+    "maxAgents": 3
+  },
+  "supervision": {
+    "forcePolling": false,
+    "hangWarningMinutes": 8
+  },
+  "panes": {
+    "mode": "grouped",
+    "direction": "right",
+    "maxPerTab": 4
+  }
+}

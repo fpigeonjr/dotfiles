@@ -10,7 +10,7 @@
  *   /o   OpenAI via Copilot      gpt-6-luna → gpt-6-sol → gpt-6.1-sol
  *   /c   GFE Copilot (mixed)     gpt-5-mini → gpt-5.3-codex → claude-opus-4.8
  *   /u   USAi (Claude)           claude-haiku-4.5 → claude-sonnet-5.5 → claude-opus-5
- *   /n   USAi (GPT)              gpt-5.6-luna → gpt-5.6-sol → gpt-6-astra
+ *   /n   USAi (GPT)              gpt-5.6-luna → gpt-6-sol → gpt-6-astra
  *
  * Usage:
  *   /u              → switches to instant tier for USAi Claude, scopes Ctrl+P
@@ -182,7 +182,8 @@ const FAMILIES: Record<string, Family> = {
     ],
   },
   // USAi OpenAI stack. USAi does not expose reasoning effort, so all tiers
-  // run off; GPT-6 Astra is the currently callable GPT-6 deployment.
+  // run off. Keep steady 5.6 Luna for instant and verified Astra for pro;
+  // 6 Sol now passes chat, streaming and tool-use checks for the middle tier.
   n: {
     label: "n",
     provider: "usai",
@@ -196,9 +197,9 @@ const FAMILIES: Record<string, Family> = {
       },
       {
         name: "thinking",
-        model: "gpt-5.6-sol-latest-guardrails-defaultv2",
+        model: "gpt-6-sol-latest-guardrails-defaultv2",
         thinking: "off",
-        short: "5.6-sol",
+        short: "6-sol",
       },
       {
         name: "pro",

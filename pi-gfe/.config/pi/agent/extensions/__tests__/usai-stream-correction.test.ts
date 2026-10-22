@@ -4,7 +4,7 @@ vi.mock("@earendil-works/pi-ai", () => ({
   streamSimpleOpenAICompletions: vi.fn(),
 }));
 
-import { fetchUsaiWithCorrection, toPiModel } from "../usai.ts";
+import { fetchUsaiWithCorrection, resolveBaseUrl, toPiModel } from "../usai.ts";
 
 describe("USAi model metadata", () => {
   it("uses official GSA catalog metadata for known models", () => {
@@ -47,7 +47,7 @@ describe("fetchUsaiWithCorrection", () => {
       });
 
     const res = await fetchUsaiWithCorrection(
-      "https://api.gsa.usai.gov/chat",
+      "https://usai.test/api/v1/chat/completions",
       undefined,
       mockFetch,
     );
@@ -72,7 +72,7 @@ describe("fetchUsaiWithCorrection", () => {
       });
 
     const res = await fetchUsaiWithCorrection(
-      "https://api.gsa.usai.gov/chat",
+      "https://usai.test/api/v1/chat/completions",
       undefined,
       mockFetch,
     );
@@ -100,7 +100,7 @@ describe("fetchUsaiWithCorrection", () => {
       });
 
     const res = await fetchUsaiWithCorrection(
-      "https://api.gsa.usai.gov/chat",
+      "https://usai.test/api/v1/chat/completions",
       undefined,
       mockFetch,
     );
@@ -126,7 +126,7 @@ describe("fetchUsaiWithCorrection", () => {
       });
 
     const res = await fetchUsaiWithCorrection(
-      "https://api.gsa.usai.gov/chat",
+      "https://usai.test/api/v1/chat/completions",
       undefined,
       mockFetch,
     );
@@ -147,11 +147,44 @@ describe("fetchUsaiWithCorrection", () => {
       });
 
     const res = await fetchUsaiWithCorrection(
-      "https://api.gsa.usai.gov/models",
+      "https://usai.test/api/v1/models",
       undefined,
       mockFetch,
     );
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toBe("application/json");
+  });
+});
+
+describe("resolveBaseUrl", () => {
+  it("returns undefined when unset, empty, or whitespace", () => {
+    expect(resolveBaseUrl(undefined)).toBeUndefined();
+    expect(resolveBaseUrl("")).toBeUndefined();
+    expect(resolveBaseUrl("   ")).toBeUndefined();
+    expect(resolveBaseUrl("/")).toBeUndefined();
+  });
+
+  it("appends /api/v1 to a bare host", () => {
+    expect(resolveBaseUrl("https://usai.test")).toBe(
+      "https://usai.test/api/v1",
+    );
+  });
+
+  it("preserves an explicit versioned path", () => {
+    expect(resolveBaseUrl("https://usai.test/api/v1")).toBe(
+      "https://usai.test/api/v1",
+    );
+    expect(resolveBaseUrl("https://usai.test/api/v2")).toBe(
+      "https://usai.test/api/v2",
+    );
+  });
+
+  it("tolerates trailing slashes and surrounding whitespace", () => {
+    expect(resolveBaseUrl("  https://usai.test/api/v1/  ")).toBe(
+      "https://usai.test/api/v1",
+    );
+    expect(resolveBaseUrl("https://usai.test///")).toBe(
+      "https://usai.test/api/v1",
+    );
   });
 });
