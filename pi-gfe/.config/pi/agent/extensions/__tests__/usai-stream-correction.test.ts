@@ -158,32 +158,32 @@ describe("fetchUsaiWithCorrection", () => {
 
 describe("resolveBaseUrl", () => {
   it("returns undefined when unset, empty, or whitespace", () => {
-    expect(resolveBaseUrl(undefined)).toBeUndefined();
-    expect(resolveBaseUrl("")).toBeUndefined();
-    expect(resolveBaseUrl("   ")).toBeUndefined();
-    expect(resolveBaseUrl("/")).toBeUndefined();
+    expect(resolveBaseUrl({})).toBeUndefined();
+    expect(resolveBaseUrl({ USAI_BASE_URL: "" })).toBeUndefined();
+    expect(resolveBaseUrl({ USAI_BASE_URL: "   " })).toBeUndefined();
+    expect(resolveBaseUrl({ USAI_BASE_URL: "/" })).toBeUndefined();
   });
 
   it("appends /api/v1 to a bare host", () => {
-    expect(resolveBaseUrl("https://usai.test")).toBe(
+    expect(resolveBaseUrl({ USAI_BASE_URL: "https://usai.test" })).toBe(
       "https://usai.test/api/v1",
     );
   });
 
   it("preserves an explicit versioned path", () => {
-    expect(resolveBaseUrl("https://usai.test/api/v1")).toBe(
+    expect(resolveBaseUrl({ USAI_BASE_URL: "https://usai.test/api/v1" })).toBe(
       "https://usai.test/api/v1",
     );
-    expect(resolveBaseUrl("https://usai.test/api/v2")).toBe(
+    expect(resolveBaseUrl({ USAI_BASE_URL: "https://usai.test/api/v2" })).toBe(
       "https://usai.test/api/v2",
     );
   });
 
   it("tolerates trailing slashes and surrounding whitespace", () => {
-    expect(resolveBaseUrl("  https://usai.test/api/v1/  ")).toBe(
+    expect(resolveBaseUrl({ USAI_BASE_URL: "  https://usai.test/api/v1/  " })).toBe(
       "https://usai.test/api/v1",
     );
-    expect(resolveBaseUrl("https://usai.test///")).toBe(
+    expect(resolveBaseUrl({ USAI_BASE_URL: "https://usai.test///" })).toBe(
       "https://usai.test/api/v1",
     );
   });

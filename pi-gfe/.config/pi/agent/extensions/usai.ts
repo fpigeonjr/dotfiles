@@ -193,8 +193,6 @@ const FALLBACK_MODELS: RemoteModel[] = [
   { id: "claude-opus-5", owned_by: "Anthropic" },
   { id: "claude-sonnet-5", owned_by: "Anthropic" },
   { id: "claude-sonnet-5.5", owned_by: "Anthropic" },
-  { id: "gemini-2.5-flash", owned_by: "Google" },
-  { id: "gemini-2.5-flash-lite", owned_by: "Google" },
   { id: "gemini-3-7-flash", owned_by: "Google" },
   { id: "gemini-3.5-flash", owned_by: "Google" },
   { id: "gemini-3.8-flash", owned_by: "Google" },
@@ -204,6 +202,9 @@ const FALLBACK_MODELS: RemoteModel[] = [
   { id: "gpt-5.6-luna", owned_by: "OpenAI" },
   { id: "gpt-5.6-terra", owned_by: "OpenAI" },
   { id: "gpt-5.6-sol-latest-guardrails-defaultv2", owned_by: "OpenAI" },
+  { id: "gpt-6-luna", owned_by: "OpenAI" },
+  { id: "gpt-6-sol-latest-guardrails-defaultv2", owned_by: "OpenAI" },
+  { id: "gpt-6.1-sol-latest-guardrails-defaultv2", owned_by: "OpenAI" },
   { id: "gpt-6-astra", owned_by: "OpenAI" },
   { id: "llama_4_maverick", owned_by: "Meta" },
 ];
@@ -225,9 +226,9 @@ function resolveApiKey(): string | undefined {
  * without a trailing slash.
  */
 export function resolveBaseUrl(
-  raw: string | undefined = process.env[BASE_URL_ENV],
+  env: Record<string, string | undefined> = process.env,
 ): string | undefined {
-  const value = raw?.trim();
+  const value = env[BASE_URL_ENV]?.trim();
   if (!value) return undefined;
 
   const withoutTrailingSlash = value.replace(/\/+$/, "");
@@ -355,6 +356,9 @@ const KNOWN_MODEL_NAMES: Record<string, string> = {
   "gpt-5.6-luna": "GPT 5.6 Luna (USAi)",
   "gpt-5.6-terra": "GPT 5.6 Terra (USAi)",
   "gpt-5.6-sol-latest-guardrails-defaultv2": "GPT 5.6 Sol (USAi)",
+  "gpt-6-luna": "GPT 6 Luna (USAi)",
+  "gpt-6-sol-latest-guardrails-defaultv2": "GPT 6 Sol (USAi)",
+  "gpt-6.1-sol-latest-guardrails-defaultv2": "GPT 6.1 Sol (USAi)",
   "gpt-6-astra": "GPT 6 Astra (USAi)",
   llama_4_maverick: "Llama 4 Maverick (USAi)",
 
@@ -546,7 +550,7 @@ async function fetchRemoteModels(
 }
 
 export default async function (pi: ExtensionAPI) {
-  const baseUrl = resolveBaseUrl();
+  const baseUrl = resolveBaseUrl(process.env);
   if (!baseUrl) {
     // No endpoint configured: stay silent and leave USAi unregistered rather
     // than registering a provider that cannot reach anything.

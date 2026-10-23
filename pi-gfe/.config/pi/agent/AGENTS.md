@@ -28,6 +28,10 @@ Use these commands to switch provider families and scope `Ctrl+P` cycling:
 - `/u` tiers — **USAi Claude stack**. USAi does not expose reasoning effort; all three tiers run at `off`; Sonnet 5.5 is the new thinking tier.
 - `/n` tiers — **USAi OpenAI stack**. USAi does not expose reasoning effort; all three tiers run at `off`. The ladder is GPT-5.6 Luna → GPT-6 Sol → GPT-6 Astra. GPT-6 Luna, Sol, 6.1 Sol and Astra are callable (checked with chat, streaming and tool use); keep the steadier 5.6 Luna for instant, and Astra for pro. Recheck availability before changing tiers again.
 
+## Delegation
+
+You can spawn Pi subagents in Herdr. At the start of a substantial task, consider whether a bounded read-only investigation, independent review, or parallel work on separate files would help. Delegate when it improves speed or confidence; do not delegate trivial or tightly sequential work. Give each child one clear outcome and retain responsibility for synthesis and verification. Follow the subagent model-routing rules below.
+
 ## Subagent Model Routing
 
 When spawning subagents, the `thinking` argument is validated against the model's
@@ -63,10 +67,15 @@ providers across children is fine and buys cross-family independence for reviews
 
 ## Bounded Delegation Preference
 
-Prefer explicit authenticated GPT model IDs for bounded recon and implementation,
-with capability matched to the task and `thinking: "off"` for USAi. Do not silently
-substitute models; report actual routing. This preference does not establish
-cross-family review independence or override a task's explicit review requirement.
+Prefer explicit authenticated USAi GPT model IDs across delegated tasks: use
+`usai/gpt-5.6-luna` for bounded recon and mechanical work,
+`usai/gpt-6-sol-latest-guardrails-defaultv2` for implementation, test runs, and
+ordinary work, and `usai/gpt-6-astra` for architecture, security, and hard
+diagnosis. Set `thinking: "off"` for every USAi child. Do not silently substitute
+models; report actual routing. For reviews of GPT-authored work, prefer a
+different model family. A same-family reviewer in a fresh standalone session is
+context-isolated, not cross-family independent; do not use it when cross-family
+verification is required. Explicit task or review requirements take precedence.
 
 Uncertain integration failures begin with diagnosis-only work: at most roughly ten
 tool calls, one reproducible failure, and a concrete hypothesis or blocker. A partial
