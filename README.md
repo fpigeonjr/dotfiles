@@ -185,6 +185,8 @@ dotfiles/
 │       │   ├── model-tiers.ts        # /a /e /g /o tier commands + Ctrl+P cycling
 │       │   └── nvidia-nim.ts         # NVIDIA NIM provider registration
 │       ├── keybindings.json # Clears built-in Ctrl+P (owned by model-tiers)
+│       ├── herdr-agents/
+│       │   └── config.json  # Subagent pane layout + 8m hang-warning supervision
 │       └── prompts/         # Slash-command prompt templates
 │   (packages: npm:pi-herdr-agents — async subagents in Herdr panes)
 │   (packages: npm:pi-herdr-roles  — scout/planner/worker/reviewer + /plan)
