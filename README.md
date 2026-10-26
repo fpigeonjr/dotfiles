@@ -179,12 +179,15 @@ dotfiles/
 ├── pi/              # Pi coding agent configuration
 │   └── .config/pi/agent/
 │       ├── AGENTS.md        # Global system prompt additions
-│       ├── settings.json    # Model whitelist, provider, thinking level
+│       ├── settings.json    # Model whitelist, provider, thinking level, packages
 │       ├── extensions/      # Auto-discovered TypeScript extensions
-│       │   ├── flexion-aws-status.ts  # Footer, AWS expiry, cmux notify
-│       │   └── model-tiers.ts         # /a /e /g /o tier commands + Ctrl+P cycling
+│       │   ├── herdr-agent-state.ts  # Herdr agent lifecycle status reporting
+│       │   ├── model-tiers.ts        # /a /e /g /o tier commands + Ctrl+P cycling
+│       │   └── nvidia-nim.ts         # NVIDIA NIM provider registration
 │       ├── keybindings.json # Clears built-in Ctrl+P (owned by model-tiers)
 │       └── prompts/         # Slash-command prompt templates
+│   (packages: npm:pi-herdr-agents — async subagents in Herdr panes)
+│   (packages: npm:pi-herdr-roles  — scout/planner/worker/reviewer + /plan)
 ├── scripts/         # Utility scripts
 │   ├── wt-clean.sh  # Clean up stale worktrunk worktrees
 │   ├── pi-pihole-restore.sh # Restore Pi-hole configuration
