@@ -10,13 +10,14 @@
 ## Code Style
 - **Lua**: 2-space indent, 120 col width (`stylua --config ~/.config/nvim/stylua.toml`)
 - **Shell**: `[[ ]]` for conditionals, `command -v` before using tools, snake_case locals
-- **JS/TS**: `npx prettier --write` + `npx eslint`
+- **JS/TS**: `npx prettier --write` (2-space indent)
 
 ## Lint / Syntax Check
 - Zsh: `zsh -n ~/.zshrc`
 - Bash: `bash -n ~/.bashrc`
 - Shell scripts in `scripts/`: `bash -n scripts/<file>.sh`
 - Lua: `stylua --config ~/.config/nvim/stylua.toml .`
+- Organization-specific GFE profiles are maintained in the separate Helix dotfiles collection.
 
 ## Platform
 - macOS: Homebrew, Zsh default shell
@@ -27,9 +28,10 @@
 - Shell config: `shell/.config/zsh/`
 - Neovim: `config/.config/nvim/`
 - Ghostty: `config/.config/ghostty/`
-- Pi agent: `pi/.config/pi/agent/`
+- Herdr: `herdr/.config/herdr/`
+- Pi agent: `pi/.config/pi/agent/` (personal/contractor)
 - Claude Code: `claude/.claude/`
-- OpenCode: `config/.config/opencode/`
+- OpenCode: `config/.config/opencode/` (personal/contractor)
 
 ## Safety
 - Never commit SSH keys, tokens, API keys, or passwords

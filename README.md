@@ -111,6 +111,7 @@ The `model-tiers` extension registers four provider families. Each family scopes
 - Footer shows active family and tier: `a·instant`, `e·thinking`, `g·pro`
 - Thinking levels baked in: instant=`off`, thinking=`medium`, pro=`high`
 - `/model` (Ctrl+L) escapes the tier system back to free selection
+- **GFE profiles** are maintained separately in the Helix dotfiles collection. This repository retains personal and contractor configuration; do not deploy those profiles on a GFE.
 
 ### Model Cheat Sheet
 
@@ -176,7 +177,7 @@ dotfiles/
 ├── herdr/           # Herdr terminal multiplexer configuration
 │   └── .config/herdr/
 │       └── config.toml # Prefix-free pane/tab keybindings
-├── pi/              # Pi coding agent configuration
+├── pi/              # Pi coding agent configuration (personal/Bedrock)
 │   └── .config/pi/agent/
 │       ├── AGENTS.md        # Global system prompt additions
 │       ├── settings.json    # Model whitelist, provider, thinking level, packages
@@ -303,10 +304,8 @@ sudo pacman -S stow
    stow -R shell
    ```
 
-5. **Or stow all packages at once:**
-   ```bash
-   stow */
-   ```
+5. **Use explicit package lists only.** Do not stow every directory: scripts,
+   documentation, and local migration remnants are not deployable packages.
 
 ### Existing Machine (Update)
 
@@ -321,8 +320,6 @@ If you already have some configs and want to adopt them:
 2. **Stow with adopt flag to take over existing files:**
    ```bash
    stow --adopt packagename  # For specific package
-   # or
-   stow --adopt */           # For all packages
    ```
 
 ## Usage
@@ -518,7 +515,7 @@ git push
 
 # On machine B
 git pull
-stow -R */  # Restow all packages
+stow -R git shell vim config  # Only the reviewed packages installed on this machine
 ```
 
 ## Troubleshooting
@@ -710,7 +707,7 @@ ls -la ~/.config/ | grep dotfiles
 ```bash
 # Unstow everything
 cd ~/dotfiles
-stow -D */
+stow -D git shell vim config  # Explicit installed packages only
 
 # Restore all from backup
 cp -r ~/config-backup/YYYYMMDD/* ~/

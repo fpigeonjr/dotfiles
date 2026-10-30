@@ -3,7 +3,10 @@
 **/*secret*
 **/*.local
 **/local.*
+!shell/.config/zsh/local.zsh.example
 **/*token*
+!**/*.ts
+!**/*.js
 shell/.profile
 aws/.aws/cli/
 aws/.aws/sso/
@@ -21,9 +24,14 @@ session-*.md
 **/.netrc
 **/credentials
 **/.env
+**/.env.*
 !**/.env.example
 
-# pi coding agent runtime state — not dotfiles (covers pi/, pi-gfe/, any future pi-* packages)
+# Local compatibility aliases after GFE migration; never publish or stow.
+/pi-gfe/
+/opencode-gfe/
+
+# pi coding agent runtime state — not dotfiles (covers all pi packages)
 pi*/.config/pi/agent/auth.json
 pi*/.config/pi/agent/trust.json
 pi*/.config/pi/agent/sessions/

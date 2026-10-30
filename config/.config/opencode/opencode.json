@@ -4,8 +4,7 @@
         "openai",
         "amazon-bedrock",
         "github-copilot",
-        "opencode-go",
-        "usai"
+        "opencode-go"
     ],
     "plugin": [
         "@mohak34/opencode-notifier@latest"
@@ -135,116 +134,6 @@
                 "gpt-5-mini": {},
                 "gpt-5.1": {},
                 "gpt-5.2": {}
-            }
-        },
-        "usai": {
-            "npm": "@ai-sdk/openai-compatible",
-            "name": "USAi",
-            "options": {
-                "baseURL": "https://api.gsa.usai.gov/api/v1"
-            },
-            "models": {
-                "claude_4_8_opus": {
-                    "name": "Claude Opus 4.8 (USAi)",
-                    "attachment": true,
-                    "limit": {
-                        "context": 1000000,
-                        "output": 128000
-                    }
-                },
-                "claude_4_7_opus": {
-                    "name": "Claude Opus 4.7 (USAi)",
-                    "attachment": true,
-                    "limit": {
-                        "context": 1000000,
-                        "output": 128000
-                    }
-                },
-                "claude_4_5_opus": {
-                    "name": "Claude Opus 4.5 (USAi)",
-                    "attachment": true,
-                    "limit": {
-                        "context": 1000000,
-                        "output": 128000
-                    }
-                },
-                "claude_4_6_sonnet": {
-                    "name": "Claude Sonnet 4.6 (USAi)",
-                    "limit": {
-                        "context": 1000000,
-                        "output": 64000
-                    }
-                },
-                "claude_4_5_sonnet": {
-                    "name": "Claude Sonnet 4.5 (USAi)",
-                    "limit": {
-                        "context": 200000,
-                        "output": 64000
-                    }
-                },
-                "claude_4_5_haiku": {
-                    "name": "Claude Haiku 4.5 (USAi)",
-                    "limit": {
-                        "context": 200000,
-                        "output": 16384
-                    }
-                },
-                "llama_4_maverick": {
-                    "name": "Llama 4 Maverick (USAi)",
-                    "tool_call": false,
-                    "limit": {
-                        "context": 128000,
-                        "output": 16384
-                    }
-                },
-                "gemini-2.5-flash": {
-                    "name": "Gemini 2.5 Flash (USAi)",
-                    "attachment": true,
-                    "limit": {
-                        "context": 1048576,
-                        "output": 65536
-                    }
-                },
-                "gemini-2.5-flash-lite": {
-                    "name": "Gemini 2.5 Flash Lite (USAi)",
-                    "attachment": true,
-                    "limit": {
-                        "context": 1048576,
-                        "output": 65536
-                    }
-                },
-                "gemini-2.5-pro": {
-                    "name": "Gemini 2.5 Pro (USAi)",
-                    "attachment": true,
-                    "limit": {
-                        "context": 1048576,
-                        "output": 65536
-                    }
-                },
-                "gpt-5.5-latest-guardrails-defaultv2": {
-                    "name": "GPT 5.5 (USAi)",
-                    "attachment": true,
-                    "limit": {
-                        "context": 1050000,
-                        "output": 128000
-                    }
-                },
-                "gpt-5.4-latest-guardrails-defaultv2": {
-                    "name": "GPT 5.4 (USAi)",
-                    "attachment": true,
-                    "limit": {
-                        "context": 1050000,
-                        "output": 128000
-                    }
-                },
-                "gpt-5.2-latest-guardrails-defaultv2": {
-                    "name": "GPT 5.2 (USAi)",
-                    "attachment": true,
-                    "limit": {
-                        "context": 1050000,
-                        "output": 128000
-                    }
-                }
             }
         }
     },
