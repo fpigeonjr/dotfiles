@@ -35,7 +35,7 @@ if isinstance(data, dict):
         data["defaultThinkingLevel"] = "off"
 
     trailing_newline = "\n" if raw.endswith("\n") else ""
-    sys.stdout.write(json.dumps(data, indent=2) + trailing_newline)
+    sys.stdout.write(json.dumps(data, indent=2, ensure_ascii=False) + trailing_newline)
 else:
     sys.stdout.write(raw)
 ' "$file_path"
