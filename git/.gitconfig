@@ -10,11 +10,10 @@
 	signingkey = ~/.ssh/id_ed25519.pub
 	username = fpigeonjr
 
-# Machine-local overrides (email, signingkey, etc.)
-# Create ~/.gitconfig.local on any machine that needs different values.
-# Optional machine-wide overrides; missing files are a safe no-op.
-[include]
-	path = ~/.gitconfig.local
+# Keep this personal profile's identity distinct from work profiles.
+# Set work identity with repository-local `git config user.email`, or maintain
+# explicit directory-scoped includeIf rules in machine-local configuration.
+# Do not automatically include the GFE machine-wide identity file here.
 
 [init]
 	defaultBranch = main

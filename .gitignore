@@ -5,8 +5,6 @@
 **/local.*
 !shell/.config/zsh/local.zsh.example
 **/*token*
-!**/*.ts
-!**/*.js
 shell/.profile
 aws/.aws/cli/
 aws/.aws/sso/
