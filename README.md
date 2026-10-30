@@ -17,6 +17,17 @@ Personal configuration files managed with [GNU Stow](https://www.gnu.org/softwar
 - **Pull strategy**: Uses `rebase` by default for cleaner history
 - **Email**: Defaults to personal email (override per project as needed)
 - **New aliases**: Added `co`, `br`, `ci`, `st` for common git commands
+- **Signature verification**: SSH-signed commits verify locally against `~/.config/git/allowed_signers`, which is intentionally **not tracked**. Create it on a new machine with:
+
+  ```bash
+  mkdir -p ~/.config/git
+  printf '%s %s\n' "4629398+fpigeonjr@users.noreply.github.com" \
+    "$(awk '{print $1, $2}' ~/.ssh/id_ed25519.pub)" > ~/.config/git/allowed_signers
+  ```
+
+  The `awk` drops the trailing comment field of the public key file (which often holds a personal email), keeping the signers file to the key and public identity only.
+
+  Without it, committing and pushing still work — only `git verify-commit` and `git log --show-signature` exit non-zero until the file exists.
 
 ### Cross-Platform Compatibility
 This repo is organized around a shared Zsh setup plus OS-specific overlays:
