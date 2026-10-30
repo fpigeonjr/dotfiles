@@ -30,8 +30,8 @@ except Exception:
 
 if isinstance(data, dict):
     if path.startswith("pi/"):
-        data["defaultProvider"] = "amazon-bedrock"
-        data["defaultModel"] = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+        data["defaultProvider"] = "github-copilot"
+        data["defaultModel"] = "claude-haiku-5.5"
         data["defaultThinkingLevel"] = "off"
 
     trailing_newline = "\n" if raw.endswith("\n") else ""

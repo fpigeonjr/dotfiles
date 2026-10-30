@@ -25,7 +25,7 @@ The `model-tiers` extension is loaded. Use these commands to switch provider fam
 
 ## Dotfiles / Committing
 
-Pi rewrites `defaultModel` and `defaultThinkingLevel` in `settings.json` on every session. Always `git diff` before staging — only `lastChangelogVersion` (and intentional config changes) should be committed; revert the model fields to `haiku-4-5` / `off` (`a·instant`) if dirty.
+Pi rewrites `defaultModel` and `defaultThinkingLevel` in `settings.json` on every session. Always `git diff` before staging — only `lastChangelogVersion` (and intentional config changes) should be committed; revert the model fields to `claude-haiku-5.5` / `off` (`c·instant`) if dirty.
 
 ## Clarifying Questions
 

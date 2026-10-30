@@ -18,7 +18,8 @@
  *   /tiers          → toggle compact tier table (5 lines, never truncates)
  *
  * Cold-start default: if no persisted state and no model match, silently
- * activates a·instant (haiku) so Ctrl+P always works without typing a command.
+ * activates c·instant (haiku-5.5 via GitHub Copilot) so Ctrl+P always works
+ * without typing a command.
  *
  * Footer shows active family and tier, e.g. "a·thinking" (via pi.events
  * cross-extension comms with flexion-aws-status).
@@ -407,10 +408,10 @@ export default function (pi: ExtensionAPI) {
       }
     }
 
-    // 3. Cold-start default: nothing matched — silently activate a·instant
+    // 3. Cold-start default: nothing matched — silently activate c·instant
     //    so Ctrl+P always works without typing a command first.
     if (!activeFamily) {
-      await activateTier("a", 0, ctx);
+      await activateTier("c", 0, ctx);
       return;
     }
 
