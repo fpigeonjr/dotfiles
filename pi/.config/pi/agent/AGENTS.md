@@ -7,19 +7,16 @@ The `model-tiers` extension is loaded. Use these commands to switch provider fam
 | command | instant | thinking | pro |
 |---|---|---|---|
 | `/a` | claude-haiku-4-5 (Bedrock) | claude-sonnet-5 | claude-opus-5 |
-| `/e` | qwen3-coder-30b (Bedrock) | qwen3-235b-a22b-2507 (Bedrock) | qwen3-coder-480b (Bedrock) |
+| `/c` | claude-haiku-5.5 (Copilot) | claude-sonnet-5.5 | claude-opus-5.5 |
+| `/g` | gemini-3.8-flash/low (Gemini) | gemini-3.8-flash/medium | gemini-3.8-flash/high |
 | `/n` | llama-4-maverick (NIM) | kimi-k2-thinking (NIM) | qwen3.5-397b (NIM) |
-| `/g` | gemini-2.5-flash/off (Gemini) | gemini-2.5-flash/medium | gemini-2.5-flash/high |
-| `/o` | gpt-5.4-mini (Codex) | gpt-5.4 | gpt-5.5 |
-| `/oc` | deepseek-v4-flash (OpenCode Go) | kimi-k2.6 | deepseek-v4-pro |
+| `/o` | gpt-6-luna (Codex) | gpt-6.1-sol | gpt-6.1-terra |
 
 - `kimi-k2.5` stalls frequently — multiple 10m+ non-responses observed on Bedrock and NIM. Available via `/model` but don't put it in a tier.
 
-- `/g` requires `GEMINI_API_KEY` (free tier, Google AI Studio) in `~/.config/zsh/local.zsh`. `gemini-2.5-pro` is not available on the free tier — all three `/g` tiers use `gemini-2.5-flash`.
+- `/g` requires `GEMINI_API_KEY` (free tier, Google AI Studio) in `~/.config/zsh/local.zsh`. `gemini-2.5-pro` is not available on the free tier — all three `/g` tiers use `gemini-3.8-flash`.
 
 - `/n` requires `NVIDIA_NIM_API_KEY` in `~/.config/zsh/local.zsh`.
-
-- `/oc` requires `OPENCODE_API_KEY` (OpenCode Go subscription) in `~/.config/zsh/local.zsh` and `/connect` in OpenCode TUI.
 
 - `/a thinking` jumps directly to a named tier; bare `/a` always starts at instant
 - `Ctrl+P` / `Shift+Ctrl+P` cycles tiers within the active family

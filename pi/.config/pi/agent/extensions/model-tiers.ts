@@ -1,22 +1,21 @@
 /**
  * model-tiers — Pi extension for tiered model selection
  *
- * Registers four provider family commands that each scope Ctrl+P to a
+ * Registers five provider family commands that each scope Ctrl+P to a
  * three-model instant → thinking → pro ladder.
  *
- *   /a   Anthropic via Bedrock   haiku → sonnet → opus
- *   /e   Experiment via Bedrock  qwen3-coder-30b → qwen3-235b-a22b-2507 → qwen3-coder-480b
- *   /g   Google Gemini           2.5-flash/off → 2.5-flash/medium → 2.5-flash/high
- *   /n   NVIDIA NIM               llama-4-maverick → kimi-k2-thinking → qwen3.5-397b
- *   /o   OpenAI via Codex        gpt-5.4-mini → gpt-5.4 → gpt-5.5
- *   /oc  OpenCode Go             deepseek-v4-flash → kimi-k2.6 → deepseek-v4-pro
+ *   /a   Anthropic via Bedrock   haiku-4-5 → sonnet-5 → opus-5
+ *   /c   GitHub Copilot          haiku-5.5 → sonnet-5.5 → opus-5.5
+ *   /g   Google Gemini           3.8-flash/low → 3.8-flash/medium → 3.8-flash/high
+ *   /n   NVIDIA NIM              llama-4-maverick → kimi-k2-thinking → qwen3.5-397b
+ *   /o   OpenAI via Codex        gpt-6-luna → gpt-6.1-sol → gpt-6.1-terra
  *
  * Usage:
  *   /a              → switches to instant tier for Anthropic, scopes Ctrl+P
  *   /a thinking     → jumps directly to thinking tier
  *   Ctrl+P          → advance to next tier within active family
  *   Shift+Ctrl+P    → back to previous tier within active family
- *   /tiers          → toggle compact tier table (4 lines, never truncates)
+ *   /tiers          → toggle compact tier table (5 lines, never truncates)
  *
  * Cold-start default: if no persisted state and no model match, silently
  * activates a·instant (haiku) so Ctrl+P always works without typing a command.
@@ -31,7 +30,10 @@
  * Selecting a model via /model (Ctrl+L) clears family tracking.
  */
 
-import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
+import type {
+  ExtensionAPI,
+  ExtensionContext,
+} from "@earendil-works/pi-coding-agent";
 
 type ThinkingLevel = "off" | "minimal" | "low" | "medium" | "high" | "xhigh";
 type TierName = "instant" | "thinking" | "pro";
@@ -57,60 +59,124 @@ interface PersistedState {
 const TIER_NAMES: TierName[] = ["instant", "thinking", "pro"];
 
 const FAMILIES: Record<string, Family> = {
-  oc: {
-    label: "oc",
-    provider: "opencode-go",
-    tiers: [
-      { name: "instant",  model: "deepseek-v4-flash", thinking: "off",    short: "ds-v4-flash" },
-      { name: "thinking", model: "kimi-k2.6",          thinking: "medium", short: "kimi-k2.6"   },
-      { name: "pro",      model: "deepseek-v4-pro",   thinking: "off",    short: "ds-v4-pro"  },
-    ],
-  },
-  n: {
-    label: "n",
-    provider: "nvidia-nim",
-    tiers: [
-      { name: "instant",  model: "meta/llama-4-maverick-17b-128e-instruct", thinking: "off",    short: "llama4-mav" },
-      { name: "thinking", model: "moonshotai/kimi-k2-thinking",          thinking: "medium", short: "kimi-k2"      },
-      { name: "pro",      model: "qwen/qwen3.5-397b-a17b",              thinking: "off",    short: "qwen3.5-397b" },
-    ],
-  },
   a: {
     label: "a",
     provider: "amazon-bedrock",
     tiers: [
-      { name: "instant",  model: "us.anthropic.claude-haiku-4-5-20251001-v1:0", thinking: "off",    short: "haiku"   },
-      { name: "thinking", model: "us.anthropic.claude-sonnet-5",                 thinking: "medium", short: "sonnet"  },
-      { name: "pro",      model: "us.anthropic.claude-opus-5",                   thinking: "high",   short: "opus"    },
+      {
+        name: "instant",
+        model: "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+        thinking: "off",
+        short: "haiku",
+      },
+      {
+        name: "thinking",
+        model: "us.anthropic.claude-sonnet-5",
+        thinking: "medium",
+        short: "sonnet",
+      },
+      {
+        name: "pro",
+        model: "us.anthropic.claude-opus-5",
+        thinking: "high",
+        short: "opus",
+      },
     ],
   },
-  e: {
-    label: "e",
-    provider: "amazon-bedrock",
+  c: {
+    label: "c",
+    provider: "github-copilot",
     tiers: [
-      { name: "instant",  model: "qwen.qwen3-coder-30b-a3b-v1:0",       thinking: "off",  short: "qwen-30b"   },
-      { name: "thinking", model: "qwen.qwen3-235b-a22b-2507-v1:0",       thinking: "off",  short: "qwen-235b"  },
-      { name: "pro",      model: "qwen.qwen3-coder-480b-a35b-v1:0",      thinking: "off",  short: "qwen-480b" },
+      {
+        name: "instant",
+        model: "claude-haiku-5.5",
+        thinking: "off",
+        short: "haiku-5.5",
+      },
+      {
+        name: "thinking",
+        model: "claude-sonnet-5.5",
+        thinking: "medium",
+        short: "sonnet-5.5",
+      },
+      {
+        name: "pro",
+        model: "claude-opus-5.5",
+        thinking: "high",
+        short: "opus-5.5",
+      },
     ],
   },
   g: {
     label: "g",
     provider: "google",
     tiers: [
-      // gemini-2.0-flash returns 404 on Cloud Code Assist.
-      // 2.5-flash covers instant (off) and thinking (medium); 2.5-pro at pro.
-      { name: "instant",  model: "gemini-2.5-flash", thinking: "off",    short: "flash·off" },
-      { name: "thinking", model: "gemini-2.5-flash", thinking: "medium", short: "flash·med" },
-      { name: "pro",      model: "gemini-2.5-flash", thinking: "high",   short: "flash·high" },
+      {
+        name: "instant",
+        model: "gemini-3.8-flash",
+        thinking: "low",
+        short: "flash·low",
+      },
+      {
+        name: "thinking",
+        model: "gemini-3.8-flash",
+        thinking: "medium",
+        short: "flash·med",
+      },
+      {
+        name: "pro",
+        model: "gemini-3.8-flash",
+        thinking: "high",
+        short: "flash·high",
+      },
+    ],
+  },
+  n: {
+    label: "n",
+    provider: "nvidia-nim",
+    tiers: [
+      {
+        name: "instant",
+        model: "meta/llama-4-maverick-17b-128e-instruct",
+        thinking: "off",
+        short: "llama4-mav",
+      },
+      {
+        name: "thinking",
+        model: "moonshotai/kimi-k2-thinking",
+        thinking: "medium",
+        short: "kimi-k2",
+      },
+      {
+        name: "pro",
+        model: "qwen/qwen3.5-397b-a17b",
+        thinking: "off",
+        short: "qwen3.5-397b",
+      },
     ],
   },
   o: {
     label: "o",
     provider: "openai-codex",
     tiers: [
-      { name: "instant",  model: "gpt-5.4-mini", thinking: "off",    short: "5.4-mini" },
-      { name: "thinking", model: "gpt-5.4",       thinking: "medium", short: "5.4"      },
-      { name: "pro",      model: "gpt-5.5",       thinking: "high",   short: "5.5"      },
+      {
+        name: "instant",
+        model: "gpt-6-luna",
+        thinking: "off",
+        short: "6-luna",
+      },
+      {
+        name: "thinking",
+        model: "gpt-6.1-sol",
+        thinking: "medium",
+        short: "6.1-sol",
+      },
+      {
+        name: "pro",
+        model: "gpt-6.1-terra",
+        thinking: "high",
+        short: "6.1-terra",
+      },
     ],
   },
 };
@@ -150,7 +216,10 @@ export default function (pi: ExtensionAPI) {
 
     const model = ctx.modelRegistry.find(family.provider, tier.model);
     if (!model) {
-      ctx.ui.notify(`model-tiers: not found — ${family.provider}/${tier.model}`, "error");
+      ctx.ui.notify(
+        `model-tiers: not found — ${family.provider}/${tier.model}`,
+        "error",
+      );
       return;
     }
 
@@ -158,7 +227,10 @@ export default function (pi: ExtensionAPI) {
     try {
       const ok = await pi.setModel(model);
       if (!ok) {
-        ctx.ui.notify(`model-tiers: no auth for ${family.provider}/${tier.model}`, "error");
+        ctx.ui.notify(
+          `model-tiers: no auth for ${family.provider}/${tier.model}`,
+          "error",
+        );
         return;
       }
       // setThinkingLevel drives the editor border color natively.
@@ -196,7 +268,7 @@ export default function (pi: ExtensionAPI) {
     });
   }
 
-  // ─── /tiers — compact toggle widget (4 lines, never truncates) ─────────────
+  // ─── /tiers — compact toggle widget (5 lines, never truncates) ─────────────
 
   pi.registerCommand("tiers", {
     description: "Show all tier stacks (toggle)",
@@ -244,7 +316,10 @@ export default function (pi: ExtensionAPI) {
     description: "Cycle to next model tier (model-tiers)",
     handler: async (ctx) => {
       if (!activeFamily) {
-        ctx.ui.notify("model-tiers: pick a provider first — /a  /e  /g  /n  /o", "info");
+        ctx.ui.notify(
+          "model-tiers: pick a provider first — /a  /c  /g  /n  /o",
+          "info",
+        );
         return;
       }
       await activateTier(activeFamily, (tierIndex + 1) % 3, ctx);
@@ -255,7 +330,10 @@ export default function (pi: ExtensionAPI) {
     description: "Cycle to previous model tier (model-tiers)",
     handler: async (ctx) => {
       if (!activeFamily) {
-        ctx.ui.notify("model-tiers: pick a provider first — /a  /e  /g  /n  /o", "info");
+        ctx.ui.notify(
+          "model-tiers: pick a provider first — /a  /c  /g  /n  /o",
+          "info",
+        );
         return;
       }
       await activateTier(activeFamily, (tierIndex + 2) % 3, ctx);
@@ -281,10 +359,21 @@ export default function (pi: ExtensionAPI) {
       const entry = entries[i] as any;
       if (entry.type === "custom" && entry.customType === "model-tiers-state") {
         const { family, index } = (entry.data ?? {}) as Partial<PersistedState>;
-        if (family && FAMILIES[family] && typeof index === "number") {
+        if (
+          family &&
+          FAMILIES[family] &&
+          typeof index === "number" &&
+          index >= 0 &&
+          index < FAMILIES[family].tiers.length
+        ) {
+          const expectedProvider = FAMILIES[family].provider;
           const expectedModel = FAMILIES[family].tiers[index].model;
+          const currentProvider = ctx.model?.provider;
           const currentModel = ctx.model?.id;
-          if (currentModel !== expectedModel) {
+          if (
+            currentProvider !== expectedProvider ||
+            currentModel !== expectedModel
+          ) {
             // Tier config was updated since this session was last active (e.g. a model
             // was renamed or removed). Force-activate so pi uses the current model ID
             // rather than the stale one pi restored from session state.
@@ -302,10 +391,12 @@ export default function (pi: ExtensionAPI) {
       }
     }
 
-    // 2. Auto-detect family from the current model ID.
+    // 2. Auto-detect family from the current model provider + ID.
     const currentId = ctx.model?.id;
+    const currentProvider = ctx.model?.provider;
     if (currentId) {
       outer: for (const [key, family] of Object.entries(FAMILIES)) {
+        if (currentProvider && family.provider !== currentProvider) continue;
         for (let i = 0; i < family.tiers.length; i++) {
           if (family.tiers[i].model === currentId) {
             activeFamily = key;
@@ -332,8 +423,10 @@ export default function (pi: ExtensionAPI) {
     if (_ownSwitch || event.source === "restore") return;
     // User picked something manually via /model or Ctrl+L.
     const id = event.model.id;
+    const provider = event.model.provider;
     let matched = false;
     outer: for (const [key, family] of Object.entries(FAMILIES)) {
+      if (provider && family.provider !== provider) continue;
       for (let i = 0; i < family.tiers.length; i++) {
         if (family.tiers[i].model === id) {
           activeFamily = key;
