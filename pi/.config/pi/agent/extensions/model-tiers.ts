@@ -1,13 +1,13 @@
 /**
  * model-tiers — Pi extension for tiered model selection
  *
- * Registers five provider family commands that each scope Ctrl+P to a
- * three-model instant → thinking → pro ladder.
+ * Registers five provider family commands that each scope Ctrl+P to an
+ * instant → thinking → pro ladder (a family may stop before pro).
  *
  *   /a   Anthropic via Bedrock   haiku-4-5 → sonnet-5 → opus-5
  *   /c   GitHub Copilot          haiku-5.5 → sonnet-5.5 → opus-5.5
  *   /g   Google Gemini           3.8-flash/low → 3.8-flash/medium → 3.8-flash/high
- *   /n   NVIDIA NIM              llama-4-maverick → kimi-k2-thinking → qwen3.5-397b
+ *   /n   NVIDIA NIM              llama-4-maverick → kimi-k2-thinking (no pro tier)
  *   /o   OpenAI via Codex        gpt-6-luna → gpt-6.1-sol → gpt-6.1-terra
  *
  * Usage:
@@ -49,7 +49,7 @@ interface Tier {
 interface Family {
   label: string;
   provider: string;
-  tiers: [Tier, Tier, Tier];
+  tiers: Tier[]; // in TIER_NAMES order; may omit trailing tiers
 }
 
 interface PersistedState {
@@ -159,12 +159,6 @@ const FAMILIES: Record<string, Family> = {
         thinking: "medium",
         short: "kimi-k2",
       },
-      {
-        name: "pro",
-        model: "qwen/qwen3.5-397b-a17b",
-        thinking: "off",
-        short: "qwen3.5-397b",
-      },
     ],
   },
   o: {
@@ -264,13 +258,20 @@ export default function (pi: ExtensionAPI) {
     pi.registerCommand(key, {
       description: `${family.provider} tier stack — instant / thinking / pro`,
       getArgumentCompletions: () =>
-        TIER_NAMES.map((t) => ({ value: t, label: t })),
+        family.tiers.map((t) => ({ value: t.name, label: t.name })),
       handler: async (args, ctx) => {
         const arg = args?.trim().toLowerCase() as TierName | undefined;
         const index = arg ? TIER_NAMES.indexOf(arg) : 0;
         if (arg && index === -1) {
           ctx.ui.notify(
             `model-tiers: unknown tier "${arg}" — use instant, thinking, or pro`,
+            "error",
+          );
+          return;
+        }
+        if (index >= family.tiers.length) {
+          ctx.ui.notify(
+            `model-tiers: /${key} has no ${arg} tier — use ${family.tiers.map((t) => t.name).join(" or ")}`,
             "error",
           );
           return;
@@ -334,7 +335,8 @@ export default function (pi: ExtensionAPI) {
         );
         return;
       }
-      await activateTier(activeFamily, (tierIndex + 1) % 3, ctx);
+      const n = FAMILIES[activeFamily].tiers.length;
+      await activateTier(activeFamily, (tierIndex + 1) % n, ctx);
     },
   });
 
@@ -348,7 +350,8 @@ export default function (pi: ExtensionAPI) {
         );
         return;
       }
-      await activateTier(activeFamily, (tierIndex + 2) % 3, ctx);
+      const n = FAMILIES[activeFamily].tiers.length;
+      await activateTier(activeFamily, (tierIndex + n - 1) % n, ctx);
     },
   });
 

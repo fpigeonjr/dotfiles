@@ -123,16 +123,6 @@ export default function (pi: ExtensionAPI) {
         compat: COMPAT,
       },
       {
-        id: "qwen/qwen3.5-397b-a17b",
-        name: "Qwen3.5 397B A17B (NIM)",
-        reasoning: false,
-        input: ["text"],
-        contextWindow: 131072,
-        maxTokens: 32768,
-        cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
-        compat: COMPAT,
-      },
-      {
         id: "deepseek-ai/deepseek-v3.1-terminus",
         name: "DeepSeek V3.1 Terminus (NIM)",
         reasoning: false,

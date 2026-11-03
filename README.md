@@ -122,7 +122,7 @@ The `model-tiers` extension registers five provider families. Each family scopes
 | `/a` Anthropic·Bedrock | haiku-4-5 | sonnet-5 | opus-5 |
 | `/c` GitHub Copilot | haiku-5.5 | sonnet-5.5 | opus-5.5 |
 | `/g` Google·Gemini | gemini-3.8-flash (thinking low) | gemini-3.8-flash (thinking medium) | gemini-3.8-flash (thinking high) |
-| `/n` NVIDIA NIM | llama-4-maverick | kimi-k2-thinking | qwen3.5-397b |
+| `/n` NVIDIA NIM | llama-4-maverick | kimi-k2-thinking | — (qwen3.5-397b retired, HTTP 410) |
 | `/o` OpenAI·Codex | gpt-6-luna | gpt-6.1-sol | gpt-6.1-terra |
 
 - `/a thinking` — jump directly to a named tier

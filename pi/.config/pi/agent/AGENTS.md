@@ -9,14 +9,14 @@ The `model-tiers` extension is loaded. Use these commands to switch provider fam
 | `/a` | claude-haiku-4-5 (Bedrock) | claude-sonnet-5 | claude-opus-5 |
 | `/c` | claude-haiku-5.5 (Copilot) | claude-sonnet-5.5 | claude-opus-5.5 |
 | `/g` | gemini-3.8-flash/low (Gemini) | gemini-3.8-flash/medium | gemini-3.8-flash/high |
-| `/n` | llama-4-maverick (NIM) | kimi-k2-thinking (NIM) | qwen3.5-397b (NIM) |
+| `/n` | llama-4-maverick (NIM) | kimi-k2-thinking (NIM) | — |
 | `/o` | gpt-6-luna (Codex) | gpt-6.1-sol | gpt-6.1-terra |
 
 - `kimi-k2.5` stalls frequently — multiple 10m+ non-responses observed on Bedrock and NIM. Available via `/model` but don't put it in a tier.
 
 - `/g` requires `GEMINI_API_KEY` (free tier, Google AI Studio) in `~/.config/zsh/local.zsh`. `gemini-2.5-pro` is not available on the free tier — all three `/g` tiers use `gemini-3.8-flash`.
 
-- `/n` requires `NVIDIA_NIM_API_KEY` in `~/.config/zsh/local.zsh`.
+- `/n` requires `NVIDIA_NIM_API_KEY` in `~/.config/zsh/local.zsh`. It has no pro tier: `qwen3.5-397b` reached end-of-life (HTTP 410), so `Ctrl+P` cycles instant ↔ thinking.
 
 - `/a thinking` jumps directly to a named tier; bare `/a` always starts at instant
 - `Ctrl+P` / `Shift+Ctrl+P` cycles tiers within the active family
