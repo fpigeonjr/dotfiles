@@ -83,6 +83,14 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 - **Tabs/sidebar**: `ctrl+alt+c` creates a tab; `ctrl+alt+b` toggles the sidebar
 - **Install/apply**: Run `stow herdr` on a new system, or `stow -R herdr` after updates; if an existing `~/.config/herdr/config.toml` is present, back it up or move it before stowing
 
+### Herdr desktop app sub-agents (herdr-core)
+- **What**: The Herdr desktop app delegates through herdr-core (`hc`). Role templates live in `herdr-core/.config/herdr-core/templates/` and stow to `~/.config/herdr-core/templates/`; the agent-facing guide is the `herdr-core` skill in `~/Code/skills`
+- **Roles**: `scout`, `worker`, `reviewer`, `planner`, `adversarial-reviewer`, `visual-tester` — ports of the `pi-herdr-roles` roles used with the old `herdr` multiplexer, each pinning its model and tools in `command:`
+- **Launching**: Template commands use `zsh -ic 'exec pi …'` because herdr-core starts programs with a minimal `PATH` (no fnm Node, no `local.zsh` API keys)
+- **Use**: `hc templates`; `hc run --bg --name review --cwd "$PWD" reviewer "<task>; report with hc send $HC_TERMINAL_ID"`; `hc wait --children all`
+- **Install/apply**: `stow --no-folding herdr-core` (no folding keeps `~/.config/herdr-core` a real directory so only the template files are symlinked and herdr-core runtime files stay out of the repo)
+- **Coexistence**: Inside the old multiplexer (`HERDR_ENV=1`) Pi keeps using `pi-herdr-agents`; inside the desktop app (`HC_TERMINAL_ID` set) it uses `hc`
+
 ### Amazon Bedrock Model Access
 - **Profile**: `employer-bedrock` (template only — real values in `~/.aws/config`, never committed; see `aws/.aws/config` for setup instructions)
 - **Permitted providers**: Anthropic (Claude), DeepSeek, Meta Llama, Amazon Nova, Mistral, Qwen, MiniMax, Moonshot AI (Kimi), Z.AI (GLM), NVIDIA Nemotron, Google Gemma, Writer Palmyra, OpenAI OSS, TwelveLabs Pegasus
@@ -299,6 +307,7 @@ sudo pacman -S stow
    stow logseq       # Logseq configuration
    stow homebrew     # Homebrew Brewfile
    stow herdr        # Herdr keybindings
+   stow --no-folding herdr-core # Herdr desktop app sub-agent templates
    stow claude       # Claude Code settings and statusline
    stow pi           # Pi coding agent config, extensions, and prompts
    ```

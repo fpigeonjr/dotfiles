@@ -53,8 +53,19 @@ interface Family {
 }
 
 interface PersistedState {
-  family: string;
+  // null marks an explicit choice of a model outside every tier.
+  family: string | null;
   index: number;
+}
+
+// True when the model was pinned on the command line (`pi --model …`), e.g. by
+// hc templates or subagent launches. Stops at `--`, after which args are messages.
+function hasExplicitCliModel(): boolean {
+  for (const arg of process.argv.slice(2)) {
+    if (arg === "--") return false;
+    if (arg === "--model" || arg.startsWith("--model=")) return true;
+  }
+  return false;
 }
 
 const TIER_NAMES: TierName[] = ["instant", "thinking", "pro"];
@@ -354,12 +365,21 @@ export default function (pi: ExtensionAPI) {
   });
 
   pi.on("session_start", async (_event, ctx) => {
+    // An explicit CLI model is authoritative: never restore or force a tier over
+    // it (fresh start, --continue/--resume/--fork, or /reload).
+    const explicitModel = hasExplicitCliModel();
+
     // 1. Try to restore from the most recent persisted entry.
-    const entries = ctx.sessionManager.getEntries();
+    const entries = explicitModel ? [] : ctx.sessionManager.getEntries();
     for (let i = entries.length - 1; i >= 0; i--) {
       const entry = entries[i] as any;
       if (entry.type === "custom" && entry.customType === "model-tiers-state") {
         const { family, index } = (entry.data ?? {}) as Partial<PersistedState>;
+        if (family === null) {
+          // Last explicit choice was a non-tier model: keep whatever is selected.
+          updateStatus(ctx);
+          return;
+        }
         if (
           family &&
           FAMILIES[family] &&
@@ -409,8 +429,13 @@ export default function (pi: ExtensionAPI) {
     }
 
     // 3. Cold-start default: nothing matched — silently activate c·instant
-    //    so Ctrl+P always works without typing a command first.
+    //    so Ctrl+P always works without typing a command first. Skipped for an
+    //    explicit CLI model, which would otherwise be silently swapped for haiku.
     if (!activeFamily) {
+      if (explicitModel) {
+        updateStatus(ctx);
+        return;
+      }
       await activateTier("c", 0, ctx);
       return;
     }
@@ -440,6 +465,11 @@ export default function (pi: ExtensionAPI) {
     if (!matched) {
       activeFamily = undefined;
       tierIndex = 0;
+      // Persist the clear so resume/reload doesn't resurrect the previous tier.
+      pi.appendEntry<PersistedState>("model-tiers-state", {
+        family: null,
+        index: 0,
+      });
     }
     updateStatus(ctx);
   });

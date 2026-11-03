@@ -54,6 +54,11 @@ herdr/.config/herdr/*.sock
 herdr/.config/herdr/session.json
 herdr/.config/herdr/release-notes.json
 
+# herdr-core runtime state if ~/.config/herdr-core ever gets folded by stow
+# (README uses --no-folding); only the role templates are tracked
+herdr-core/.config/herdr-core/*
+!herdr-core/.config/herdr-core/templates/
+
 # herdr-managed opencode integration files — overwritten by herdr on update/reinstall
 **/.config/opencode/cli.json
 **/.config/opencode/tui.jsonc

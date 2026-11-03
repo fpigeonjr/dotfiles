@@ -29,6 +29,7 @@
 - Neovim: `config/.config/nvim/`
 - Ghostty: `config/.config/ghostty/`
 - Herdr: `herdr/.config/herdr/`
+- Herdr desktop (herdr-core `hc` templates): `herdr-core/.config/herdr-core/templates/`
 - Pi agent: `pi/.config/pi/agent/` (personal/contractor)
 - Claude Code: `claude/.claude/`
 - OpenCode: `config/.config/opencode/` (personal/contractor)
