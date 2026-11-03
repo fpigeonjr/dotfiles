@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Git clean filter for Pi settings.json files.
-# Strips session-mutated defaultProvider / defaultModel / defaultThinkingLevel
-# values so switching models in Pi does not dirty the dotfiles repository.
+# Pins session-mutated defaultProvider / defaultModel / defaultThinkingLevel
+# values and drops Pi's changelog bookkeeping (lastChangelogVersion,
+# extensionChangelogVersions) so model switches and Pi/extension updates do
+# not dirty the dotfiles repository. A fresh machine shows Pi's changelog once.
 #
 # Install in a fresh clone with:
 #   git config filter.pi-settings.clean "scripts/git-clean-pi-settings.sh %f"
@@ -33,6 +35,8 @@ if isinstance(data, dict):
         data["defaultProvider"] = "github-copilot"
         data["defaultModel"] = "claude-haiku-5.5"
         data["defaultThinkingLevel"] = "off"
+        data.pop("lastChangelogVersion", None)
+        data.pop("extensionChangelogVersions", None)
 
     trailing_newline = "\n" if raw.endswith("\n") else ""
     sys.stdout.write(json.dumps(data, indent=2, ensure_ascii=False) + trailing_newline)

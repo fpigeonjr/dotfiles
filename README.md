@@ -285,6 +285,8 @@ sudo pacman -S stow
    ```bash
    git clone <your-repo-url> ~/dotfiles
    cd ~/dotfiles
+   # Keep Pi's session-rewritten settings.json fields (model, changelog) out of Git
+   git config filter.pi-settings.clean "scripts/git-clean-pi-settings.sh %f"
    ```
 
 3. **Install packages from Brewfile:**

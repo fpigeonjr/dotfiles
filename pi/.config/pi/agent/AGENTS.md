@@ -25,7 +25,7 @@ The `model-tiers` extension is loaded. Use these commands to switch provider fam
 
 ## Dotfiles / Committing
 
-Pi rewrites `defaultModel` and `defaultThinkingLevel` in `settings.json` on every session. Always `git diff` before staging — only `lastChangelogVersion` (and intentional config changes) should be committed; revert the model fields to `claude-haiku-5.5` / `off` (`c·instant`) if dirty.
+Pi rewrites `defaultModel`, `defaultThinkingLevel`, and its changelog bookkeeping (`lastChangelogVersion`, `extensionChangelogVersions`) in `settings.json`. The dotfiles `pi-settings` Git clean filter (`scripts/git-clean-pi-settings.sh`) pins the model fields to `claude-haiku-5.5` / `off` (`c·instant`) and drops the changelog fields, so they never reach a commit. If `git status` shows `settings.json` modified but `git diff` is empty, `git add` it (stages nothing, clears the flag). If `git diff` shows only those fields, check the filter is configured: `git config filter.pi-settings.clean` (setup line in the README).
 
 ## Clarifying Questions
 
