@@ -71,3 +71,6 @@ node_modules/
 
 # zed runtime databases
 config/.config/zed/prompts/
+
+# pi-herdr-agents runtime outcome log
+pi/.config/pi/agent/herdr-agents/outcomes.jsonl
