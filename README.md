@@ -59,6 +59,15 @@ Note: Hyprland configs only apply to OMArchy/Linux systems with Hyprland install
 - **Behavior**: New worktrees are created under `.worktrees/{{ branch | sanitize_db }}` so paths stay lowercase-safe
 - **Shell integration**: Loaded in `shell/.config/zsh/common.zsh` — enables auto-cd after `wt switch` and tab completions (no-op if `wt` is not installed)
 
+### Codex shared skills
+
+Personal skills live in the separate `~/Code/skills` repository. Run
+`python3 ~/dotfiles/scripts/sync-codex-skills.py` to link them into
+`~/.agents/skills`. Existing overlapping copies are backed up under
+`~/.local/share/skill-backups/`; Codex-only, system, and plugin skills are preserved.
+Re-run after adding new shared skills. Existing links follow repo edits and pulls
+automatically. Deleted repo skills require a separate review of stale links.
+
 ### OpenCode
 - **Global config**: `config/.config/opencode/opencode.json` is stowed to `~/.config/opencode/opencode.json`
 - **Custom agents**: Store reusable agents in `config/.config/opencode/agents/`
