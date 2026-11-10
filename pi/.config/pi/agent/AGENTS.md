@@ -10,7 +10,7 @@ The `model-tiers` extension is loaded. Use these commands to switch provider fam
 | `/c` | claude-haiku-5.5 (Copilot) | claude-sonnet-5.5 | claude-opus-5.5 |
 | `/g` | gemini-3.8-flash/low (Gemini) | gemini-3.8-flash/medium | gemini-3.8-flash/high |
 | `/n` | llama-4-maverick (NIM) | kimi-k2-thinking (NIM) | — |
-| `/o` | gpt-6-luna (Codex) | gpt-6.1-sol | gpt-6.1-terra |
+| `/o` | gpt-6-luna (Codex) | gpt-6.1-terra | gpt-6.1-sol |
 
 - `kimi-k2.5` stalls frequently — multiple 10m+ non-responses observed on Bedrock and NIM. Available via `/model` but don't put it in a tier.
 

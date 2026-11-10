@@ -8,7 +8,7 @@
  *   /c   GitHub Copilot          haiku-5.5 → sonnet-5.5 → opus-5.5
  *   /g   Google Gemini           3.8-flash/low → 3.8-flash/medium → 3.8-flash/high
  *   /n   NVIDIA NIM              llama-4-maverick → kimi-k2-thinking (no pro tier)
- *   /o   OpenAI via Codex        gpt-6-luna → gpt-6.1-sol → gpt-6.1-terra
+ *   /o   OpenAI via Codex        gpt-6-luna → gpt-6.1-terra → gpt-6.1-sol
  *
  * Usage:
  *   /a              → switches to instant tier for Anthropic, scopes Ctrl+P
@@ -173,15 +173,15 @@ const FAMILIES: Record<string, Family> = {
       },
       {
         name: "thinking",
-        model: "gpt-6.1-sol",
+        model: "gpt-6.1-terra",
         thinking: "medium",
-        short: "6.1-sol",
+        short: "6.1-terra",
       },
       {
         name: "pro",
-        model: "gpt-6.1-terra",
+        model: "gpt-6.1-sol",
         thinking: "high",
-        short: "6.1-terra",
+        short: "6.1-sol",
       },
     ],
   },
