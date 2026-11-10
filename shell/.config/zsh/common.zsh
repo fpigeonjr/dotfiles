@@ -9,6 +9,14 @@ fi
 # instead of the default ~/.pi/agent so config lives under version control.
 export PI_CODING_AGENT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/pi/agent"
 
+# Under herdr / herdr-core (Herdr desktop) the pane is spawned by a daemon, not
+# sshd, so SSH_CONNECTION is unset and pi doesn't know it's remote. On a headless
+# host (e.g. Mac Mini with no GUI login) pbcopy fails and pi reports "Clipboard
+# unavailable". Force OSC 52 so copies reach the connected client's clipboard.
+if [[ -n $HC_TERMINAL_SOCKET || -n $HERDR_PANE_ID ]] && [[ -z $SSH_CONNECTION ]]; then
+  export PI_CLIPBOARD_OSC52=1
+fi
+
 alias zshell="$EDITOR ~/.zshrc"
 alias ohmyzsh="$EDITOR ~/.oh-my-zsh"
 alias new="source ~/.zshrc"
