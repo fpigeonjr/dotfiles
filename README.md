@@ -124,21 +124,24 @@ automatically. Deleted repo skills require a separate review of stale links.
 
 ### Pi Model Tiers
 
-The `model-tiers` extension registers five provider families. Each family scopes `Ctrl+P` to an instant → thinking → pro ladder.
+The `model-tiers` extension registers seven provider families. Each family scopes `Ctrl+P` to an instant → thinking → pro ladder.
 
 | command | instant | thinking | pro |
 |---|---|---|---|
 | `/a` Anthropic·Bedrock | haiku-4-5 | sonnet-5 | opus-5 |
 | `/c` GitHub Copilot | haiku-5.5 | sonnet-5.5 | opus-5.5 |
+| `/co` Copilot·OpenAI | gpt-6-luna | gpt-6.1-terra | gpt-6.1-sol |
+| `/cg` Copilot·Gemini | gemini-3.8-flash (thinking low) | gemini-3.8-flash (thinking medium) | gemini-4-argon (thinking high) |
 | `/g` Google·Gemini | gemini-3.8-flash (thinking low) | gemini-3.8-flash (thinking medium) | gemini-3.8-flash (thinking high) |
 | `/n` NVIDIA NIM | llama-4-maverick | kimi-k2-thinking | — (qwen3.5-397b retired, HTTP 410) |
-| `/o` OpenAI·Codex | gpt-6-luna | gpt-6.1-sol | gpt-6.1-terra |
+| `/o` OpenAI·Codex | gpt-6-luna | gpt-6.1-terra | gpt-6.1-sol |
 
 - `/a thinking` — jump directly to a named tier
 - `Ctrl+P` / `Shift+Ctrl+P` — cycle forward / backward within the active family
 - Footer shows active family and tier: `a·instant`, `c·thinking`, `g·pro`
-- Thinking levels baked in: instant=`off`, thinking=`medium`, pro=`high`
-- `/model` (Ctrl+L) escapes the tier system back to free selection
+- Thinking levels baked in: instant=`off`, thinking=`medium`, pro=`high`; `/g` and `/cg` start instant at `low`
+- `/co` and `/cg` route OpenAI and Gemini models through GitHub Copilot, so they share `/c`'s billing
+- `/model` (Ctrl+L) escapes the tier system: picking a non-tier model clears family tracking; picking a tier model joins that tier
 - **GFE profiles** are maintained separately in the Helix dotfiles collection. This repository retains personal and contractor configuration; do not deploy those profiles on a GFE.
 
 ### Model Cheat Sheet
@@ -171,8 +174,9 @@ The `model-tiers` extension registers five provider families. Each family scopes
 **Quick picks (pi — use tier commands):**
 - Start any session → `/a` (Anthropic instant) or `/c` (Copilot instant), then `Ctrl+P` to escalate
 - Google context window → `/g` (Gemini: 1M ctx across all tiers)
-- OpenAI reasoning → `/o` (Codex: gpt-6-luna → 6.1-sol → 6.1-terra)
-- Hard problem / big codebase → `/a pro`, `/c pro`, or `/o pro`
+- OpenAI reasoning → `/o` (Codex: gpt-6-luna → 6.1-terra → 6.1-sol) or `/co` (same models via Copilot)
+- Gemini pro tier → `/cg pro` (gemini-4-argon via Copilot)
+- Hard problem / big codebase → `/a pro`, `/c pro`, `/co pro`, or `/o pro`
 
 **Quick picks (OpenCode):**
 - Default everyday work → `claude-sonnet-4-6`
@@ -210,7 +214,7 @@ dotfiles/
 │       ├── settings.json    # Model whitelist, provider, thinking level, packages
 │       ├── extensions/      # Auto-discovered TypeScript extensions
 │       │   ├── herdr-agent-state.ts  # Herdr agent lifecycle status reporting
-│       │   ├── model-tiers.ts        # /a /c /g /n /o tier commands + Ctrl+P cycling
+│       │   ├── model-tiers.ts        # /a /c /co /cg /g /n /o tier commands + Ctrl+P cycling
 │       │   └── nvidia-nim.ts         # NVIDIA NIM provider registration
 │       ├── keybindings.json # Clears built-in Ctrl+P (owned by model-tiers)
 │       ├── herdr-agents/

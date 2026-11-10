@@ -1,11 +1,13 @@
 /**
  * model-tiers — Pi extension for tiered model selection
  *
- * Registers five provider family commands that each scope Ctrl+P to an
+ * Registers seven provider family commands that each scope Ctrl+P to an
  * instant → thinking → pro ladder (a family may stop before pro).
  *
  *   /a   Anthropic via Bedrock   haiku-4-5 → sonnet-5 → opus-5
  *   /c   GitHub Copilot          haiku-5.5 → sonnet-5.5 → opus-5.5
+ *   /co  Copilot · OpenAI        gpt-6-luna → gpt-6.1-terra → gpt-6.1-sol
+ *   /cg  Copilot · Gemini        3.8-flash/low → 3.8-flash/medium → 4-argon/high
  *   /g   Google Gemini           3.8-flash/low → 3.8-flash/medium → 3.8-flash/high
  *   /n   NVIDIA NIM              llama-4-maverick → kimi-k2-thinking (no pro tier)
  *   /o   OpenAI via Codex        gpt-6-luna → gpt-6.1-terra → gpt-6.1-sol
@@ -15,7 +17,7 @@
  *   /a thinking     → jumps directly to thinking tier
  *   Ctrl+P          → advance to next tier within active family
  *   Shift+Ctrl+P    → back to previous tier within active family
- *   /tiers          → toggle compact tier table (5 lines, never truncates)
+ *   /tiers          → toggle compact tier table (one line per family, never truncates)
  *
  * Cold-start default: if no persisted state and no model match, silently
  * activates c·instant (haiku-5.5 via GitHub Copilot) so Ctrl+P always works
@@ -28,7 +30,9 @@
  * pi.setThinkingLevel() — no extra code needed.
  *
  * State persists across session resume/fork via pi.appendEntry().
- * Selecting a model via /model (Ctrl+L) clears family tracking.
+ * Selecting a non-tier model via /model (Ctrl+L) clears family tracking;
+ * selecting a tier model (with a matching thinking level when tiers share
+ * the model) joins that tier.
  */
 
 import type {
@@ -69,6 +73,29 @@ function hasExplicitCliModel(): boolean {
 }
 
 const TIER_NAMES: TierName[] = ["instant", "thinking", "pro"];
+
+// Find the tier for a model. A model that appears in one tier matches on
+// provider + ID; when several tiers share it (e.g. /g and /cg reuse
+// gemini-3.8-flash at different thinking levels) the thinking level must
+// match too, and an ambiguous combination stays untracked.
+function findTier(
+  provider: string | undefined,
+  id: string,
+  thinking: string,
+): { family: string; index: number } | undefined {
+  const hits: { family: string; index: number }[] = [];
+  for (const [key, family] of Object.entries(FAMILIES)) {
+    if (provider && family.provider !== provider) continue;
+    family.tiers.forEach((tier, index) => {
+      if (tier.model === id) hits.push({ family: key, index });
+    });
+  }
+  if (hits.length <= 1) return hits[0];
+  const exact = hits.filter(
+    (h) => FAMILIES[h.family].tiers[h.index].thinking === thinking,
+  );
+  return exact.length === 1 ? exact[0] : undefined;
+}
 
 const FAMILIES: Record<string, Family> = {
   a: {
@@ -116,6 +143,54 @@ const FAMILIES: Record<string, Family> = {
         model: "claude-opus-5.5",
         thinking: "high",
         short: "opus-5.5",
+      },
+    ],
+  },
+  co: {
+    label: "co",
+    provider: "github-copilot",
+    tiers: [
+      {
+        name: "instant",
+        model: "gpt-6-luna",
+        thinking: "off",
+        short: "6-luna",
+      },
+      {
+        name: "thinking",
+        model: "gpt-6.1-terra",
+        thinking: "medium",
+        short: "6.1-terra",
+      },
+      {
+        name: "pro",
+        model: "gpt-6.1-sol",
+        thinking: "high",
+        short: "6.1-sol",
+      },
+    ],
+  },
+  cg: {
+    label: "cg",
+    provider: "github-copilot",
+    tiers: [
+      {
+        name: "instant",
+        model: "gemini-3.8-flash",
+        thinking: "low",
+        short: "flash·low",
+      },
+      {
+        name: "thinking",
+        model: "gemini-3.8-flash",
+        thinking: "medium",
+        short: "flash·med",
+      },
+      {
+        name: "pro",
+        model: "gemini-4-argon",
+        thinking: "high",
+        short: "argon",
       },
     ],
   },
@@ -281,7 +356,7 @@ export default function (pi: ExtensionAPI) {
     });
   }
 
-  // ─── /tiers — compact toggle widget (5 lines, never truncates) ─────────────
+  // ─── /tiers — compact toggle widget (one line per family, never truncates) ──
 
   pi.registerCommand("tiers", {
     description: "Show all tier stacks (toggle)",
@@ -330,7 +405,9 @@ export default function (pi: ExtensionAPI) {
     handler: async (ctx) => {
       if (!activeFamily) {
         ctx.ui.notify(
-          "model-tiers: pick a provider first — /a  /c  /g  /n  /o",
+          `model-tiers: pick a provider first — ${Object.keys(FAMILIES)
+            .map((k) => `/${k}`)
+            .join("  ")}`,
           "info",
         );
         return;
@@ -345,7 +422,9 @@ export default function (pi: ExtensionAPI) {
     handler: async (ctx) => {
       if (!activeFamily) {
         ctx.ui.notify(
-          "model-tiers: pick a provider first — /a  /c  /g  /n  /o",
+          `model-tiers: pick a provider first — ${Object.keys(FAMILIES)
+            .map((k) => `/${k}`)
+            .join("  ")}`,
           "info",
         );
         return;
@@ -415,19 +494,18 @@ export default function (pi: ExtensionAPI) {
       }
     }
 
-    // 2. Auto-detect family from the current model provider + ID.
+    // 2. Auto-detect family from the current model provider + ID (+ thinking
+    //    level when several tiers share the model).
     const currentId = ctx.model?.id;
-    const currentProvider = ctx.model?.provider;
     if (currentId) {
-      outer: for (const [key, family] of Object.entries(FAMILIES)) {
-        if (currentProvider && family.provider !== currentProvider) continue;
-        for (let i = 0; i < family.tiers.length; i++) {
-          if (family.tiers[i].model === currentId) {
-            activeFamily = key;
-            tierIndex = i;
-            break outer;
-          }
-        }
+      const hit = findTier(
+        ctx.model?.provider,
+        currentId,
+        pi.getThinkingLevel(),
+      );
+      if (hit) {
+        activeFamily = hit.family;
+        tierIndex = hit.index;
       }
     }
 
@@ -451,19 +529,15 @@ export default function (pi: ExtensionAPI) {
   pi.on("model_select", async (event, ctx) => {
     if (_ownSwitch || event.source === "restore") return;
     // User picked something manually via /model or Ctrl+L.
-    const id = event.model.id;
-    const provider = event.model.provider;
-    let matched = false;
-    outer: for (const [key, family] of Object.entries(FAMILIES)) {
-      if (provider && family.provider !== provider) continue;
-      for (let i = 0; i < family.tiers.length; i++) {
-        if (family.tiers[i].model === id) {
-          activeFamily = key;
-          tierIndex = i;
-          matched = true;
-          break outer;
-        }
-      }
+    const hit = findTier(
+      event.model.provider,
+      event.model.id,
+      pi.getThinkingLevel(),
+    );
+    const matched = hit !== undefined;
+    if (hit) {
+      activeFamily = hit.family;
+      tierIndex = hit.index;
     }
     if (!matched) {
       activeFamily = undefined;
