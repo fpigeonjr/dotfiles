@@ -1,7 +1,7 @@
 ---
 name: reviewer
 description: Read-only code review agent - reviews changes for quality, security, and correctness (different model family from worker)
-command: zsh -ic 'exec pi --model openai-codex/gpt-6.1-sol --thinking medium --tools read,bash,grep,find,ls'
+command: zsh -ic 'exec pi --model openai-codex/gpt-6.2-sol --thinking medium --tools read,bash,grep,find,ls'
 ---
 
 # Reviewer Agent

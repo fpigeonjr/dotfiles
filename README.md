@@ -179,7 +179,7 @@ The `model-tiers` extension registers seven provider families. Each family scope
 **Quick picks (pi — use tier commands):**
 - Start any session → `/c` (Copilot instant), then `Ctrl+P` to escalate
 - Large context → `/n` (NIM Nemotron: ~1M ctx across all tiers) or `/cg instant` (hydrogen: ~983k)
-- OpenAI reasoning → `/o` (Codex: gpt-6-luna → 6.1-terra → 6.1-sol) or `/co` (Copilot: gpt-6-luna → 6.1-terra → 6.2-sol)
+- OpenAI reasoning → `/o` (Codex: gpt-6-luna → 6.1-terra → 6.2-sol) or `/co` (Copilot: gpt-6-luna → 6.1-terra → 6.2-sol)
 - Gemini pro tier → `/cg pro` (gemini-4-carbon via Copilot)
 - Hard problem / big codebase → `/c pro`, `/co pro`, or `/o pro`
 
