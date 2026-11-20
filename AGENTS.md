@@ -32,7 +32,7 @@
 - Herdr desktop (herdr-core `hc` templates): `herdr-core/.config/herdr-core/templates/`
 - Pi agent: `pi/.config/pi/agent/` (personal/contractor)
 - Claude Code: `claude/.claude/`
-- OpenCode: `config/.config/opencode/` (personal/contractor)
+- OpenCode: `config/.config/opencode/` (personal/contractor; disabled — see README)
 
 ## Safety
 - Never commit SSH keys, tokens, API keys, or passwords

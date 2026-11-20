@@ -69,6 +69,7 @@ Re-run after adding new shared skills. Existing links follow repo edits and pull
 automatically. Deleted repo skills require a separate review of stale links.
 
 ### OpenCode
+- **Disabled (2026-11-20)**: subscription cancelled. `brew "opencode"` is commented out in `homebrew/Brewfile` and `OPENCODE_API_KEY` is commented out in `local.zsh` (which also removes Pi's `opencode`/`opencode-go` providers). Config below is kept as-is; to re-enable, uncomment both and run `brew bundle`
 - **Global config**: `config/.config/opencode/opencode.json` is stowed to `~/.config/opencode/opencode.json`
 - **Custom agents**: Store reusable agents in `config/.config/opencode/agents/`
 - **Current custom agent**: `study.md` adds a primary study mode focused on guided learning, hints, and knowledge checks
@@ -101,6 +102,7 @@ automatically. Deleted repo skills require a separate review of stale links.
 - **Coexistence**: Inside the old multiplexer (`HERDR_ENV=1`) Pi keeps using `pi-herdr-agents`; inside the desktop app (`HC_TERMINAL_ID` set) it uses `hc`
 
 ### Amazon Bedrock Model Access
+- **Disabled in Pi (2026-11-20)**: the `/a` family carries `disabled: "Bedrock access paused"` in `model-tiers.ts`; delete that line to re-enable. The opt-in `flexion-*` shell helpers are unchanged
 - **Profile**: `employer-bedrock` (template only — real values in `~/.aws/config`, never committed; see `aws/.aws/config` for setup instructions)
 - **Permitted providers**: Anthropic (Claude), DeepSeek, Meta Llama, Amazon Nova, Mistral, Qwen, MiniMax, Moonshot AI (Kimi), Z.AI (GLM), NVIDIA Nemotron, Google Gemma, Writer Palmyra, OpenAI OSS, TwelveLabs Pegasus
 - **Auto-discovery**: `bedrock:ListFoundationModels` is now permitted — OpenCode will discover models available in `us-east-2`. However, discovered models may still fail if they require an inference profile or don't support tool call streaming
@@ -120,7 +122,7 @@ automatically. Deleted repo skills require a separate review of stale links.
 - **Do not use `models.json` to override Bedrock model metadata.** The `pi-ai` package ships a bundled `models.generated.js` with correct `contextWindow`, `maxTokens`, and real per-token `cost` values for all Bedrock models.
 - Overriding with a local `models.json` (even with zeros or conservative window sizes) silently replaces the bundled values — causing the context fill bar to saturate too early, premature compaction, and `$0.000` cost in the footer.
 - Only add `models.json` for genuinely custom providers (Ollama, vLLM, proxies, NVIDIA NIM) or models not yet in the bundled registry. Check `node_modules/@earendil-works/pi-ai/dist/models.generated.js` first before adding any Bedrock entry.
-- `models.json` is **gitignored** — it's machine-local and may contain API key resolvers. Recreate it from scratch on new machines using `curl https://integrate.api.nvidia.com/v1/models` to discover current working NIM models.
+- `models.json` is **gitignored** — it's machine-local and may contain API key resolvers. NVIDIA NIM is not in it: Pi's built-in `nvidia` provider covers it (`NVIDIA_API_KEY`, set in `local.zsh` from `NVIDIA_NIM_API_KEY`), with model metadata maintained upstream. NIM retires free-tier models often (HTTP 410), so check `pi --list-models nvidia` and re-test tool calls before changing `/n`.
 - **GitHub Copilot limit overrides are the exception.** The bundled/cached catalog reports ~1M context for newer Copilot models (gemini-4-*, gpt-6.2-sol), but Copilot accepts far less (200k–983k). Set `providers.github-copilot.modelOverrides` `contextWindow`/`maxTokens` from Copilot's live `max_prompt_tokens`/`max_output_tokens` (the `copilot-models` skill's `--overrides` does this). These models aren't in Pi 1.5.2's bundled list, so a new machine also needs one online start (or `pi update --models`) before `/cg` and `/co pro` resolve.
 
 ### Pi Model Tiers
@@ -129,18 +131,19 @@ The `model-tiers` extension registers seven provider families. Each family scope
 
 | command | instant | thinking | pro |
 |---|---|---|---|
-| `/a` Anthropic·Bedrock | haiku-4-5 | sonnet-5 | opus-5 |
+| `/a` Anthropic·Bedrock *(disabled)* | haiku-4-5 | sonnet-5 | opus-5 |
 | `/c` GitHub Copilot | haiku-5.5 | sonnet-5.5 | opus-5.5 |
 | `/co` Copilot·OpenAI | gpt-6-luna | gpt-6.1-terra | gpt-6.2-sol |
 | `/cg` Copilot·Gemini | gemini-4-hydrogen (thinking low) | gemini-4-neon (thinking medium) | gemini-4-carbon (thinking high) |
-| `/g` Google·Gemini | gemini-3.8-flash (thinking low) | gemini-3.8-flash (thinking medium) | gemini-3.8-flash (thinking high) |
-| `/n` NVIDIA NIM | llama-4-maverick | kimi-k2-thinking | — (qwen3.5-397b retired, HTTP 410) |
+| `/g` Google·Gemini *(disabled)* | gemini-3.8-flash (thinking low) | gemini-3.8-flash (thinking medium) | gemini-3.8-flash (thinking high) |
+| `/n` NVIDIA NIM | nemotron-3.5-lightning | nemotron-3.5-super-vl | nemotron-3-ultra |
 | `/o` OpenAI·Codex | gpt-6-luna | gpt-6.1-terra | gpt-6.1-sol |
 
-- `/a thinking` — jump directly to a named tier
+- `/c thinking` — jump directly to a named tier
 - `Ctrl+P` / `Shift+Ctrl+P` — cycle forward / backward within the active family
-- Footer shows active family and tier: `a·instant`, `c·thinking`, `g·pro`
-- Thinking levels baked in: instant=`off`, thinking=`medium`, pro=`high`; `/g` and `/cg` start instant at `low`
+- Footer shows active family and tier: `c·instant`, `co·thinking`, `cg·pro`
+- Thinking levels baked in: instant=`off`, thinking=`medium`, pro=`high`; `/cg` starts instant at `low`
+- **Disabled families** (`/a` Bedrock, `/g` Gemini API) keep their definitions in `model-tiers.ts` with a `disabled:` reason: no command is registered and `/tiers` lists them dimmed. Delete the `disabled` line (and uncomment the provider's key in `local.zsh`, for `/g`) to re-enable
 - `/co` and `/cg` route OpenAI and Gemini models through GitHub Copilot, so they share `/c`'s billing
 - `/cg` drops from ~983k (hydrogen) to 200k (neon, carbon) when escalating — `/compact` a long session before `Ctrl+P`; neon also costs more per token than carbon
 - `/model` (Ctrl+L) escapes the tier system: picking a non-tier model clears family tracking; picking a tier model joins that tier
@@ -174,13 +177,13 @@ The `model-tiers` extension registers seven provider families. Each family scope
 | `claude-opus-4-6` | Hardest coding and review tasks | Slow | Strong upgrade path when Sonnet is not enough |
 
 **Quick picks (pi — use tier commands):**
-- Start any session → `/a` (Anthropic instant) or `/c` (Copilot instant), then `Ctrl+P` to escalate
-- Google context window → `/g` (Gemini: 1M ctx across all tiers)
+- Start any session → `/c` (Copilot instant), then `Ctrl+P` to escalate
+- Large context → `/n` (NIM Nemotron: ~1M ctx across all tiers) or `/cg instant` (hydrogen: ~983k)
 - OpenAI reasoning → `/o` (Codex: gpt-6-luna → 6.1-terra → 6.1-sol) or `/co` (Copilot: gpt-6-luna → 6.1-terra → 6.2-sol)
 - Gemini pro tier → `/cg pro` (gemini-4-carbon via Copilot)
-- Hard problem / big codebase → `/a pro`, `/c pro`, `/co pro`, or `/o pro`
+- Hard problem / big codebase → `/c pro`, `/co pro`, or `/o pro`
 
-**Quick picks (OpenCode):**
+**Quick picks (OpenCode — disabled):**
 - Default everyday work → `claude-sonnet-4-6`
 - Hard problem / big codebase → `qwen3-coder-480b`
 - Need speed → `claude-haiku-4-5`, `qwen3-next-80b`, or `minimax-m2.5`
@@ -210,14 +213,13 @@ dotfiles/
 ├── herdr/           # Herdr terminal multiplexer configuration
 │   └── .config/herdr/
 │       └── config.toml # Prefix-free pane/tab keybindings
-├── pi/              # Pi coding agent configuration (personal/Bedrock)
+├── pi/              # Pi coding agent configuration (personal)
 │   └── .config/pi/agent/
 │       ├── AGENTS.md        # Global system prompt additions
 │       ├── settings.json    # Model whitelist, provider, thinking level, packages
 │       ├── extensions/      # Auto-discovered TypeScript extensions
 │       │   ├── herdr-agent-state.ts  # Herdr agent lifecycle status reporting
-│       │   ├── model-tiers.ts        # /a /c /co /cg /g /n /o tier commands + Ctrl+P cycling
-│       │   └── nvidia-nim.ts         # NVIDIA NIM provider registration
+│       │   └── model-tiers.ts        # /a /c /co /cg /g /n /o tier commands + Ctrl+P cycling
 │       ├── keybindings.json # Clears built-in Ctrl+P (owned by model-tiers)
 │       ├── herdr-agents/
 │       │   └── config.json  # Subagent pane layout + 8m hang-warning supervision

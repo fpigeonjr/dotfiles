@@ -21,7 +21,7 @@ brew "lazydocker"              # container TUI
 # editors & AI
 brew "luarocks"                # Lua package manager (neovim plugins)
 brew "neovim"
-brew "opencode"                # AI coding agent
+# brew "opencode"                # AI coding agent — disabled 2026-11-20 (subscription cancelled)
 brew "tree-sitter"             # parser generator (neovim)
 
 # files & search

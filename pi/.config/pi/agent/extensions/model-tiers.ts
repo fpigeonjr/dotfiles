@@ -4,17 +4,21 @@
  * Registers seven provider family commands that each scope Ctrl+P to an
  * instant → thinking → pro ladder (a family may stop before pro).
  *
- *   /a   Anthropic via Bedrock   haiku-4-5 → sonnet-5 → opus-5
+ *   /a   Anthropic via Bedrock   haiku-4-5 → sonnet-5 → opus-5   (disabled)
  *   /c   GitHub Copilot          haiku-5.5 → sonnet-5.5 → opus-5.5
  *   /co  Copilot · OpenAI        gpt-6-luna → gpt-6.1-terra → gpt-6.2-sol
  *   /cg  Copilot · Gemini        4-hydrogen/low → 4-neon/medium → 4-carbon/high
- *   /g   Google Gemini           3.8-flash/low → 3.8-flash/medium → 3.8-flash/high
- *   /n   NVIDIA NIM              llama-4-maverick → kimi-k2-thinking (no pro tier)
+ *   /g   Google Gemini           3.8-flash/low → 3.8-flash/medium → 3.8-flash/high   (disabled)
+ *   /n   NVIDIA NIM              nemotron-3.5-lightning → nemotron-3.5-super-vl → nemotron-3-ultra
  *   /o   OpenAI via Codex        gpt-6-luna → gpt-6.1-terra → gpt-6.1-sol
  *
+ * A family with `disabled` set keeps its definition but registers no command,
+ * is never matched or restored, and shows dimmed in /tiers. Delete the
+ * `disabled` line to re-enable it.
+ *
  * Usage:
- *   /a              → switches to instant tier for Anthropic, scopes Ctrl+P
- *   /a thinking     → jumps directly to thinking tier
+ *   /c              → switches to instant tier for Copilot, scopes Ctrl+P
+ *   /c thinking     → jumps directly to thinking tier
  *   Ctrl+P          → advance to next tier within active family
  *   Shift+Ctrl+P    → back to previous tier within active family
  *   /tiers          → toggle compact tier table (one line per family, never truncates)
@@ -23,7 +27,7 @@
  * activates c·instant (haiku-5.5 via GitHub Copilot) so Ctrl+P always works
  * without typing a command.
  *
- * Footer shows active family and tier, e.g. "a·thinking" (via pi.events
+ * Footer shows active family and tier, e.g. "c·thinking" (via pi.events
  * cross-extension comms with flexion-aws-status).
  *
  * Editor border color reflects the thinking level natively via
@@ -54,6 +58,7 @@ interface Family {
   label: string;
   provider: string;
   tiers: Tier[]; // in TIER_NAMES order; may omit trailing tiers
+  disabled?: string; // reason; keeps the definition but turns the family off
 }
 
 interface PersistedState {
@@ -97,10 +102,11 @@ function findTier(
   return exact.length === 1 ? exact[0] : undefined;
 }
 
-const FAMILIES: Record<string, Family> = {
+const ALL_FAMILIES: Record<string, Family> = {
   a: {
     label: "a",
     provider: "amazon-bedrock",
+    disabled: "Bedrock access paused",
     tiers: [
       {
         name: "instant",
@@ -197,6 +203,7 @@ const FAMILIES: Record<string, Family> = {
   g: {
     label: "g",
     provider: "google",
+    disabled: "Gemini API free tier unused and unreliable; use /cg",
     tiers: [
       {
         name: "instant",
@@ -220,19 +227,25 @@ const FAMILIES: Record<string, Family> = {
   },
   n: {
     label: "n",
-    provider: "nvidia-nim",
+    provider: "nvidia",
     tiers: [
       {
         name: "instant",
-        model: "meta/llama-4-maverick-17b-128e-instruct",
+        model: "nvidia/nemotron-3.5-lightning-30b-a3b",
         thinking: "off",
-        short: "llama4-mav",
+        short: "lightning",
       },
       {
         name: "thinking",
-        model: "moonshotai/kimi-k2-thinking",
+        model: "nvidia/nemotron-3.5-super-vl-120b-a12b",
         thinking: "medium",
-        short: "kimi-k2",
+        short: "super-vl",
+      },
+      {
+        name: "pro",
+        model: "nvidia/nemotron-3-ultra-550b-a55b",
+        thinking: "high",
+        short: "ultra",
       },
     ],
   },
@@ -261,6 +274,11 @@ const FAMILIES: Record<string, Family> = {
     ],
   },
 };
+
+// Active families: everything not marked `disabled`.
+const FAMILIES: Record<string, Family> = Object.fromEntries(
+  Object.entries(ALL_FAMILIES).filter(([, family]) => !family.disabled),
+);
 
 export default function (pi: ExtensionAPI) {
   let activeFamily: string | undefined;
@@ -384,6 +402,15 @@ export default function (pi: ExtensionAPI) {
         const provider = theme.fg("dim", family.provider);
         return `${prefix} ${slash}  ${tierLabels}  ${provider}`;
       });
+      for (const [key, family] of Object.entries(ALL_FAMILIES)) {
+        if (!family.disabled) continue;
+        rows.push(
+          theme.fg(
+            "dim",
+            `  /${key}  disabled — ${family.disabled}  ${family.provider}`,
+          ),
+        );
+      }
 
       ctx.ui.setWidget("model-tiers-table", rows);
       tiersWidgetVisible = true;

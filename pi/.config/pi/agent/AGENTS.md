@@ -6,24 +6,26 @@ The `model-tiers` extension is loaded. Use these commands to switch provider fam
 
 | command | instant | thinking | pro |
 |---|---|---|---|
-| `/a` | claude-haiku-4-5 (Bedrock) | claude-sonnet-5 | claude-opus-5 |
+| `/a` *(disabled)* | claude-haiku-4-5 (Bedrock) | claude-sonnet-5 | claude-opus-5 |
 | `/c` | claude-haiku-5.5 (Copilot) | claude-sonnet-5.5 | claude-opus-5.5 |
 | `/co` | gpt-6-luna (Copilot) | gpt-6.1-terra | gpt-6.2-sol |
 | `/cg` | gemini-4-hydrogen/low (Copilot) | gemini-4-neon/medium | gemini-4-carbon/high |
-| `/g` | gemini-3.8-flash/low (Gemini) | gemini-3.8-flash/medium | gemini-3.8-flash/high |
-| `/n` | llama-4-maverick (NIM) | kimi-k2-thinking (NIM) | — |
+| `/g` *(disabled)* | gemini-3.8-flash/low (Gemini) | gemini-3.8-flash/medium | gemini-3.8-flash/high |
+| `/n` | nemotron-3.5-lightning (NIM) | nemotron-3.5-super-vl | nemotron-3-ultra |
 | `/o` | gpt-6-luna (Codex) | gpt-6.1-terra | gpt-6.1-sol |
 
-- `kimi-k2.5` stalls frequently — multiple 10m+ non-responses observed on Bedrock and NIM. Available via `/model` but don't put it in a tier.
+- Don't put Kimi in a tier: on NIM, `kimi-k3.1-pro` took 60–90s per turn on the free tier (2026-11, not in Pi's built-in `nvidia` list), and `kimi-k2.5` stalled 10m+ before it was retired.
 
-- `/g` requires `GEMINI_API_KEY` (free tier, Google AI Studio) in `~/.config/zsh/local.zsh`. `gemini-2.5-pro` is not available on the free tier — all three `/g` tiers use `gemini-3.8-flash`.
+- `/g` (Gemini API free tier) is disabled: it was barely used and hung or errored in 2026-11 tests, and `/cg` covers Gemini via Copilot. `GEMINI_API_KEY` is commented out in `~/.config/zsh/local.zsh`; to re-enable, uncomment it and delete `/g`'s `disabled` line in `model-tiers.ts`. `gemini-2.5-pro` is not available on the free tier — all three `/g` tiers use `gemini-3.8-flash`.
 
-- `/n` requires `NVIDIA_NIM_API_KEY` in `~/.config/zsh/local.zsh`. It has no pro tier: `qwen3.5-397b` reached end-of-life (HTTP 410), so `Ctrl+P` cycles instant ↔ thinking.
+- `/n` uses Pi's built-in `nvidia` provider, which reads `NVIDIA_API_KEY`; `~/.config/zsh/local.zsh` sets it from `NVIDIA_NIM_API_KEY`. Pi maintains its model list and limits (`pi --list-models nvidia`). NIM retires free-tier models often (HTTP 410; the whole previous list died by 2026-11), so re-test tool calls before changing `/n`. The provider sends no reasoning effort (`supportsReasoningEffort: false`), so `/n` thinking levels are labels only.
 
-- `/a thinking` jumps directly to a named tier; bare `/a` always starts at instant
+- `/a` (Bedrock) is disabled: its family in `model-tiers.ts` has `disabled: "Bedrock access paused"`, so `/a` isn't registered and `/tiers` shows it dimmed. Delete that line to re-enable.
+
+- `/c thinking` jumps directly to a named tier; bare `/c` always starts at instant
 - `Ctrl+P` / `Shift+Ctrl+P` cycles tiers within the active family
 - `/model` (Ctrl+L) escapes to free model selection; picking a non-tier model clears family tracking, picking a tier model joins that tier
-- Footer shows active family and tier, e.g. `a·thinking`
+- Footer shows active family and tier, e.g. `c·thinking`
 
 ## Dotfiles / Committing
 
