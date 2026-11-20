@@ -12,7 +12,7 @@ The `model-tiers` extension is loaded. Use these commands to switch provider fam
 | `/cg` | gemini-4-hydrogen/low (Copilot) | gemini-4-neon/medium | gemini-4-carbon/high |
 | `/g` *(disabled)* | gemini-3.8-flash/low (Gemini) | gemini-3.8-flash/medium | gemini-3.8-flash/high |
 | `/n` | nemotron-3.5-lightning (NIM) | nemotron-3.5-super-vl | nemotron-3-ultra |
-| `/o` | gpt-6-luna (Codex) | gpt-6.1-terra | gpt-6.1-sol |
+| `/o` | gpt-6-luna (Codex) | gpt-6.1-terra | gpt-6.2-sol |
 
 - Don't put Kimi in a tier: on NIM, `kimi-k3.1-pro` took 60–90s per turn on the free tier (2026-11, not in Pi's built-in `nvidia` list), and `kimi-k2.5` stalled 10m+ before it was retired.
 

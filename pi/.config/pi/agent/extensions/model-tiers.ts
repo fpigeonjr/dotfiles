@@ -10,7 +10,7 @@
  *   /cg  Copilot · Gemini        4-hydrogen/low → 4-neon/medium → 4-carbon/high
  *   /g   Google Gemini           3.8-flash/low → 3.8-flash/medium → 3.8-flash/high   (disabled)
  *   /n   NVIDIA NIM              nemotron-3.5-lightning → nemotron-3.5-super-vl → nemotron-3-ultra
- *   /o   OpenAI via Codex        gpt-6-luna → gpt-6.1-terra → gpt-6.1-sol
+ *   /o   OpenAI via Codex        gpt-6-luna → gpt-6.1-terra → gpt-6.2-sol
  *
  * A family with `disabled` set keeps its definition but registers no command,
  * is never matched or restored, and shows dimmed in /tiers. Delete the
@@ -267,9 +267,9 @@ const ALL_FAMILIES: Record<string, Family> = {
       },
       {
         name: "pro",
-        model: "gpt-6.1-sol",
+        model: "gpt-6.2-sol",
         thinking: "high",
-        short: "6.1-sol",
+        short: "6.2-sol",
       },
     ],
   },

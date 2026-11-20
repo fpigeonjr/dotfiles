@@ -137,7 +137,7 @@ The `model-tiers` extension registers seven provider families. Each family scope
 | `/cg` Copilot·Gemini | gemini-4-hydrogen (thinking low) | gemini-4-neon (thinking medium) | gemini-4-carbon (thinking high) |
 | `/g` Google·Gemini *(disabled)* | gemini-3.8-flash (thinking low) | gemini-3.8-flash (thinking medium) | gemini-3.8-flash (thinking high) |
 | `/n` NVIDIA NIM | nemotron-3.5-lightning | nemotron-3.5-super-vl | nemotron-3-ultra |
-| `/o` OpenAI·Codex | gpt-6-luna | gpt-6.1-terra | gpt-6.1-sol |
+| `/o` OpenAI·Codex | gpt-6-luna | gpt-6.1-terra | gpt-6.2-sol |
 
 - `/c thinking` — jump directly to a named tier
 - `Ctrl+P` / `Shift+Ctrl+P` — cycle forward / backward within the active family
