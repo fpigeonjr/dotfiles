@@ -8,8 +8,8 @@ The `model-tiers` extension is loaded. Use these commands to switch provider fam
 |---|---|---|---|
 | `/a` | claude-haiku-4-5 (Bedrock) | claude-sonnet-5 | claude-opus-5 |
 | `/c` | claude-haiku-5.5 (Copilot) | claude-sonnet-5.5 | claude-opus-5.5 |
-| `/co` | gpt-6-luna (Copilot) | gpt-6.1-terra | gpt-6.1-sol |
-| `/cg` | gemini-3.8-flash/low (Copilot) | gemini-3.8-flash/medium | gemini-4-argon/high |
+| `/co` | gpt-6-luna (Copilot) | gpt-6.1-terra | gpt-6.2-sol |
+| `/cg` | gemini-4-hydrogen/low (Copilot) | gemini-4-neon/medium | gemini-4-carbon/high |
 | `/g` | gemini-3.8-flash/low (Gemini) | gemini-3.8-flash/medium | gemini-3.8-flash/high |
 | `/n` | llama-4-maverick (NIM) | kimi-k2-thinking (NIM) | — |
 | `/o` | gpt-6-luna (Codex) | gpt-6.1-terra | gpt-6.1-sol |

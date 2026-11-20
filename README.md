@@ -121,6 +121,7 @@ automatically. Deleted repo skills require a separate review of stale links.
 - Overriding with a local `models.json` (even with zeros or conservative window sizes) silently replaces the bundled values — causing the context fill bar to saturate too early, premature compaction, and `$0.000` cost in the footer.
 - Only add `models.json` for genuinely custom providers (Ollama, vLLM, proxies, NVIDIA NIM) or models not yet in the bundled registry. Check `node_modules/@earendil-works/pi-ai/dist/models.generated.js` first before adding any Bedrock entry.
 - `models.json` is **gitignored** — it's machine-local and may contain API key resolvers. Recreate it from scratch on new machines using `curl https://integrate.api.nvidia.com/v1/models` to discover current working NIM models.
+- **GitHub Copilot limit overrides are the exception.** The bundled/cached catalog reports ~1M context for newer Copilot models (gemini-4-*, gpt-6.2-sol), but Copilot accepts far less (200k–983k). Set `providers.github-copilot.modelOverrides` `contextWindow`/`maxTokens` from Copilot's live `max_prompt_tokens`/`max_output_tokens` (the `copilot-models` skill's `--overrides` does this). These models aren't in Pi 1.5.2's bundled list, so a new machine also needs one online start (or `pi update --models`) before `/cg` and `/co pro` resolve.
 
 ### Pi Model Tiers
 
@@ -130,8 +131,8 @@ The `model-tiers` extension registers seven provider families. Each family scope
 |---|---|---|---|
 | `/a` Anthropic·Bedrock | haiku-4-5 | sonnet-5 | opus-5 |
 | `/c` GitHub Copilot | haiku-5.5 | sonnet-5.5 | opus-5.5 |
-| `/co` Copilot·OpenAI | gpt-6-luna | gpt-6.1-terra | gpt-6.1-sol |
-| `/cg` Copilot·Gemini | gemini-3.8-flash (thinking low) | gemini-3.8-flash (thinking medium) | gemini-4-argon (thinking high) |
+| `/co` Copilot·OpenAI | gpt-6-luna | gpt-6.1-terra | gpt-6.2-sol |
+| `/cg` Copilot·Gemini | gemini-4-hydrogen (thinking low) | gemini-4-neon (thinking medium) | gemini-4-carbon (thinking high) |
 | `/g` Google·Gemini | gemini-3.8-flash (thinking low) | gemini-3.8-flash (thinking medium) | gemini-3.8-flash (thinking high) |
 | `/n` NVIDIA NIM | llama-4-maverick | kimi-k2-thinking | — (qwen3.5-397b retired, HTTP 410) |
 | `/o` OpenAI·Codex | gpt-6-luna | gpt-6.1-terra | gpt-6.1-sol |
@@ -141,6 +142,7 @@ The `model-tiers` extension registers seven provider families. Each family scope
 - Footer shows active family and tier: `a·instant`, `c·thinking`, `g·pro`
 - Thinking levels baked in: instant=`off`, thinking=`medium`, pro=`high`; `/g` and `/cg` start instant at `low`
 - `/co` and `/cg` route OpenAI and Gemini models through GitHub Copilot, so they share `/c`'s billing
+- `/cg` drops from ~983k (hydrogen) to 200k (neon, carbon) when escalating — `/compact` a long session before `Ctrl+P`; neon also costs more per token than carbon
 - `/model` (Ctrl+L) escapes the tier system: picking a non-tier model clears family tracking; picking a tier model joins that tier
 - **GFE profiles** are maintained separately in the Helix dotfiles collection. This repository retains personal and contractor configuration; do not deploy those profiles on a GFE.
 
@@ -174,8 +176,8 @@ The `model-tiers` extension registers seven provider families. Each family scope
 **Quick picks (pi — use tier commands):**
 - Start any session → `/a` (Anthropic instant) or `/c` (Copilot instant), then `Ctrl+P` to escalate
 - Google context window → `/g` (Gemini: 1M ctx across all tiers)
-- OpenAI reasoning → `/o` (Codex: gpt-6-luna → 6.1-terra → 6.1-sol) or `/co` (same models via Copilot)
-- Gemini pro tier → `/cg pro` (gemini-4-argon via Copilot)
+- OpenAI reasoning → `/o` (Codex: gpt-6-luna → 6.1-terra → 6.1-sol) or `/co` (Copilot: gpt-6-luna → 6.1-terra → 6.2-sol)
+- Gemini pro tier → `/cg pro` (gemini-4-carbon via Copilot)
 - Hard problem / big codebase → `/a pro`, `/c pro`, `/co pro`, or `/o pro`
 
 **Quick picks (OpenCode):**

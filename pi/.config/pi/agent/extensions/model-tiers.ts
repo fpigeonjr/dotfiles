@@ -6,8 +6,8 @@
  *
  *   /a   Anthropic via Bedrock   haiku-4-5 → sonnet-5 → opus-5
  *   /c   GitHub Copilot          haiku-5.5 → sonnet-5.5 → opus-5.5
- *   /co  Copilot · OpenAI        gpt-6-luna → gpt-6.1-terra → gpt-6.1-sol
- *   /cg  Copilot · Gemini        3.8-flash/low → 3.8-flash/medium → 4-argon/high
+ *   /co  Copilot · OpenAI        gpt-6-luna → gpt-6.1-terra → gpt-6.2-sol
+ *   /cg  Copilot · Gemini        4-hydrogen/low → 4-neon/medium → 4-carbon/high
  *   /g   Google Gemini           3.8-flash/low → 3.8-flash/medium → 3.8-flash/high
  *   /n   NVIDIA NIM              llama-4-maverick → kimi-k2-thinking (no pro tier)
  *   /o   OpenAI via Codex        gpt-6-luna → gpt-6.1-terra → gpt-6.1-sol
@@ -75,8 +75,8 @@ function hasExplicitCliModel(): boolean {
 const TIER_NAMES: TierName[] = ["instant", "thinking", "pro"];
 
 // Find the tier for a model. A model that appears in one tier matches on
-// provider + ID; when several tiers share it (e.g. /g and /cg reuse
-// gemini-3.8-flash at different thinking levels) the thinking level must
+// provider + ID; when several tiers share it (e.g. /g reuses
+// gemini-3.8-flash at three thinking levels) the thinking level must
 // match too, and an ambiguous combination stays untracked.
 function findTier(
   provider: string | undefined,
@@ -164,9 +164,9 @@ const FAMILIES: Record<string, Family> = {
       },
       {
         name: "pro",
-        model: "gpt-6.1-sol",
+        model: "gpt-6.2-sol",
         thinking: "high",
-        short: "6.1-sol",
+        short: "6.2-sol",
       },
     ],
   },
@@ -176,21 +176,21 @@ const FAMILIES: Record<string, Family> = {
     tiers: [
       {
         name: "instant",
-        model: "gemini-3.8-flash",
+        model: "gemini-4-hydrogen",
         thinking: "low",
-        short: "flash·low",
+        short: "hydrogen·low",
       },
       {
         name: "thinking",
-        model: "gemini-3.8-flash",
+        model: "gemini-4-neon",
         thinking: "medium",
-        short: "flash·med",
+        short: "neon·med",
       },
       {
         name: "pro",
-        model: "gemini-4-argon",
+        model: "gemini-4-carbon",
         thinking: "high",
-        short: "argon",
+        short: "carbon",
       },
     ],
   },
