@@ -1,11 +1,35 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+
 input=$(cat)
 
-model=$(echo "$input" | jq -r '.model.display_name')
-dir=$(echo "$input" | jq -r '.workspace.current_dir')
-cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
-pct=$(echo "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)
-duration_ms=$(echo "$input" | jq -r '.cost.total_duration_ms // 0')
+model="unknown"
+dir=""
+cost="0"
+pct="0"
+duration_ms="0"
+
+if command -v jq >/dev/null 2>&1 && [[ -n "$input" ]]; then
+  if jq_out=$(printf '%s' "$input" | jq -r '
+    (.model.display_name // "unknown"),
+    (.workspace.current_dir // ""),
+    (.cost.total_cost_usd // 0),
+    ((.context_window.used_percentage // 0) | tonumber? // 0 | floor),
+    ((.cost.total_duration_ms // 0) | tonumber? // 0 | floor)
+  ' 2>/dev/null) && [[ -n "$jq_out" ]]; then
+    {
+      IFS= read -r model || true
+      IFS= read -r dir || true
+      IFS= read -r cost || true
+      IFS= read -r pct || true
+      IFS= read -r duration_ms || true
+    } <<< "$jq_out"
+  fi
+fi
+
+[[ -n "$model" ]] || model="unknown"
+[[ "$pct" =~ ^[0-9]+$ ]] || pct=0
+[[ "$duration_ms" =~ ^[0-9]+$ ]] || duration_ms=0
 
 CYAN='\033[36m'
 GREEN='\033[32m'
@@ -23,9 +47,11 @@ get_aws_ttl() {
   command -v jq &>/dev/null || return 1
   command -v aws &>/dev/null || return 1
 
+  local profile="${AWS_PROFILE:-ClaudeCodeAccess-FlexionLLM}"
+
   # Read AWS credentials expiration
   local expiration
-  expiration=$(aws configure export-credentials --profile ClaudeCodeAccess-FlexionLLM --format process 2>/dev/null | jq -r '.Expiration') || return 1
+  expiration=$(aws configure export-credentials --profile "$profile" --format process 2>/dev/null | jq -r '.Expiration') || return 1
   [[ -z "$expiration" || "$expiration" == "null" ]] && return 1
 
   # Convert to Unix timestamp and calculate remaining time
@@ -59,27 +85,36 @@ get_aws_ttl() {
   fi
 }
 
-aws_ttl=$(get_aws_ttl)
+aws_ttl=$(get_aws_ttl || true)
 
 # Pick bar color based on context usage
-if [ "$pct" -ge 90 ]; then
+if [[ "$pct" -ge 90 ]]; then
   bar_color="$RED"
-elif [ "$pct" -ge 70 ]; then
+elif [[ "$pct" -ge 70 ]]; then
   bar_color="$YELLOW"
-else bar_color="$GREEN"; fi
+else
+  bar_color="$GREEN"
+fi
 
 filled=$((pct / 10))
+(( filled > 10 )) && filled=10
 empty=$((10 - filled))
-bar=$(printf "%${filled}s" | tr ' ' '█')$(printf "%${empty}s" | tr ' ' '░')
+bar=""
+for ((i = 0; i < filled; i++)); do bar+="█"; done
+for ((i = 0; i < empty; i++)); do bar+="░"; done
 
 mins=$((duration_ms / 60000))
 secs=$(((duration_ms % 60000) / 1000))
 
 branch=""
-git rev-parse --git-dir >/dev/null 2>&1 && branch=" | 🌿 $(git branch --show-current 2>/dev/null)"
+git_dir="${dir:-.}"
+if [[ -d "$git_dir" ]] && git -C "$git_dir" rev-parse --git-dir >/dev/null 2>&1; then
+  current_branch=$(git -C "$git_dir" branch --show-current 2>/dev/null || true)
+  [[ -n "$current_branch" ]] && branch=" | 🌿 ${current_branch}"
+fi
 
 echo -e "${CYAN}[$model]${RESET} 📁 ${dir##*/}$branch"
-cost_fmt=$(printf '$%.2f' "$cost")
+cost_fmt=$(printf '$%.2f' "$cost" 2>/dev/null || printf '$0.00')
 if [[ -n "$aws_ttl" ]]; then
   echo -e "${bar_color}${bar}${RESET} ${pct}% | ${YELLOW}${cost_fmt}${RESET} | ⏱️ ${mins}m ${secs}s | 🔐 AWS: ${aws_ttl}"
 else

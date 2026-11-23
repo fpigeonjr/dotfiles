@@ -12,7 +12,8 @@
 
 # Keep this personal profile's identity distinct from work profiles.
 # Set work identity with repository-local `git config user.email`, or maintain
-# explicit directory-scoped includeIf rules in machine-local configuration.
+# explicit directory-scoped includeIf rules in ~/.gitconfig.local (included at
+# the bottom of this file so local settings override defaults; not tracked).
 # Do not automatically include the GFE machine-wide identity file here.
 
 [init]
@@ -43,7 +44,11 @@
 	st = status
 [credential "https://github.com"]
 	helper = 
-	helper = !/opt/homebrew/bin/gh auth git-credential
+	helper = "!env \"PATH=/opt/homebrew/bin:/usr/local/bin:$PATH\" gh auth git-credential"
 [credential "https://gist.github.com"]
 	helper = 
-	helper = !/opt/homebrew/bin/gh auth git-credential
+	helper = "!env \"PATH=/opt/homebrew/bin:/usr/local/bin:$PATH\" gh auth git-credential"
+
+# Machine-local overrides and directory-scoped includeIf rules (last-value-wins).
+[include]
+	path = ~/.gitconfig.local

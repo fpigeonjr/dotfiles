@@ -38,10 +38,12 @@ fi
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
-# All aliases, functions, and tool initialization are now in the layered config files:
-# - ~/.config/zsh/common.zsh (shared across all platforms)
+# All aliases, functions, and tool initialization live in the layered config files.
+# Load OS-specific setup first so Homebrew (/opt/homebrew/bin) and Linux /usr/local/bin
+# are on PATH before common.zsh checks `command -v` for tools like fnm, zoxide, and wt:
 # - ~/.config/zsh/macos.zsh or ~/.config/zsh/linux.zsh (platform-specific)
+# - ~/.config/zsh/common.zsh (shared across all platforms)
 # - ~/.config/zsh/local.zsh (optional, machine-specific, not tracked in git)
-[[ -r "$ZDOTFILES_CONFIG_DIR/common.zsh" ]] && source "$ZDOTFILES_CONFIG_DIR/common.zsh"
 [[ -r "$ZDOTFILES_CONFIG_DIR/$DOTFILES_OS.zsh" ]] && source "$ZDOTFILES_CONFIG_DIR/$DOTFILES_OS.zsh"
+[[ -r "$ZDOTFILES_CONFIG_DIR/common.zsh" ]] && source "$ZDOTFILES_CONFIG_DIR/common.zsh"
 [[ -r "$ZDOTFILES_CONFIG_DIR/local.zsh" ]] && source "$ZDOTFILES_CONFIG_DIR/local.zsh"

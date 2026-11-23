@@ -1,4 +1,4 @@
-alias hermes-daemons="$HOME/scripts/hermes-restart-daemons.sh"
-alias hermes-restart-daemons="$HOME/scripts/hermes-restart-daemons.sh"
-alias hermes-daemon-status="$HOME/scripts/hermes-restart-daemons.sh status"
-alias hermes-daemon-logs="$HOME/scripts/hermes-restart-daemons.sh logs"
+alias hermes-daemons="$HOME/dotfiles/scripts/hermes-restart-daemons.sh"
+alias hermes-restart-daemons="$HOME/dotfiles/scripts/hermes-restart-daemons.sh"
+alias hermes-daemon-status="$HOME/dotfiles/scripts/hermes-restart-daemons.sh status"
+alias hermes-daemon-logs="$HOME/dotfiles/scripts/hermes-restart-daemons.sh logs"

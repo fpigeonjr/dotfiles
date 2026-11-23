@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SERVICE_TEMPLATE="$SCRIPT_DIR/disable-lid-wakeup.service"
 SERVICE_PATH="/etc/systemd/system/disable-lid-wakeup.service"
 
 usage() {
@@ -18,19 +20,12 @@ EOF
 }
 
 write_service() {
+  if [[ ! -f "$SERVICE_TEMPLATE" ]]; then
+    echo "Service template not found: $SERVICE_TEMPLATE" >&2
+    exit 1
+  fi
   sudo install -d /etc/systemd/system
-  sudo tee "$SERVICE_PATH" >/dev/null <<'EOF'
-[Unit]
-Description=Disable ACPI lid wakeup on boot
-After=local-fs.target
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/sh -c "grep -q 'LID0.*enabled' /proc/acpi/wakeup && echo LID0 > /proc/acpi/wakeup || true"
-
-[Install]
-WantedBy=multi-user.target
-EOF
+  sudo install -m 0644 "$SERVICE_TEMPLATE" "$SERVICE_PATH"
 }
 
 disable_lid_wakeup_now() {

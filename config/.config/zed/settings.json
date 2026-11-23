@@ -49,8 +49,6 @@
   },
   "buffer_font_family": "MonoLisa",
   "buffer_font_features": {
-    "feat": true,
-    "ures": true,
     "liga": true,
     "ss02": true,
     "ss07": true,
@@ -98,7 +96,7 @@
     // Whether to show the collaboration panel button in the status bar.
     "button": false,
   },
-  "chat-panel": {
+  "chat_panel": {
     // Whether to show the chat panel button in the status bar.
     "button": "never",
   },

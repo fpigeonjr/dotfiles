@@ -4,111 +4,33 @@ set -euo pipefail
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 script="$script_dir/scripts/hermes-restart-daemons.sh"
 
-assert_contains() {
-  local haystack="$1"
-  local needle="$2"
+tmp_root="$(mktemp -d)"
+trap 'rm -rf "$tmp_root"' EXIT
 
-  if [[ "$haystack" != *"$needle"* ]]; then
-    echo "Expected output to contain: $needle" >&2
-    echo "--- output ---" >&2
-    echo "$haystack" >&2
+assert_eq() {
+  local actual="$1"
+  local expected="$2"
+
+  if [[ "$actual" != "$expected" ]]; then
+    echo "Expected: $expected" >&2
+    echo "Actual:   $actual" >&2
     exit 1
   fi
 }
 
-assert_file_contains() {
-  local path="$1"
-  local needle="$2"
+make_fake_repo_helper() {
+  local repo="$1"
+  local exit_code="${2:-0}"
 
-  if ! grep -Fq "$needle" "$path"; then
-    echo "Expected $path to contain: $needle" >&2
-    echo "--- file ---" >&2
-    cat "$path" >&2
-    exit 1
-  fi
-}
-
-make_fake_repo() {
-  local root="$1"
-
-  mkdir -p "$root/scripts"
-
-  cat >"$root/scripts/validate-area-agent-registry.rb" <<'FAKE'
+  mkdir -p "$repo/scripts"
+  cat >"$repo/scripts/hermes-restart-daemons.sh" <<FAKE
 #!/usr/bin/env bash
-echo "valid registry: fake"
+printf 'delegated:'
+printf '[%s]' "\$@"
+printf '\n'
+exit $exit_code
 FAKE
-
-  cat >"$root/scripts/run-area-agent-gateways.rb" <<'FAKE'
-#!/usr/bin/env bash
-echo "configured agents: accountant"
-echo "skipped agents: none"
-FAKE
-
-  chmod +x "$root/scripts/validate-area-agent-registry.rb" "$root/scripts/run-area-agent-gateways.rb"
-}
-
-make_fake_path() {
-  local bin="$1"
-  local log="$2"
-
-  mkdir -p "$bin"
-
-  cat >"$bin/uname" <<'FAKE'
-#!/usr/bin/env bash
-echo Darwin
-FAKE
-
-  cat >"$bin/sleep" <<'FAKE'
-#!/usr/bin/env bash
-exit 0
-FAKE
-
-  cat >"$bin/launchctl" <<'FAKE'
-#!/usr/bin/env bash
-set -euo pipefail
-echo "launchctl $*" >>"$TEST_LOG"
-
-if [[ "${1:-}" == "print" ]]; then
-  label="${2:-}"
-  if [[ "$label" == "system/ai.hermes.area-agents" && ! -f "$TEST_STATE/area_loaded" ]]; then
-    exit 113
-  fi
-  echo "	active count = 1"
-  echo "	path = /Library/LaunchDaemons/test.plist"
-  echo "	state = running"
-  echo "	pid = 123"
-  exit 0
-fi
-
-if [[ "${1:-}" == "bootstrap" ]]; then
-  touch "$TEST_STATE/area_loaded"
-  exit 0
-fi
-
-if [[ "${1:-}" == "bootout" ]]; then
-  rm -f "$TEST_STATE/main_loaded"
-  exit 0
-fi
-FAKE
-
-  cat >"$bin/sudo" <<'FAKE'
-#!/usr/bin/env bash
-echo "sudo $*" >>"$TEST_LOG"
-exec "$@"
-FAKE
-
-  cat >"$bin/ps" <<'FAKE'
-#!/usr/bin/env bash
-echo "123 1 S /usr/bin/ruby /fake/run-area-agent-gateways.rb"
-echo "124 123 S python -m hermes_cli.main --profile accountant gateway run --replace"
-FAKE
-
-  cat >"$bin/tail" <<'FAKE'
-#!/usr/bin/env bash
-echo "tail $*" >>"$TEST_LOG"
-FAKE
-
-  chmod +x "$bin/"*
+  chmod +x "$repo/scripts/hermes-restart-daemons.sh"
 }
 
 run_test() {
@@ -118,115 +40,48 @@ run_test() {
   "$@"
 }
 
-test_status_prints_daemon_state() {
-  local tmp bin repo output
-  tmp="$(mktemp -d)"
-  bin="$tmp/bin"
-  repo="$tmp/hermes"
-  export TEST_LOG="$tmp/calls.log"
-  export TEST_STATE="$tmp/state"
-  mkdir -p "$TEST_STATE"
-  touch "$TEST_STATE/area_loaded"
-  make_fake_path "$bin" "$TEST_LOG"
-  make_fake_repo "$repo"
+test_delegates_to_hermes_repo_with_arguments() {
+  local repo="$tmp_root/custom-hermes"
+  local output
+  make_fake_repo_helper "$repo"
 
-  output="$(PATH="$bin:/usr/bin:/bin" HERMES_REPO="$repo" "$script" status)"
-
-  assert_contains "$output" "==> Main gateway"
-  assert_contains "$output" "==> Area Agent supervisor"
-  assert_contains "$output" "configured agents: accountant"
-  assert_contains "$output" "--profile accountant gateway run --replace"
+  output="$(HERMES_REPO="$repo" "$script" status "with spaces" --verbose)"
+  assert_eq "$output" "delegated:[status][with spaces][--verbose]"
 }
 
-test_area_restart_success_does_not_retry() {
-  local tmp bin repo output
-  tmp="$(mktemp -d)"
-  bin="$tmp/bin"
-  repo="$tmp/hermes"
-  export TEST_LOG="$tmp/calls.log"
-  export TEST_STATE="$tmp/state"
-  mkdir -p "$TEST_STATE"
-  make_fake_path "$bin" "$TEST_LOG"
-  make_fake_repo "$repo"
+test_defaults_to_home_code_hermes() {
+  local fake_home="$tmp_root/home"
+  local output
+  make_fake_repo_helper "$fake_home/Code/hermes"
 
-  cat >"$repo/scripts/install-area-agent-daemon.sh" <<'FAKE'
-#!/usr/bin/env bash
-echo "installer ok"
-touch "$TEST_STATE/area_loaded"
-FAKE
-  chmod +x "$repo/scripts/install-area-agent-daemon.sh"
-
-  output="$(PATH="$bin:/usr/bin:/bin" HERMES_REPO="$repo" "$script" area)"
-
-  assert_contains "$output" "installer ok"
-  assert_contains "$output" "Area Agent supervisor status"
-  assert_file_contains "$TEST_LOG" "launchctl print system/ai.hermes.area-agents"
+  output="$(env -u HERMES_REPO HOME="$fake_home" "$script" area)"
+  assert_eq "$output" "delegated:[area]"
 }
 
-test_area_restart_retries_after_bootstrap_race() {
-  local tmp bin repo output
-  tmp="$(mktemp -d)"
-  bin="$tmp/bin"
-  repo="$tmp/hermes"
-  export TEST_LOG="$tmp/calls.log"
-  export TEST_STATE="$tmp/state"
-  mkdir -p "$TEST_STATE"
-  make_fake_path "$bin" "$TEST_LOG"
-  make_fake_repo "$repo"
+test_propagates_nonzero_exit_code() {
+  local repo="$tmp_root/failing-hermes"
+  local status=0
+  make_fake_repo_helper "$repo" 42
 
-  cat >"$repo/scripts/install-area-agent-daemon.sh" <<'FAKE'
-#!/usr/bin/env bash
-echo "Bootstrap failed: 5: Input/output error" >&2
-exit 5
-FAKE
-  chmod +x "$repo/scripts/install-area-agent-daemon.sh"
-
-  output="$(PATH="$bin:/usr/bin:/bin" HERMES_REPO="$repo" "$script" area 2>&1)"
-
-  assert_contains "$output" "Area Agent installer failed"
-  assert_contains "$output" "Retrying Area Agent bootstrap in 3s"
-  assert_file_contains "$TEST_LOG" "sudo launchctl bootstrap system /Library/LaunchDaemons/ai.hermes.area-agents.plist"
-  assert_file_contains "$TEST_LOG" "launchctl bootstrap system /Library/LaunchDaemons/ai.hermes.area-agents.plist"
+  HERMES_REPO="$repo" "$script" logs >/dev/null || status=$?
+  assert_eq "$status" "42"
 }
 
-test_area_restart_does_not_retry_unrelated_failure() {
-  local tmp bin repo output status
-  tmp="$(mktemp -d)"
-  bin="$tmp/bin"
-  repo="$tmp/hermes"
-  export TEST_LOG="$tmp/calls.log"
-  export TEST_STATE="$tmp/state"
-  mkdir -p "$TEST_STATE"
-  make_fake_path "$bin" "$TEST_LOG"
-  make_fake_repo "$repo"
+test_fails_when_target_helper_missing() {
+  local repo="$tmp_root/missing-hermes"
+  local status=0
+  mkdir -p "$repo"
 
-  cat >"$repo/scripts/install-area-agent-daemon.sh" <<'FAKE'
-#!/usr/bin/env bash
-echo "sudo: a terminal is required to read the password" >&2
-exit 1
-FAKE
-  chmod +x "$repo/scripts/install-area-agent-daemon.sh"
-
-  set +e
-  output="$(PATH="$bin:/usr/bin:/bin" HERMES_REPO="$repo" "$script" area 2>&1)"
-  status=$?
-  set -e
-
+  HERMES_REPO="$repo" "$script" status >/dev/null 2>&1 || status=$?
   if [[ "$status" -eq 0 ]]; then
-    echo "Expected unrelated installer failure to remain failed" >&2
-    exit 1
-  fi
-  assert_contains "$output" "sudo: a terminal is required"
-  if [[ -f "$TEST_LOG" ]] && grep -Fq "sudo launchctl bootstrap system" "$TEST_LOG"; then
-    echo "Expected no bootstrap retry for unrelated installer failure" >&2
-    cat "$TEST_LOG" >&2
+    echo "Expected non-zero exit status when repository helper is missing" >&2
     exit 1
   fi
 }
 
-run_test "status prints daemon state" test_status_prints_daemon_state
-run_test "area restart success does not retry" test_area_restart_success_does_not_retry
-run_test "area restart retries after bootstrap race" test_area_restart_retries_after_bootstrap_race
-run_test "area restart does not retry unrelated failure" test_area_restart_does_not_retry_unrelated_failure
+run_test "delegates to HERMES_REPO with arguments" test_delegates_to_hermes_repo_with_arguments
+run_test "defaults to \$HOME/Code/hermes when HERMES_REPO is unset" test_defaults_to_home_code_hermes
+run_test "propagates non-zero exit code from delegated helper" test_propagates_nonzero_exit_code
+run_test "fails when repository helper is missing" test_fails_when_target_helper_missing
 
 echo "ok"

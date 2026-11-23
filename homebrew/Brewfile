@@ -14,6 +14,9 @@ tap "oven-sh/bun"
 brew "ffmpeg"
 brew "mpv"
 
+# cloud
+brew "awscli"                  # AWS CLI (Bedrock SSO)
+
 # containers
 brew "hadolint"                # Dockerfile linter
 brew "lazydocker"              # container TUI
@@ -22,22 +25,27 @@ brew "lazydocker"              # container TUI
 brew "luarocks"                # Lua package manager (neovim plugins)
 brew "neovim"
 # brew "opencode"                # AI coding agent — disabled 2026-11-20 (subscription cancelled)
+brew "stylua"                  # Lua formatter (neovim config)
 brew "tree-sitter"             # parser generator (neovim)
 
 # files & search
 brew "fd"                      # fast find
 brew "fzf"                     # fuzzy finder
+brew "jq"                      # JSON processor (scripts & statusline)
 brew "kondo"                   # project cleaner
 brew "ripgrep"                 # fast grep (rg)
+brew "rsync"                   # modern rsync (required for iCloud Logseq sync)
 brew "tree"                    # directory listing
 brew "wget"
 
 # git
 brew "gh"                      # GitHub CLI
+brew "git-lfs"                 # Git Large File Storage
 brew "lazygit"                 # git TUI
 brew "mob"                     # mob programming
 brew "pre-commit"              # repo-level hooks
 brew "trufflehog"              # secrets scanner
+brew "worktrunk"               # git worktree manager (wt)
 
 # image processing
 brew "ghostscript"
@@ -64,6 +72,7 @@ brew "ruby"
 brew "btop"                    # resource monitor
 brew "cmatrix"
 brew "fastfetch"               # system info
+brew "shellcheck"              # shell script linter
 brew "simple-scan"
 brew "stow"                    # dotfile management
 brew "zoxide"                  # smart cd

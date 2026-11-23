@@ -1,6 +1,24 @@
 # Enhanced Bash Configuration
 # OMArchy integration + robbyrussell-inspired theme + directory persistence
 
+# ===== Non-interactive Environment (also runs for `bash -lc` cron/agent jobs) =====
+export EDITOR="nvim"
+export VISUAL="$EDITOR"
+
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+  export PATH="$HOME/.local/bin:$PATH"
+fi
+
+[[ -f ~/.env.local ]] && source ~/.env.local
+
+if command -v fnm &> /dev/null; then
+  eval "$(fnm env --shell bash)"
+fi
+
+# Bail out for non-interactive shells so directory persistence, prompts,
+# EXIT traps, aliases, and completions only run interactively.
+[[ $- != *i* ]] && return
+
 # ===== OS Detection =====
 DOTFILES_OS="unknown"
 case "$(uname -s)" in
@@ -17,10 +35,6 @@ esac
 if [[ "$DOTFILES_OS" == "linux" ]] && [[ -f ~/.local/share/omarchy/default/bash/rc ]]; then
   source ~/.local/share/omarchy/default/bash/rc
 fi
-
-# ===== Environment Setup =====
-export EDITOR="nvim"
-export VISUAL="$EDITOR"
 
 # ===== History Settings =====
 export HISTSIZE=10000
@@ -163,12 +177,7 @@ if [[ -d ~/.bash_functions ]]; then
     done
 fi
 
-# ===== Environment Variables =====
-# Source local environment variables
-[[ -f ~/.env.local ]] && source ~/.env.local
-
 # ===== zoxide (smart cd) =====
 if command -v zoxide &> /dev/null; then
     eval "$(zoxide init bash)"
 fi
-export PATH="$HOME/.local/bin:$PATH"

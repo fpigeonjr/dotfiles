@@ -74,9 +74,9 @@ prunable=$(echo "$worktree_data" | jq -r '.[] | select(.worktree.state == "pruna
 integrated=$(echo "$worktree_data" | jq -r '.[] | select(.main_state == "integrated" or .main_state == "empty") | select(.is_main == false) | .branch' 2>/dev/null || true)
 
 # Combine all stale worktrees (prunable first, then integrated)
-stale_list=$(printf "%s\n" "$prunable" "$integrated" | grep -v '^$' | sort -u)
+stale_list=$(printf "%s\n" "$prunable" "$integrated" | grep -v '^$' | sort -u || true)
 
-if [ -z "$stale_list" ]; then
+if [[ -z "$stale_list" ]]; then
   echo -e "${GREEN}✓ No stale worktrees found${NC}"
   exit 0
 fi
@@ -87,22 +87,23 @@ stale_count=$(echo "$stale_list" | wc -l | xargs)
 echo ""
 echo -e "${YELLOW}Found ${stale_count} stale worktree(s) to remove:${NC}"
 echo ""
-echo "$stale_list" | while read -r item; do
+while IFS= read -r item; do
+  [[ -z "$item" ]] && continue
   # Get more details from worktree data
-  details=$(echo "$worktree_data" | jq -r ".[] | select(.branch == \"$item\" or .path == \"$item\") | \"\(.branch // .path) - \(.worktree.state // .main_state)\"" 2>/dev/null || echo "$item")
+  details=$(echo "$worktree_data" | jq -r --arg item "$item" '.[] | select(.branch == $item or .path == $item) | "\(.branch // .path) - \(.worktree.state // .main_state)"' 2>/dev/null || echo "$item")
   echo -e "  ${BLUE}•${NC} $details"
-done
+done <<< "$stale_list"
 
 echo ""
 
 # Dry run mode
-if [ "$DRY_RUN" = true ]; then
+if [[ "$DRY_RUN" == true ]]; then
   echo -e "${YELLOW}Dry run mode - no changes made${NC}"
   exit 0
 fi
 
 # Ask for confirmation (unless force)
-if [ "$FORCE" = false ]; then
+if [[ "$FORCE" == false ]]; then
   read -p "Remove ${stale_count} worktree(s)? [y/N] " -n 1 -r
   echo
   if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -116,30 +117,34 @@ removed=0
 failed=0
 
 echo ""
-echo "$stale_list" | while read -r item; do
-  if [ -z "$item" ]; then
+while IFS= read -r item; do
+  if [[ -z "$item" ]]; then
     continue
   fi
 
-  if [ "$VERBOSE" = true ]; then
+  if [[ "$VERBOSE" == true ]]; then
     echo -e "${BLUE}Removing: ${NC}$item"
   fi
 
-  if wt remove "$item" 2>/dev/null; then
+  if wt remove "$item" </dev/null 2>/dev/null; then
     echo -e "${GREEN}✓${NC} Removed: $item"
     ((removed++)) || true
   else
     echo -e "${RED}✗${NC} Failed to remove: $item"
     ((failed++)) || true
   fi
-done
+done <<< "$stale_list"
 
 # Also run git worktree prune to clean up prunable entries
 if git worktree prune 2>/dev/null; then
-  if [ "$VERBOSE" = true ]; then
+  if [[ "$VERBOSE" == true ]]; then
     echo -e "${GREEN}✓${NC} Ran git worktree prune"
   fi
 fi
 
 echo ""
-echo -e "${GREEN}Complete!${NC} Processed ${stale_count} worktree(s)"
+if (( failed > 0 )); then
+  echo -e "${YELLOW}Complete with errors:${NC} removed ${removed}, failed ${failed} (of ${stale_count} worktree(s))"
+  exit 1
+fi
+echo -e "${GREEN}Complete!${NC} Removed ${removed} worktree(s)"

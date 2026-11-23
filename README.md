@@ -173,7 +173,7 @@ The `model-tiers` extension registers seven provider families. Each family scope
 | `llama4-scout` | Huge context, multi-doc analysis | Medium | 10M token context; no tool calls on Bedrock |
 | `deepseek-r1` | Hard reasoning, math, STEM | Slow | Chain-of-thought; no tool calls on Bedrock; 64K context |
 | `deepseek-v3.2` | Coding, general (latest DeepSeek) | Medium | Newer/stronger than V3; bare model ID `deepseek.v3.2` |
-| `claude-opus-4-7` | Default, highest reliability | Medium | **Current default** (pi) |
+| `claude-opus-4-7` | Hardest coding and review tasks | Medium | Previous Pi default (current default is `claude-haiku-5.5` via `/c`) |
 | `claude-opus-4-6` | Hardest coding and review tasks | Slow | Strong upgrade path when Sonnet is not enough |
 
 **Quick picks (pi — use tier commands):**
@@ -213,6 +213,9 @@ dotfiles/
 ├── herdr/           # Herdr terminal multiplexer configuration
 │   └── .config/herdr/
 │       └── config.toml # Prefix-free pane/tab keybindings
+├── herdr-core/      # Herdr desktop app sub-agent templates (stow --no-folding)
+│   └── .config/herdr-core/
+│       └── templates/  # scout, planner, worker, reviewer, adversarial-reviewer, visual-tester
 ├── pi/              # Pi coding agent configuration (personal)
 │   └── .config/pi/agent/
 │       ├── AGENTS.md        # Global system prompt additions
@@ -250,7 +253,6 @@ dotfiles/
 │   ├── .bashrc           # Enhanced bash config (Arch Linux/OMArchy)
 │   ├── .bash_profile     # Bash profile (sources .bashrc)
 │   ├── .config/zsh/      # Shared + OS-specific Zsh config layers
-│   ├── .env.local
 │   └── .zshrc            # Cross-platform Zsh entrypoint
 ├── ssh/             # SSH client configuration
 │   └── .ssh/
@@ -364,10 +366,10 @@ If you already have some configs and want to adopt them:
 
 ### Zsh Layout
 
-- `~/.zshrc` detects the OS and loads shared config first
-- `~/.config/zsh/common.zsh` holds portable aliases, tool init, and function loading
-- `~/.config/zsh/macos.zsh` holds Homebrew and macOS-specific behavior
+- `~/.zshrc` detects the OS and loads platform-specific config first so Homebrew / `/usr/local/bin` are on `PATH` before shared tool init
+- `~/.config/zsh/macos.zsh` holds Homebrew, `cmux`, and macOS `ssh-agent` behavior
 - `~/.config/zsh/linux.zsh` holds Linux clipboard and path behavior
+- `~/.config/zsh/common.zsh` holds portable aliases, tool init (`fnm`, `zoxide`, `wt`), and function loading
 - `~/.config/zsh/local.zsh` is optional and stays machine-specific
 
 ### Raspberry Pi Pi-hole Rebuild
@@ -438,33 +440,23 @@ compress-logseq-assets --migrate --execute
 ln -sf ~/dotfiles/scripts/compress-logseq-assets.sh ~/.local/bin/compress-logseq-assets
 ```
 
-**LaunchAgent job (Mac Mini — run weekly to compress newly added images):**
+**LaunchAgent jobs (macOS — compression, iCloud sync, and persistent `ssh-agent`):**
 
-Install the bundled LaunchAgent and load it in the user domain:
+The `.plist` files under `scripts/` are templates containing `__HOME__` placeholders — do **not** symlink them directly into `~/Library/LaunchAgents/`. Install or reinstall all LaunchAgents with:
 ```bash
-mkdir -p ~/Library/LaunchAgents ~/.local/share/logs
-ln -sf ~/dotfiles/scripts/com.fpigeon.compress-logseq-assets.plist \
-  ~/Library/LaunchAgents/com.fpigeon.compress-logseq-assets.plist
-launchctl bootout "gui/$(id -u)" ~/Library/LaunchAgents/com.fpigeon.compress-logseq-assets.plist 2>/dev/null || true
-launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.fpigeon.compress-logseq-assets.plist
-launchctl enable "gui/$(id -u)/com.fpigeon.compress-logseq-assets"
-launchctl kickstart -k "gui/$(id -u)/com.fpigeon.compress-logseq-assets"
+~/dotfiles/scripts/install-launchagents.sh
 ```
 
-This LaunchAgent runs every Sunday at `03:00`, uses the same `--incremental --execute` behavior as the old cron entry, injects the Homebrew-friendly PATH, and logs to `~/.local/share/logs/compress-logseq-assets.log`. New images pasted into LogSeq during the week are compressed before the next iCloud sync picks them up.
+This substitutes `__HOME__` with `$HOME`, writes the rendered plists into `~/Library/LaunchAgents/`, and bootstraps them into `gui/$(id -u)`:
+- **`com.fpigeon.compress-logseq-assets`**: Runs every Sunday at `03:00` (`--incremental --execute`), injects Homebrew `PATH`, and logs to `~/.local/share/logs/compress-logseq-assets.log`. New images pasted into LogSeq during the week are compressed before the next iCloud sync picks them up.
+- **`com.fpigeon.sync-notes-to-icloud`**: Runs every 15 minutes and on load via `sync-notes-to-icloud-export.sh`. Writes detailed sync logs to `~/.local/share/logs/sync-notes-to-icloud.log` and `launchd` output to `~/.local/share/logs/launchd-sync-notes-to-icloud.log`.
+- **`com.fpigeonjr.ssh-agent`**: Keeps a persistent `ssh-agent` socket at `~/.ssh/ssh-agent.sock` (used by `macos.zsh` for SSH auth and commit signing).
 
-**Sync job (every 15 minutes):**
+To trigger an immediate test run after installation:
 ```bash
-mkdir -p ~/Library/LaunchAgents ~/.local/share/logs ~/.local/state
-ln -sf ~/dotfiles/scripts/com.fpigeon.sync-notes-to-icloud.plist \
-  ~/Library/LaunchAgents/com.fpigeon.sync-notes-to-icloud.plist
-launchctl bootout "gui/$(id -u)" ~/Library/LaunchAgents/com.fpigeon.sync-notes-to-icloud.plist 2>/dev/null || true
-launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.fpigeon.sync-notes-to-icloud.plist
-launchctl enable "gui/$(id -u)/com.fpigeon.sync-notes-to-icloud"
+launchctl kickstart -k "gui/$(id -u)/com.fpigeon.compress-logseq-assets"
 launchctl kickstart -k "gui/$(id -u)/com.fpigeon.sync-notes-to-icloud"
 ```
-
-This LaunchAgent runs every 15 minutes and once when loaded. The script still writes its own detailed sync log to `~/.local/share/logs/sync-notes-to-icloud.log`, and `launchd` stdout/stderr go to `~/.local/share/logs/launchd-sync-notes-to-icloud.log`.
 
 ### Export-Style Sync Behavior
 
@@ -488,7 +480,7 @@ After both agents are loaded, remove the old cron entries with `crontab -e` or `
 - Installing Homebrew `rsync` fixed the remaining sync failures. The sync script now prefers `/opt/homebrew/bin/rsync` automatically when available and logs which binary it used on each run.
 - A successful verification run completed at `2026-04-17 21:26:14`, with the log showing `Using rsync binary: /opt/homebrew/bin/rsync` followed by `Sync completed successfully.`
 
-**Recommended macOS setup for `sync-notes-to-icloud.sh`:**
+**Recommended macOS setup for `sync-notes-to-icloud-export.sh`:**
 
 - Scheduler: user `LaunchAgent`, not `cron`
 - Permissions: `Full Disk Access` for `/bin/bash` and `rsync`
@@ -686,7 +678,12 @@ cp ~/config-backup/YYYYMMDD/.configfile ~/.configfile
 | Shell (Bash/Zsh) | `[[ ]]` conditionals, `command -v` guards, snake_case locals | `shellcheck` (if available) |
 | JavaScript/TypeScript | Prettier defaults | `npx prettier --write .` + `npx eslint .` |
 
-Syntax-check shell configs before sourcing:
+Syntax-check and lint configs/scripts in one command:
+```bash
+./scripts/check.sh
+```
+
+Or run individual checks:
 ```bash
 zsh -n ~/.zshrc          # Zsh syntax check
 bash -n ~/.bashrc         # Bash syntax check
@@ -764,7 +761,7 @@ cp -r ~/config-backup/YYYYMMDD/* ~/
 | Package | Contains | Purpose |
 |---------|----------|---------|
 | `git` | .gitconfig, .gitignore_global | Git settings and global ignores |
-| `shell` | .bashrc, .bash_profile, .zshrc, .env.local, functions | Shell configuration (bash for Arch/OMArchy, zsh for macOS) |
+| `shell` | .bashrc, .bash_profile, .zshrc, .config/zsh/, functions | Shell configuration (bash for Arch/OMArchy, zsh for macOS; untracked `.env.local` / `local.zsh` supported) |
 | `vim` | .vimrc | Traditional Vim settings |
 | `config` | .config/nvim/, .config/zed/, .config/hypr/, .config/waybar/, .config/ghostty/, .config/opencode/ | Modern app configurations (Neovim includes GitHub Copilot; OpenCode config, agents, and plugins) |
 | `ssh` | .ssh/config | SSH client settings (no keys) |
@@ -774,6 +771,7 @@ cp -r ~/config-backup/YYYYMMDD/* ~/
 | `logseq` | .logseq/config/, .logseq/custom.css, .logseq/settings/, .logseq/preferences.json, Notes/logseq/custom.css | Logseq knowledge management settings, plugins, and graph-level CSS (graph CSS takes precedence over global) |
 | `homebrew` | Brewfile | Homebrew package list for easy setup |
 | `herdr` | .config/herdr/config.toml | Herdr keybindings for splits, pane close/focus/zoom, tabs, and sidebar |
+| `herdr-core` | .config/herdr-core/templates/ | Herdr desktop app (`hc`) sub-agent role templates (`stow --no-folding`) |
 | `claude` | .claude/settings.json, .claude/statusline.sh | Claude Code Bedrock/SSO config and status bar renderer |
 | `pi` | .config/pi/agent/ | Pi coding agent settings, extensions, and prompt templates |
 

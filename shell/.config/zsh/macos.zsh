@@ -15,13 +15,6 @@ fi
 # Prefer BSD (macOS) open for URLs — already the default, but explicit here
 # so open_url() in common.zsh doesn't need OS branching.
 
-# Re-run fnm env after Homebrew shellenv so fnm shims win over /opt/homebrew/bin/node.
-# Homebrew installs its own node; without this, `fnm use` switches the version fnm
-# tracks but Homebrew's node (earlier in PATH) still answers `which node`.
-if command -v fnm >/dev/null 2>&1; then
-  eval "$(fnm env --use-on-cd --shell zsh)"
-fi
-
 # Persistent ssh-agent via LaunchAgent (scripts/com.fpigeonjr.ssh-agent.plist).
 # launchd keeps a long-lived agent on a fixed socket so git SSH commit signing
 # (gpg.format=ssh) and SSH auth work across shells without re-entering passphrases.
